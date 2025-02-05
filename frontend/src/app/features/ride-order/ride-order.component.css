@@ -1,0 +1,26 @@
+.container {
+    display: flex;
+    width: 100%;
+}
+
+.left {
+    flex: 1;
+    padding: 20px;
+}
+
+.right {
+    flex: 3;
+    display: flex;
+    padding: 20px;
+}
+
+.driver-part {
+    flex: 1;
+    background-color: #f0f0f0;
+    margin-right: 20px;
+}
+
+.map {
+    flex: 4;
+    background-color: #dcdcdc;
+}
