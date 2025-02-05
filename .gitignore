@@ -23,3 +23,20 @@
 hs_err_pid*
 replay_pid*
 *.mov
+
+# Ignoriši Angular build cache fajlove
+/.angular/cache/
+/*.tsbuildinfo
+
+# Node modules
+/node_modules/
+
+# Compiled JavaScript files
+/dist/
+/out-tsc/
+
+# IDE i alatke za razvoj
+.idea/
+/.vscode/
+/*.sublime-workspace
+/*.sublime-project
