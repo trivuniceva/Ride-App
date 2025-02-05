@@ -4,4 +4,11 @@
 
 <div class="right">
     <router-outlet></router-outlet>
+
+    <div class="video-background" *ngIf="showVideo">
+        <video autoplay loop playsinline>
+            <source src="assets/video/vacay.mov" type="video/mp4">
+            Your browser does not support the video tag.
+        </video>
+    </div>
 </div>

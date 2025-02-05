@@ -12,6 +12,7 @@ import {RouterModule} from "@angular/router";
 })
 export class NavbarComponent {
   userRole: any;
+  isSearchActive: boolean = false;
 
   logout() {
 
