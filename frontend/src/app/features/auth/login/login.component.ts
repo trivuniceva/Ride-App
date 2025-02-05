@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import {FormsModule} from "@angular/forms";
+import {Router} from "@angular/router";
 
 @Component({
   selector: 'app-login',
@@ -16,6 +17,8 @@ export class LoginComponent {
     password: string = '';
     errorMessage: string = '';
 
+    constructor( private router: Router) { }
+
     login() {
 
     }
@@ -25,7 +28,7 @@ export class LoginComponent {
     }
 
     goToSignup() {
-
+        this.router.navigate(['/signup'])
     }
 
 
