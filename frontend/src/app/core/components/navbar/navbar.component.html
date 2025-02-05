@@ -4,29 +4,29 @@
     <a routerLink="/login">Login</a>
 </div>
 
-<div *ngIf="userRole === 'REGISTERED_USER'" class="sidenav">
-    <a routerLink="/profile">Profile</a>
-    <a routerLink="/order-ride">Order ride</a>
-    <a routerLink="/ride-history">Ride history</a>
-    <a routerLink="/support">Support</a>
-    <a href="#" (click)="logout()">Logout</a>
-</div>
+<!--<div *ngIf="userRole === 'REGISTERED_USER'" class="sidenav">-->
+<!--    <a routerLink="/profile">Profile</a>-->
+<!--    <a routerLink="/order-ride">Order ride</a>-->
+<!--    <a routerLink="/ride-history">Ride history</a>-->
+<!--    <a routerLink="/support">Support</a>-->
+<!--    <a href="#" (click)="logout()">Logout</a>-->
+<!--</div>-->
 
 
-<div *ngIf="userRole === 'ADMINISTRATOR'" class="sidenav">
-    <a routerLink="/profile">Profile</a>
-    <a routerLink="/create-driver">Create driver</a>
-    <a routerLink="/get-all-driver">Block driver</a>
-    <a routerLink="/ride-history-all">Ride history</a>
+<!--<div *ngIf="userRole === 'ADMINISTRATOR'" class="sidenav">-->
+<!--    <a routerLink="/profile">Profile</a>-->
+<!--    <a routerLink="/create-driver">Create driver</a>-->
+<!--    <a routerLink="/get-all-driver">Block driver</a>-->
+<!--    <a routerLink="/ride-history-all">Ride history</a>-->
 
-    <a href="#" (click)="logout()">Logout</a>
+<!--    <a href="#" (click)="logout()">Logout</a>-->
 
 
-</div>
+<!--</div>-->
 
-<div *ngIf="userRole === 'DRIVER'" class="sidenav">
-    <a routerLink="/profile">Profile</a>
-    <a routerLink="/ride-history-driver">Ride history</a>
-    <a href="#" (click)="logout()">Logout</a>
+<!--<div *ngIf="userRole === 'DRIVER'" class="sidenav">-->
+<!--    <a routerLink="/profile">Profile</a>-->
+<!--    <a routerLink="/ride-history-driver">Ride history</a>-->
+<!--    <a href="#" (click)="logout()">Logout</a>-->
 
-</div>
+<!--</div>-->

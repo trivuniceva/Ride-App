@@ -1,23 +1,23 @@
+
 .sidenav {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
     height: 100%;
-    width: 10%;
-    position: fixed;
-    z-index: 1;
-    top: 0;
-    left: 0;
-    background-color: #111;
-    overflow-x: hidden;
-    padding-top: 20px;
 }
 
 .sidenav a {
-    padding: 8px 8px 8px 28px;
+    color: white;
+    padding: 25px;
     text-decoration: none;
-    color: #818181;
-    display: block;
-    margin-bottom: 32px;
+    font-size: 18px;
+    text-align: center;
+    width: 100%;
+    transition: background-color 0.3s ease;
+    margin-bottom: 45px;
 }
 
 .sidenav a:hover {
-    color: #f1f1f1;
+    color: #575757;
 }

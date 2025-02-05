@@ -1,1 +1,27 @@
 
+
+.left{
+    width: 8%;
+    background-color: black;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: fixed;
+    left: 0;
+    top: 0;
+    bottom: 0;
+}
+
+.right{
+    width: 90%;
+    margin-left: 8%;
+    height: 95vh;
+    padding: 20px;
+    box-sizing: border-box;
+    background-color: white;
+    border-radius: 15px;
+    position: fixed;
+    top: 3%;
+}
+
