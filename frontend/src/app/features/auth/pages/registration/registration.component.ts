@@ -2,7 +2,7 @@ import { Component } from '@angular/core';
 import {FormBuilder, FormGroup, ReactiveFormsModule, Validators} from "@angular/forms";
 import {NgIf} from "@angular/common";
 import {Router} from "@angular/router";
-import {AuthService} from '../../../core/services/auth/auth.service';
+import {AuthService} from '../../../../core/services/auth/auth.service';
 
 @Component({
   selector: 'app-registration',
