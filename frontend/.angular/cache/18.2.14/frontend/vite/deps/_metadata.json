@@ -1,36 +1,60 @@
 {
+<<<<<<< Updated upstream
   "hash": "da21595b",
   "configHash": "691f556a",
   "lockfileHash": "b59525cf",
   "browserHash": "dd0f99b8",
+=======
+  "hash": "c9e68381",
+  "configHash": "19965a5f",
+  "lockfileHash": "193c7084",
+  "browserHash": "29a3da6b",
+>>>>>>> Stashed changes
   "optimized": {
     "@angular/common": {
       "src": "../../../../../../node_modules/@angular/common/fesm2022/common.mjs",
       "file": "@angular_common.js",
+<<<<<<< Updated upstream
       "fileHash": "1838eafa",
+=======
+      "fileHash": "a0b4b49a",
+>>>>>>> Stashed changes
       "needsInterop": false
     },
     "@angular/core": {
       "src": "../../../../../../node_modules/@angular/core/fesm2022/core.mjs",
       "file": "@angular_core.js",
+<<<<<<< Updated upstream
       "fileHash": "cefef569",
+=======
+      "fileHash": "1606ed2f",
+>>>>>>> Stashed changes
       "needsInterop": false
     },
     "@angular/forms": {
       "src": "../../../../../../node_modules/@angular/forms/fesm2022/forms.mjs",
       "file": "@angular_forms.js",
+<<<<<<< Updated upstream
       "fileHash": "a08c5dec",
+=======
+      "fileHash": "a2b1c16e",
+>>>>>>> Stashed changes
       "needsInterop": false
     },
     "@angular/platform-browser": {
       "src": "../../../../../../node_modules/@angular/platform-browser/fesm2022/platform-browser.mjs",
       "file": "@angular_platform-browser.js",
+<<<<<<< Updated upstream
       "fileHash": "8400c75d",
+=======
+      "fileHash": "395f3d71",
+>>>>>>> Stashed changes
       "needsInterop": false
     },
     "@angular/router": {
       "src": "../../../../../../node_modules/@angular/router/fesm2022/router.mjs",
       "file": "@angular_router.js",
+<<<<<<< Updated upstream
       "fileHash": "c0f0e25e",
       "needsInterop": false
     }
@@ -38,6 +62,30 @@
   "chunks": {
     "chunk-LX3WVF5P": {
       "file": "chunk-LX3WVF5P.js"
+=======
+      "fileHash": "1b9e72f4",
+      "needsInterop": false
+    },
+    "leaflet": {
+      "src": "../../../../../../node_modules/leaflet/dist/leaflet-src.js",
+      "file": "leaflet.js",
+      "fileHash": "3245f1af",
+      "needsInterop": true
+    },
+    "@angular/common/http": {
+      "src": "../../../../../../node_modules/@angular/common/fesm2022/http.mjs",
+      "file": "@angular_common_http.js",
+      "fileHash": "3f7ff9e0",
+      "needsInterop": false
+    }
+  },
+  "chunks": {
+    "chunk-N7XYY2Q3": {
+      "file": "chunk-N7XYY2Q3.js"
+    },
+    "chunk-JREMHDRD": {
+      "file": "chunk-JREMHDRD.js"
+>>>>>>> Stashed changes
     },
     "chunk-LC63JU7F": {
       "file": "chunk-LC63JU7F.js"
