@@ -320,20 +320,12 @@ path.leaflet-interactive:focus:not(:focus-visible) {
 	border-radius: 5px;
 	}
 .leaflet-control-layers-toggle {
-<<<<<<< HEAD
 	/*background-image: url(images/layers.png);*/
-=======
-	background-image: url(images/layers.png);
->>>>>>> main
 	width: 36px;
 	height: 36px;
 	}
 .leaflet-retina .leaflet-control-layers-toggle {
-<<<<<<< HEAD
 	/*background-image: url(images/layers-2x.png);*/
-=======
-	background-image: url(images/layers-2x.png);
->>>>>>> main
 	background-size: 26px 26px;
 	}
 .leaflet-touch .leaflet-control-layers-toggle {
@@ -381,11 +373,7 @@ path.leaflet-interactive:focus:not(:focus-visible) {
 
 /* Default icon URLs */
 .leaflet-default-icon-path { /* used only in path-guessing heuristic, see L.Icon.Default */
-<<<<<<< HEAD
 	/*background-image: url(images/marker-icon.png);*/
-=======
-	background-image: url(images/marker-icon.png);
->>>>>>> main
 	}
 
 

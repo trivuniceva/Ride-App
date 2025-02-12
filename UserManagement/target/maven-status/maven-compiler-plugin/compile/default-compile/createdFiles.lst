@@ -1,1 +1,10 @@
+usermanagement/config/SecurityConfig.class
+usermanagement/controller/UserController.class
+usermanagement/model/User.class
 usermanagement/UserManagementApplication.class
+usermanagement/config/WebConfig.class
+usermanagement/service/UserService.class
+usermanagement/repository/UserRepository.class
+usermanagement/controller/AuthController.class
+usermanagement/model/UserRole.class
+usermanagement/service/AuthService.class
