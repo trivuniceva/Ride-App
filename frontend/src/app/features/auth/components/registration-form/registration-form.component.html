@@ -1,5 +1,5 @@
-<form [formGroup]="signupForm" (ngSubmit)="onSubmit()">
-  <div *ngIf="currentStep === 1" class="form-step">
+<form [formGroup]="signupForm">
+<div *ngIf="currentStep === 1" class="form-step">
     <div class="form-group">
       <input id="email" formControlName="email" type="email" placeholder="Email:" class="form-control">
       <div *ngIf="signupForm.get('email')?.invalid && (signupForm.get('email')?.touched || signupForm.get('email')?.dirty)">
@@ -25,8 +25,6 @@
         </small>
       </div>
     </div>
-
-    <button type="button" (click)="goToStep(2)" class="btn btn-next">Next</button>
   </div>
 
   <div *ngIf="currentStep === 2" class="form-step">
@@ -51,8 +49,5 @@
     <div class="form-group">
       <input id="address" formControlName="address" type="text" placeholder="Address:" class="form-control">
     </div>
-
-    <button type="button" (click)="goToStep(1)" class="btn btn-back">Back</button>
-    <button type="submit" class="btn btn-submit">Submit</button>
   </div>
 </form>

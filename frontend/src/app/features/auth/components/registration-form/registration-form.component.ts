@@ -1,6 +1,6 @@
-import { Component, EventEmitter, Output } from '@angular/core';
-import {FormBuilder, FormGroup, ReactiveFormsModule, Validators} from '@angular/forms';
-import {NgIf} from '@angular/common';
+import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
+import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { NgIf } from '@angular/common';
 
 @Component({
   selector: 'app-registration-form',
@@ -12,11 +12,10 @@ import {NgIf} from '@angular/common';
   templateUrl: './registration-form.component.html',
   styleUrls: ['./registration-form.component.css']
 })
-export class RegistrationFormComponent {
+export class RegistrationFormComponent implements OnInit{
+  @Input() currentStep: number = 1;
+  @Output() goToStep: EventEmitter<number> = new EventEmitter();
   signupForm!: FormGroup;
-  currentStep: number = 1;
-
-  @Output() submitForm: EventEmitter<any> = new EventEmitter();
 
   constructor(private fb: FormBuilder) {}
 
@@ -29,28 +28,17 @@ export class RegistrationFormComponent {
       lastname: ['', [Validators.required]],
       address: [''],
       phone: [''],
-    });
+    }, { validator: this.passwordMatchValidator });
   }
 
-  goToStep(step: number): void {
-    this.currentStep = step;
-  }
-
-  onSubmit(): void {
-    if (this.signupForm.invalid || this.signupForm.value.password !== this.signupForm.value.confirmPassword) {
-      console.error('Form is invalid or passwords do not match');
-      return;
+  passwordMatchValidator(group: FormGroup): { [key: string]: boolean } | null {
+    const password = group.get('password')?.value;
+    const confirmPassword = group.get('confirmPassword')?.value;
+    if (password && confirmPassword && password !== confirmPassword) {
+      return { 'passwordMismatch': true };
     }
-
-    const userData = {
-      email: this.signupForm.value.email,
-      password: this.signupForm.value.password,
-      firstname: this.signupForm.value.firstname,
-      lastname: this.signupForm.value.lastname,
-      address: this.signupForm.value.address,
-      phone: this.signupForm.value.phone,
-    };
-
-    this.submitForm.emit(userData);
+    return null;
   }
+
+
 }
