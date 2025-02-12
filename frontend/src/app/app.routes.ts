@@ -6,6 +6,7 @@ import {RideOrderComponent} from "./features/ride/ride-order/ride-order.componen
 import {UserProfileComponent} from "./features/user-profile/user-profile.component";
 import {ForgotPasswordComponent} from './features/auth/pages/forgot-password/forgot-password.component';
 import {ResetPasswordComponent} from './features/auth/pages/reset-password/reset-password.component';
+import {CreateDriverComponent} from './features/admin/create-driver/create-driver.component';
 
 
 export const routes: Routes = [
@@ -18,6 +19,7 @@ export const routes: Routes = [
     {path: 'order-ride', component: RideOrderComponent},
     {path: 'forgot-password', component: ForgotPasswordComponent},
     { path: 'reset-password', component: ResetPasswordComponent },
+    { path: 'create-driver', component: CreateDriverComponent },
 
 
 ];
