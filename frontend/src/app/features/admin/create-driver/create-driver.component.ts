@@ -3,13 +3,15 @@ import {RegistrationFormComponent} from '../../auth/components/registration-form
 import {Router} from '@angular/router';
 import {AuthService} from '../../../core/services/auth/auth.service';
 import {NgIf} from '@angular/common';
+import {VehicleFormComponent} from '../vehicle-form/vehicle-form.component';
 
 @Component({
   selector: 'app-create-driver',
   standalone: true,
   imports: [
     RegistrationFormComponent,
-    NgIf
+    NgIf,
+    VehicleFormComponent
   ],
   templateUrl: './create-driver.component.html',
   styleUrl: './create-driver.component.css'

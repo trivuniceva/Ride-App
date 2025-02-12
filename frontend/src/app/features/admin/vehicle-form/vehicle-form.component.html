@@ -1,0 +1,28 @@
+<form [formGroup]="vehicleForm">
+  <div *ngIf="currentStep === 1" class="form-step">
+    <div class="form-group">
+      <input id="registrationNumber" formControlName="registrationNumber" type="text" placeholder="Registration Number:" class="form-control">
+      <div *ngIf="vehicleForm.get('registrationNumber')?.invalid && (vehicleForm.get('registrationNumber')?.touched || vehicleForm.get('registrationNumber')?.dirty)">
+        <small class="text-danger" *ngIf="vehicleForm.get('registrationNumber')?.errors?.['required']">Registration Number is required.</small>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <input id="vehicleName" formControlName="vehicleName" type="text" placeholder="Vehicle Name:" class="form-control">
+      <div *ngIf="vehicleForm.get('vehicleName')?.invalid && (vehicleForm.get('vehicleName')?.touched || vehicleForm.get('vehicleName')?.dirty)">
+        <small class="text-danger" *ngIf="vehicleForm.get('vehicleName')?.errors?.['required']">Vehicle Name is required.</small>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <select id="vehicleType" formControlName="vehicleType" class="form-control">
+        <option value="" disabled selected>Select Vehicle Type:</option>
+        <option *ngFor="let type of vehicleTypes" [value]="type">{{ type }}</option>
+      </select>
+      <div *ngIf="vehicleForm.get('vehicleType')?.invalid && (vehicleForm.get('vehicleType')?.touched || vehicleForm.get('vehicleType')?.dirty)">
+        <small class="text-danger" *ngIf="vehicleForm.get('vehicleType')?.errors?.['required']">Vehicle Type is required.</small>
+      </div>
+    </div>
+
+  </div>
+</form>

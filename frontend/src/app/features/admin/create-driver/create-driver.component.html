@@ -18,6 +18,8 @@
   </div>
 
   <div *ngIf="currentStep === 3">
+    <app-vehicle-form></app-vehicle-form>
+    <button type="button" (click)="goToStep(2)" class="btn btn-next">Back</button>
     <button type="button" (click)="registerDriver()" class="btn btn-submit">Submit</button>
 
   </div>
