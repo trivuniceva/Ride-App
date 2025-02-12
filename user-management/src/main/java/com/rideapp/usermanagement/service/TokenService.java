@@ -8,12 +8,8 @@ import java.util.UUID;
 @Service
 public class TokenService {
 
-    public String generateActivationToken() {
+    public String generateToken() {
         return UUID.randomUUID().toString();
     }
 
-
-    public String generateResetToken(User user) {
-        return UUID.randomUUID().toString();
-    }
 }

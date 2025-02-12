@@ -29,23 +29,23 @@ export class ForgotPasswordComponent {
       return;
     }
 
-    // this.userService.requestPasswordReset(this.email).subscribe({
-    //   next: (response: any) => {
-    //     // Proveri da li je odgovor uspešan i prikazi poruku
-    //     console.log(response);
-    //     if (response && typeof response === 'string') {
-    //       alert(response);
-    //     } else {
-    //       alert('Password reset email sent if email exists.');
-    //     }
-    //
-    //     this.goToLogin();
-    //   },
-    //   error: (err: HttpErrorResponse) => {
-    //     this.errorMessage = 'An error occurred while sending the password reset email.';
-    //     console.error(err);
-    //   }
-    // });
+    this.userService.requestPasswordReset(this.email).subscribe({
+      next: (response: any) => {
+        // Proveri da li je odgovor uspešan i prikazi poruku
+        console.log(response);
+        if (response && typeof response === 'string') {
+          alert(response);
+        } else {
+          alert('Password reset email sent if email exists.');
+        }
+
+        this.goToLogin();
+      },
+      error: (err: HttpErrorResponse) => {
+        this.errorMessage = 'An error occurred while sending the password reset email.';
+        console.error(err);
+      }
+    });
   }
 
 
