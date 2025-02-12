@@ -4,6 +4,7 @@ import {HomeComponent} from "./pages/home/home.component";
 import {RegistrationComponent} from "./features/auth/registration/registration.component";
 import {RideOrderComponent} from "./features/ride/ride-order/ride-order.component";
 import {UserProfileComponent} from "./features/user-profile/user-profile.component";
+import {ForgotPasswordComponent} from './features/auth/pages/forgot-password/forgot-password.component';
 
 
 export const routes: Routes = [
@@ -13,5 +14,7 @@ export const routes: Routes = [
     {path: 'ride', component: RideOrderComponent},
     {path: 'profile', component: UserProfileComponent},
     {path: 'order-ride', component: RideOrderComponent},
+    {path: 'order-ride', component: RideOrderComponent},
+    {path: 'forgot-password', component: ForgotPasswordComponent},
 
 ];

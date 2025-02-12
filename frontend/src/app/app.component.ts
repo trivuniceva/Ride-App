@@ -26,7 +26,7 @@ export class AppComponent {
   ngOnInit(): void {
     this.router.events.subscribe(() => {
       const currentPath = this.router.url;
-      this.showVideo = currentPath === '/login' || currentPath === '/' || currentPath === '/signup';
+      this.showVideo = currentPath === '/login' || currentPath === '/' || currentPath === '/signup' || currentPath === '/forgot-password';
     });
   }
 }
