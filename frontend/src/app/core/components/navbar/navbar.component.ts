@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import {RouterModule} from "@angular/router";
 import {NgClass, NgIf} from "@angular/common";
 import {AuthService} from "../../services/auth/auth.service";
@@ -14,7 +14,7 @@ import {AuthService} from "../../services/auth/auth.service";
   templateUrl: './navbar.component.html',
   styleUrl: './navbar.component.css'
 })
-export class NavbarComponent {
+export class NavbarComponent implements OnInit{
   userRole: string = '';
   isSearchActive: boolean = false;
 
