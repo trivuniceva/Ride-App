@@ -1,8 +1,14 @@
 package usermanagement.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import usermanagement.DTO.RegisterRequest;
+import usermanagement.model.SuccessResponse;
 import usermanagement.model.User;
+import usermanagement.model.ErrorResponse;
+import usermanagement.model.UserRole;
 import usermanagement.repository.UserRepository;
 
 
@@ -11,6 +17,12 @@ public class AuthService {
 
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private UserRepository userRepository;
+
+    @Autowired
+    private TokenService tokenService;
 
     public User login(String email, String password) {
         System.out.println("email: " + email);
@@ -22,6 +34,42 @@ public class AuthService {
             return user;
         }
         return null;
+    }
+
+
+    public ResponseEntity<?> signup(RegisterRequest registerRequest) {
+
+        System.out.println("RegisterRequest password: " + registerRequest.getPassword());
+
+        if (userService.getUserByEmail(registerRequest.getEmail()) != null) {
+            return ResponseEntity.status(400).body(new ErrorResponse("Email is already in use."));
+        }
+
+        User newUser = new User();
+        newUser.setEmail(registerRequest.getEmail());
+        newUser.setPassword(registerRequest.getPassword());
+        newUser.setFirstname(registerRequest.getFirstname());
+        newUser.setLastname(registerRequest.getLastname());
+        newUser.setAddress(registerRequest.getAddress());
+        newUser.setPhone(registerRequest.getPhone());
+        newUser.setUserRole(UserRole.REGISTERED_USER);
+        newUser.setResetToken(tokenService.generateActivationToken());
+
+        try {
+            userRepository.save(newUser);
+            System.out.println("snimio korisnika");
+            String token = tokenService.generateResetToken(newUser);
+            newUser.setResetToken(token);
+
+            return ResponseEntity.ok(new SuccessResponse("Registration successful! Please check your email to activate your account."));
+
+        } catch (Exception e) {
+            System.err.println("Error saving user: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ErrorResponse("Failed to save user."));
+        }
+
+
+
     }
 
 

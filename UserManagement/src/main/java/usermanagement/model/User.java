@@ -30,6 +30,8 @@ public class User {
     @Column(name = "reset_token")
     private String resetToken;
 
+    @Column(name = "address")
+    private String address;
 
     @Column(name = "phone")
     private String phone;
@@ -120,6 +122,14 @@ public class User {
         this.profilePic = profilePic;
     }
 
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
+    }
+
     @Override
     public String toString() {
         return "User{" +
@@ -130,6 +140,7 @@ public class User {
                 ", lastname='" + lastname + '\'' +
                 ", userRole=" + userRole +
                 ", resetToken='" + resetToken + '\'' +
+                ", address='" + address + '\'' +
                 ", phone='" + phone + '\'' +
                 ", isActive=" + isActive +
                 ", profilePic='" + profilePic + '\'' +

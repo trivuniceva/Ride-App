@@ -8,6 +8,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import usermanagement.DTO.RegisterRequest;
+import usermanagement.model.SuccessResponse;
 import usermanagement.model.User;
 import usermanagement.service.AuthService;
 
@@ -29,6 +31,20 @@ public class AuthController {
         System.out.println("user::: " + user.toString());
         return ResponseEntity.ok(user);
     }
+
+    @PostMapping("/signup")
+    public ResponseEntity<?> registerUser(@RequestBody RegisterRequest registerRequest) {
+
+        System.out.println("Registration request received: " + registerRequest.getEmail());
+
+        System.out.println(" - - - - - - - ");
+        System.out.println(registerRequest.toString());
+
+        authService.signup(registerRequest);
+
+        return ResponseEntity.ok(new SuccessResponse("Registration successful!"));
+    }
+
 
 
 
