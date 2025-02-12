@@ -32,22 +32,5 @@ public class UserController {
         return userService.resetPassword(request);
     }
 
-//    @PostMapping("/reset-password")
-//    public ResponseEntity<?> resetPassword(@RequestBody ResetPasswordRequest request) {
-//        System.out.println("Token received: " + request.getToken());
-//        System.out.println("New Password received: " + request.getNewPassword());
-//
-//        User user = userService.findByResetToken(request.getToken());
-//        if (user == null) {
-//            return ResponseEntity.badRequest().body(new ErrorResponse("Invalid token."));
-//        }
-//
-//        user.setPassword(request.getNewPassword());
-//        user.setResetToken(null);
-//        userService.save(user);
-//
-//        return ResponseEntity.ok(new SuccessResponse("Password reset successfully."));
-//    }
-
 
 }

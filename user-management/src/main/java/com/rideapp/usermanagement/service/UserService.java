@@ -65,19 +65,7 @@ public class UserService {
         user.setPassword(request.getNewPassword());
         user.setResetToken(null);
         userRepository.save(user);
-        System.out.println("snimioooo novi sifru");
-
         return ResponseEntity.ok(new SuccessResponse("Password reset successfully."));
     }
 
-
-    public User findByResetToken(String token) {
-        return userRepository.findByResetToken(token);
-    }
-
-
-    public void save(User user) {
-        userRepository.save(user);
-        System.out.println("maaaaac mac mac");
-    }
 }
