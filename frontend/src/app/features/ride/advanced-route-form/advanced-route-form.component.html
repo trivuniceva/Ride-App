@@ -1,0 +1,50 @@
+<div class="route-form-container">
+  <h2>Advanced Route Options</h2>
+
+  <label for="stops">Add Intermediate Stops:</label>
+  <input class="form-control" type="text" id="stops" placeholder="Enter stop location" (keyup.enter)="addStop($event)">
+
+  <ul>
+    <li *ngFor="let stop of stops">{{ stop }} <button (click)="removeStop(stop)">X</button></li>
+  </ul>
+
+  <!-- Route Optimization -->
+  <label for="optimization">Route Optimization:</label>
+  <select id="optimization" [(ngModel)]="selectedOptimization">
+    <option value="fastest">Fastest Arrival Time</option>
+    <option value="shortest">Shortest Distance</option>
+    <option value="cheapest">Lowest Fare</option>
+  </select>
+
+  <br><br>
+  <label for="passengers">Link Passengers (Email):</label>
+  <input class="form-control" type="email" id="passengers" placeholder="Enter email" (keyup.enter)="addPassenger($event)">
+
+  <ul>
+    <li *ngFor="let passenger of passengers">{{ passenger }} <button (click)="removePassenger(passenger)">X</button></li>
+  </ul>
+
+  <!-- Vehicle Preferences -->
+  <label for="vehicle">Vehicle Type:</label>
+  <select id="vehicle" [(ngModel)]="selectedVehicle">
+    <option value="standard">Standard</option>
+    <option value="luxury">Luxury</option>
+    <option value="van">Van</option>
+  </select>
+
+  <!-- Additional Preferences -->
+  <br><br>
+  <div>
+    <input  type="checkbox" id="baby" [(ngModel)]="babyOnBoard">
+    <label for="baby">Baby on Board</label>
+  </div>
+
+  <br><br>
+
+  <div>
+    <input type="checkbox" id="pets" [(ngModel)]="petsAllowed">
+    <label for="pets">Pets Allowed</label>
+  </div>
+
+  <button class="btn btn-primary" (click)="submitRidePreferences()">Confirm Ride Preferences</button>
+</div>
