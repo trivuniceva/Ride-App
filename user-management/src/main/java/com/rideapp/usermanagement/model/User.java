@@ -3,7 +3,7 @@ package com.rideapp.usermanagement.model;
 import jakarta.persistence.*;
 
 @Entity
-@Table(name = "nvt_users")
+@Table(name = "users")
 @Inheritance(strategy = InheritanceType.JOINED)
 public class User {
     @Id
