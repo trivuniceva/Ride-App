@@ -60,12 +60,12 @@ export class LoginComponent {
 
 
   forgotPassword() {
+    this.router.navigate(['/forgot-password'])
+  }
 
-    }
-
-    goToSignup() {
-        this.router.navigate(['/signup'])
-    }
+  goToSignup() {
+      this.router.navigate(['/signup'])
+  }
 
 
 }

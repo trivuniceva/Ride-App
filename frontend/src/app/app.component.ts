@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import {Component, OnInit, ViewEncapsulation} from '@angular/core';
 import {ActivatedRoute, Router, RouterOutlet} from '@angular/router';
 import {HomeComponent} from "./pages/home/home.component";
 import {NavbarComponent} from "./core/components/navbar/navbar.component";
@@ -14,9 +14,10 @@ import {NgIf} from "@angular/common";
       NgIf,
   ],
   templateUrl: './app.component.html',
-  styleUrl: './app.component.css'
+  styleUrl: './app.component.css',
+  encapsulation: ViewEncapsulation.None,
 })
-export class AppComponent {
+export class AppComponent implements OnInit{
   title = 'frontend';
   showVideo: boolean = false;
 
@@ -25,7 +26,11 @@ export class AppComponent {
   ngOnInit(): void {
     this.router.events.subscribe(() => {
       const currentPath = this.router.url;
-      this.showVideo = currentPath === '/login' || currentPath === '/' || currentPath === '/signup';
+      this.showVideo = currentPath === '/login' ||
+        currentPath === '/' ||
+        currentPath === '/signup' ||
+        currentPath.startsWith('/reset-password') ||
+        currentPath === '/forgot-password';
     });
   }
 }

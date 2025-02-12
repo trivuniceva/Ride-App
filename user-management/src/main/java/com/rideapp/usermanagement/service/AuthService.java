@@ -53,12 +53,12 @@ public class AuthService {
         newUser.setAddress(registerRequest.getAddress());
         newUser.setPhone(registerRequest.getPhone());
         newUser.setUserRole(UserRole.REGISTERED_USER);
-        newUser.setResetToken(tokenService.generateActivationToken());
+        newUser.setResetToken(tokenService.generateToken());
 
         try {
             userRepository.save(newUser);
             System.out.println("snimio korisnika");
-            String token = tokenService.generateResetToken(newUser);
+            String token = tokenService.generateToken();
             newUser.setResetToken(token);
             emailService.sendActivationEmail(newUser.getEmail(), newUser.getResetToken());
 
