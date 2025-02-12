@@ -1,0 +1,27 @@
+<div class="route-form-container">
+    <h2>Prikazi putanje</h2>
+
+    <form (submit)="submitRouteData(startAddress.value, destinationAddress.value)">
+        <div class="form-group">
+            <input
+                    type="text"
+                    id="startAddress"
+                    #startAddress
+                    placeholder="Unesite polazište"
+                    class="form-control"
+            >
+        </div>
+
+        <div class="form-group">
+            <input
+                    type="text"
+                    id="destinationAddress"
+                    #destinationAddress
+                    placeholder="Unesite destinaciju"
+                    class="form-control"
+            >
+        </div>
+
+        <button type="submit" class="btn btn-primary">Prikazi putanje</button>
+    </form>
+</div>

@@ -11,7 +11,6 @@ public class UserService {
     @Autowired
     private UserRepository userRepository;
 
-
     public User getUserByEmail(String email) {
         return userRepository.findByEmail(email);
     }
@@ -23,8 +22,5 @@ public class UserService {
     public boolean validPassword(User user, String password) {
         return user.getPassword().equals(password);
     }
-
-
-
 
 }

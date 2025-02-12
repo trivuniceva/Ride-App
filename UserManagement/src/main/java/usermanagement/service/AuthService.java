@@ -2,7 +2,9 @@ package usermanagement.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import usermanagement.model.User;
 import usermanagement.repository.UserRepository;
+
 
 @Service
 public class AuthService {
@@ -16,8 +18,8 @@ public class AuthService {
 
         User user = userService.getUserByEmail(email);
         if (user != null && userService.validPassword(user, password)) {
-                System.out.println("dobar korisnik: " + user.getProfilePic());
-                return user;
+            System.out.println("dobar korisnik: " + user.getProfilePic());
+            return user;
         }
         return null;
     }

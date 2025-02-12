@@ -1,0 +1,128 @@
+.homepage-container {
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    height: 100vh;
+    overflow-y: auto;
+}
+
+
+.welcome-section {
+    text-align: center;
+    padding: 60px 20px;
+    color: #f8f9fa;
+}
+
+.welcome-content {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.welcome-section h1 {
+    font-size: 3em;
+    margin-bottom: 20px;
+    color: white;
+    /*text-shadow: 2px 2px 6px rgba(1, 28, 20, 2)*/
+    text-shadow: 5px -1px 8px rgba(30,30,30, 2)
+
+}
+
+.welcome-section p {
+    font-size: 1.2em;
+    margin-bottom: 30px;
+    color: white;
+    /*text-shadow: 2px 2px 2.5px rgba(1, 28, 20, 1)*/
+    text-shadow: 2px 2px 8px rgba(30,30,30, 2)
+}
+
+.btn-primary {
+    background-color: #3b5998;
+
+}
+
+.btn-primary {
+    background-color: #007bff;
+}
+
+.btn-secondary {
+    background-color: #6c757d;
+    color: white;
+    padding: 15px 25px;
+    border: none;
+    border-radius: 4px;
+    font-size: 1.2em;
+    cursor: pointer;
+    margin: 0 10px;
+}
+
+.btn-primary:hover, .btn-secondary:hover {
+    opacity: 0.9;
+}
+
+.featured-rides {
+    padding: 40px 20px;
+    text-align: center;
+}
+
+.featured-rides h2 {
+    margin-bottom: 20px;
+    color: white;
+    /*text-shadow: 2px 2px 3.5px rgba(1, 38, 30, 1)*/
+    text-shadow: 2px 2px 8px rgba(30,30,30, 2)
+
+}
+
+.ride-cards {
+    display: flex;
+    justify-content: space-around;
+    flex-wrap: wrap;
+}
+
+.ride-card {
+    color: white;
+    background-color: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(7px);
+    border-radius: 8px;
+    padding: 20px;
+    width: 30%;
+    margin: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.ride-card h3 {
+    margin-top: 0;
+}
+
+/* App Features Section */
+.app-features {
+    padding: 40px 20px;
+    background-color: #f1f1f1;
+    text-align: center;
+}
+
+.app-features h2 {
+    margin-bottom: 20px;
+}
+
+.feature {
+    display: inline-block;
+    width: 30%;
+    margin: 20px 1.5%;
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.feature .icon {
+    font-size: 3em;
+    margin-bottom: 10px;
+}
+
+.feature h3 {
+    margin: 0 0 10px 0;
+}
+
+.feature p {
+    margin: 0;
+}
