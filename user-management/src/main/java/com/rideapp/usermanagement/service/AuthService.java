@@ -60,7 +60,7 @@ public class AuthService {
             System.out.println("snimio korisnika");
             String token = tokenService.generateResetToken(newUser);
             newUser.setResetToken(token);
-//            emailService.sendActivationEmail(newUser.getEmail(), newUser.getResetToken());
+            emailService.sendActivationEmail(newUser.getEmail(), newUser.getResetToken());
 
             return ResponseEntity.ok(new SuccessResponse("Registration successful! Please check your email to activate your account."));
 

@@ -10,8 +10,6 @@ import org.springframework.context.annotation.Import;
 public class RideAppApplication {
 
     public static void main(String[] args) {
-
         SpringApplication.run(RideAppApplication.class, args);
-//        SpringApplication.run(UserManagementApplication.class, args);
     }
 }
