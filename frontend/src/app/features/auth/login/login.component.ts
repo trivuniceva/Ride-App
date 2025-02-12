@@ -25,8 +25,8 @@ export class LoginComponent {
         this.authService.login(this.email, this.password).subscribe(
             response => {
                 console.log('Login successful', response);
-                // this.authService.storageHandle({ user: response });
-                // this.router.navigate(['/profile']);
+                this.authService.storageHandle({ user: response });
+                this.router.navigate(['/profile']);
             },
             error => {
                 console.error('Login failed', error);

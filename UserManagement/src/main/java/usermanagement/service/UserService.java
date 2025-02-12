@@ -12,6 +12,7 @@ public class UserService {
     private UserRepository userRepository;
 
     public User getUserByEmail(String email) {
+        System.out.println("userRepository.findByEmail(email);  " + userRepository.findByEmail(email));
         return userRepository.findByEmail(email);
     }
 
@@ -20,6 +21,7 @@ public class UserService {
     }
 
     public boolean validPassword(User user, String password) {
+        System.out.println("user.getPassword().equals(password); " + user.getPassword().equals(password));
         return user.getPassword().equals(password);
     }
 

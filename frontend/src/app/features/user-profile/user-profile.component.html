@@ -1,0 +1,38 @@
+<div *ngIf="user" class="profile-container">
+
+    <div  class="image-container">
+        <img [src]="user.profilePic" alt="Profilna slika" class="profile-image" />
+    </div>
+
+    <div class="form-group">
+        <label for="firstname">Name:</label>
+        <input id="firstname" [(ngModel)]="user.firstname" [readonly]="!isEditing" type="text" />
+    </div>
+
+    <div class="form-group">
+        <label for="lastname">Last Name:</label>
+        <input id="lastname" [(ngModel)]="user.lastname" [readonly]="!isEditing" type="text" />
+    </div>
+
+    <div class="form-group">
+        <label for="email">Email:</label>
+        <input id="email" [(ngModel)]="user.email" readonly type="email" />
+    </div>
+
+    <div class="form-group">
+        <label for="profilePicture">Add new profile picture:</label>
+        <input type="file" id="profilePicture" (change)="onFileSelected($event)" [disabled]="!isEditing" />
+    </div>
+
+    <div class="button-container">
+        <button *ngIf="!isEditing" (click)="enableEditing()">Edit</button>
+        <button style="background-color: #B80C09;" *ngIf="!isEditing" (click)="deleteAcc()">Delete</button>
+        <button *ngIf="isEditing" (click)="saveChanges()">Save</button>
+        <button style="background-color: #555" *ngIf="isEditing" (click)="cancelEditing()">Cancel</button>
+    </div>
+
+</div>
+
+<div *ngIf="!user" class="profile-container">
+    <p>Nemate prijavljene korisnike.</p>
+</div>
