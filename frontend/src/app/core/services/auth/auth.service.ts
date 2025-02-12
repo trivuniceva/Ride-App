@@ -27,6 +27,10 @@ export class AuthService {
     this.userRoleSubject.next(user.userRole);
   }
 
+  logout() {
+    localStorage.removeItem('loggedUser');
+    this.userRoleSubject.next('');
+  }
 
 
 
