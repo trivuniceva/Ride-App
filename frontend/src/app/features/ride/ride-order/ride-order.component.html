@@ -3,6 +3,11 @@
     <div class="left">
         <app-route-form (routeDataSubmitted)="handleRouteData($event)"></app-route-form>
 
+        <app-advanced-route-form
+          *ngIf="userRole === 'REGISTERED_USER'"
+          (routePreferencesSubmitted)="handleAdvancedRoutePreferences($event)">
+        </app-advanced-route-form>
+
     </div>
 
 

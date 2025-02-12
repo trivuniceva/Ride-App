@@ -12,5 +12,6 @@ export const routes: Routes = [
     {path: 'signup', component: RegistrationComponent},
     {path: 'ride', component: RideOrderComponent},
     {path: 'profile', component: UserProfileComponent},
+    {path: 'order-ride', component: RideOrderComponent},
 
 ];
