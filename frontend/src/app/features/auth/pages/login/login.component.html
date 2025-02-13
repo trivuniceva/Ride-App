@@ -1,0 +1,14 @@
+<div class="login-container">
+
+    <h2>Login</h2>
+
+  <app-login-form (loginEvent)="handleLogin($event)"> </app-login-form>
+
+  <p (click)="forgotPassword()" class="link-text">Forgot password?</p>
+
+  <p class="signup-text">
+    Don't have an account? <strong (click)="goToSignup()" class="signup-link">Signup</strong>
+  </p>
+
+
+</div>

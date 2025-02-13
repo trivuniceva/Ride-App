@@ -1,6 +1,6 @@
-package com.rideapp.usermanagement.DTO;
+package com.rideapp.usermanagement.dto;
 
-public class ForgotPasswordRequest {
+public class ForgotPasswordRequestDTO {
     private String email;
 
     public String getEmail() {

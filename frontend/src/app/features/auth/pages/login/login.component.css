@@ -1,0 +1,17 @@
+.login-container {
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    max-width: 400px;
+    margin: 8% auto;
+    padding: 20px;
+    text-align: center;
+    color: white;
+    background-color: rgba(30,30,30, 0.1);
+    backdrop-filter: blur(10px);
+    border-radius: 8px;
+}
+
+h2 {
+    margin-bottom: 20px;
+}

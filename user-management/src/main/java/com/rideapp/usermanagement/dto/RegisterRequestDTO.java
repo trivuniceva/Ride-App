@@ -1,6 +1,6 @@
-package com.rideapp.usermanagement.DTO;
+package com.rideapp.usermanagement.dto;
 
-public class RegisterRequest {
+public class RegisterRequestDTO {
     private String email;
     private String password;
     private String confirmPassword;
