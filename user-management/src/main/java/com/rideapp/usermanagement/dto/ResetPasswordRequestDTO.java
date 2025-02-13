@@ -1,6 +1,6 @@
-package com.rideapp.usermanagement.DTO;
+package com.rideapp.usermanagement.dto;
 
-public class ResetPasswordRequest {
+public class ResetPasswordRequestDTO {
     private String token;
     private String newPassword;
 

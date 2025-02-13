@@ -1,9 +1,10 @@
 package com.rideapp.usermanagement.controller;
 
 
-import com.rideapp.usermanagement.DTO.RegisterRequest;
+import com.rideapp.usermanagement.dto.RegisterRequestDTO;
 import com.rideapp.usermanagement.model.SuccessResponse;
 import com.rideapp.usermanagement.model.User;
+import com.rideapp.usermanagement.model.UserRole;
 import com.rideapp.usermanagement.service.AuthService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -33,17 +34,19 @@ public class AuthController {
     }
 
     @PostMapping("/signup")
-    public ResponseEntity<?> registerUser(@RequestBody RegisterRequest registerRequest) {
+    public ResponseEntity<?> registerUser(@RequestBody RegisterRequestDTO registerRequest) {
 
         System.out.println("Registration request received: " + registerRequest.getEmail());
 
         System.out.println(" - - - - - - - ");
         System.out.println(registerRequest.toString());
 
-        authService.signup(registerRequest);
+        authService.signup(registerRequest, UserRole.REGISTERED_USER);
 
         return ResponseEntity.ok(new SuccessResponse("Registration successful!"));
     }
+
+
 
 
 

@@ -4,7 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import com.rideapp.usermanagement.DTO.RegisterRequest;
+import com.rideapp.usermanagement.dto.RegisterRequestDTO;
 import com.rideapp.usermanagement.model.*;
 import com.rideapp.usermanagement.repository.UserRepository;
 
@@ -36,12 +36,8 @@ public class AuthService {
         return null;
     }
 
-
-    public ResponseEntity<?> signup(RegisterRequest registerRequest) {
-
-        System.out.println("RegisterRequest password: " + registerRequest.getPassword());
-
-        if (userService.getUserByEmail(registerRequest.getEmail()) != null) {
+    public ResponseEntity<?> signup(RegisterRequestDTO registerRequest, UserRole userRole) {
+        if(isEmailTaken(registerRequest.getEmail())){
             return ResponseEntity.status(400).body(new ErrorResponse("Email is already in use."));
         }
 
@@ -52,7 +48,7 @@ public class AuthService {
         newUser.setLastname(registerRequest.getLastname());
         newUser.setAddress(registerRequest.getAddress());
         newUser.setPhone(registerRequest.getPhone());
-        newUser.setUserRole(UserRole.REGISTERED_USER);
+        newUser.setUserRole(userRole);
         newUser.setResetToken(tokenService.generateToken());
 
         try {
@@ -68,10 +64,10 @@ public class AuthService {
             System.err.println("Error saving user: " + e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ErrorResponse("Failed to save user."));
         }
-
-
-
     }
 
+    private boolean isEmailTaken(String email){
+        return userService.getUserByEmail(email) != null;
+    }
 
 }

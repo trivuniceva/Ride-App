@@ -1,13 +1,12 @@
 package com.rideapp.usermanagement.service;
 
-import com.rideapp.usermanagement.DTO.ResetPasswordRequest;
+import com.rideapp.usermanagement.dto.ResetPasswordRequestDTO;
 import com.rideapp.usermanagement.model.EmailService;
 import com.rideapp.usermanagement.model.ErrorResponse;
 import com.rideapp.usermanagement.model.SuccessResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.mail.SimpleMailMessage;
 import org.springframework.stereotype.Service;
 import com.rideapp.usermanagement.repository.UserRepository;
 import com.rideapp.usermanagement.model.User;
@@ -56,7 +55,7 @@ public class UserService {
     }
 
 
-    public ResponseEntity<?> resetPassword(ResetPasswordRequest request) {
+    public ResponseEntity<?> resetPassword(ResetPasswordRequestDTO request) {
         User user = userRepository.findByResetToken(request.getToken());
         if (user == null) {
             return ResponseEntity.badRequest().body(new ErrorResponse("Invalid token."));

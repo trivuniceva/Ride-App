@@ -26,7 +26,6 @@ export class VehicleFormComponent implements OnInit{
       registrationNumber: ['', Validators.required],
       vehicleName: ['', Validators.required],
       vehicleType: ['', Validators.required],
-      driverId: ['', Validators.required]
     });
   }
 
