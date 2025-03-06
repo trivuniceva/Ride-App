@@ -2,8 +2,8 @@ package backend.rideapp.service;
 
 import backend.rideapp.dto.DriverRegistrationDTO;
 import backend.rideapp.dto.VehicleDTO;
-import backend.rideapp.model.Vehicle;
-import backend.rideapp.model.VehicleType;
+import ridemanagement.backend.model.Vehicle;
+import ridemanagement.backend.model.VehicleType;
 import backend.rideapp.repository.VehicleRepository;
 import com.rideapp.usermanagement.dto.RegisterRequestDTO;
 import com.rideapp.usermanagement.model.ErrorResponse;
