@@ -1,4 +1,4 @@
-package backend.rideapp.model;
+package ridemanagement.backend.model;
 
 import com.rideapp.usermanagement.model.User;
 import jakarta.persistence.*;

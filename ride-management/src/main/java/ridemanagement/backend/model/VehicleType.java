@@ -1,4 +1,4 @@
-package backend.rideapp.model;
+package ridemanagement.backend.model;
 
 public enum VehicleType {
     STANDARD,
