@@ -20,7 +20,8 @@
         <div class="driver-name">{{ driver.firstname }} {{ driver.lastname }}</div>
       </div>
       <div class="driver-time">
-        {{ driver.timeOfLogin ? (driver.timeOfLogin | date:'short') : 'N/A' }}
+<!--        {{ driver.timeOfLogin ? (driver.timeOfLogin | date:'short') : 'N/A' }}-->
+        <p>{{ remainingTimes[driver.id] || 'N/A' }}</p>
       </div>
     </div>
   </div>
