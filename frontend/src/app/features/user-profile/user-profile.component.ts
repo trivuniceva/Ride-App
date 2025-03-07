@@ -6,14 +6,13 @@ import {FormsModule} from "@angular/forms";
 import {NgIf} from "@angular/common";
 
 @Component({
-  selector: 'app-user-profile',
-  standalone: true,
-  imports: [
-    NgIf,
-    FormsModule
-  ],
-  templateUrl: './user-profile.component.html',
-  styleUrl: './user-profile.component.css'
+    selector: 'app-user-profile',
+    imports: [
+        NgIf,
+        FormsModule
+    ],
+    templateUrl: './user-profile.component.html',
+    styleUrl: './user-profile.component.css'
 })
 export class UserProfileComponent {
 

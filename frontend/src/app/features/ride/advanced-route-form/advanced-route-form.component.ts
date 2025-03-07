@@ -3,11 +3,10 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
 @Component({
-  selector: 'app-advanced-route-form',
-  standalone: true,
-  imports: [CommonModule, FormsModule],
-  templateUrl: './advanced-route-form.component.html',
-  styleUrls: ['./advanced-route-form.component.css']
+    selector: 'app-advanced-route-form',
+    imports: [CommonModule, FormsModule],
+    templateUrl: './advanced-route-form.component.html',
+    styleUrls: ['./advanced-route-form.component.css']
 })
 export class AdvancedRouteFormComponent {
   stops: string[] = [];

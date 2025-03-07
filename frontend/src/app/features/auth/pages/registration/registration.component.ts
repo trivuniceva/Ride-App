@@ -5,14 +5,13 @@ import { RegistrationFormComponent } from '../../components/registration-form/re
 import {NgIf} from '@angular/common';
 
 @Component({
-  selector: 'app-registration',
-  standalone: true,
-  imports: [
-    RegistrationFormComponent,
-    NgIf
-  ],
-  templateUrl: './registration.component.html',
-  styleUrls: ['./registration.component.css']
+    selector: 'app-registration',
+    imports: [
+        RegistrationFormComponent,
+        NgIf
+    ],
+    templateUrl: './registration.component.html',
+    styleUrls: ['./registration.component.css']
 })
 export class RegistrationComponent implements AfterViewInit{
   @ViewChild(RegistrationFormComponent) registrationFormComponent!: RegistrationFormComponent;

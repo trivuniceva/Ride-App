@@ -7,17 +7,16 @@ import {AdvancedRouteFormComponent} from '../advanced-route-form/advanced-route-
 import {DriversAvailabilityComponent} from '../../drivers/drivers-availability/drivers-availability.component';
 
 @Component({
-  selector: 'app-ride-order',
-  standalone: true,
-  imports: [
-    MapComponent,
-    RouteFormComponent,
-    NgIf,
-    AdvancedRouteFormComponent,
-    DriversAvailabilityComponent,
-  ],
-  templateUrl: './ride-order.component.html',
-  styleUrl: './ride-order.component.css'
+    selector: 'app-ride-order',
+    imports: [
+        MapComponent,
+        RouteFormComponent,
+        NgIf,
+        AdvancedRouteFormComponent,
+        DriversAvailabilityComponent,
+    ],
+    templateUrl: './ride-order.component.html',
+    styleUrl: './ride-order.component.css'
 })
 export class RideOrderComponent implements OnInit{
   userRole: string = '';

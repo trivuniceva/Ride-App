@@ -7,15 +7,14 @@ import {VehicleFormComponent} from '../vehicle-form/vehicle-form.component';
 import {VehicleService} from '../../../core/services/vehicle/vehicle.service';
 
 @Component({
-  selector: 'app-create-driver',
-  standalone: true,
-  imports: [
-    RegistrationFormComponent,
-    NgIf,
-    VehicleFormComponent
-  ],
-  templateUrl: './create-driver.component.html',
-  styleUrl: './create-driver.component.css'
+    selector: 'app-create-driver',
+    imports: [
+        RegistrationFormComponent,
+        NgIf,
+        VehicleFormComponent
+    ],
+    templateUrl: './create-driver.component.html',
+    styleUrl: './create-driver.component.css'
 })
 
 export class CreateDriverComponent implements AfterViewInit {

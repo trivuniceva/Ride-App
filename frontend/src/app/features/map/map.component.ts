@@ -7,11 +7,10 @@ import { RouteService } from '../../core/services/route/route.service';
 import { Point } from '../../core/models/point.model';
 
 @Component({
-  selector: 'app-map',
-  standalone: true,
-  imports: [],
-  templateUrl: './map.component.html',
-  styleUrls: ['./map.component.css']
+    selector: 'app-map',
+    imports: [],
+    templateUrl: './map.component.html',
+    styleUrls: ['./map.component.css']
 })
 export class MapComponent implements OnInit {
   map: any;
@@ -39,7 +38,7 @@ export class MapComponent implements OnInit {
           L.Routing.control({
             waypoints: latlngs,
             routeWhileDragging: true,
-            createMarker: () => null,
+            // createMarker: () => null,
             addWaypoints: false
           }).addTo(this.map);
         } else {

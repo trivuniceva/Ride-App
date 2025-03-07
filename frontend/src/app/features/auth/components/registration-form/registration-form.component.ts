@@ -3,14 +3,13 @@ import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angula
 import { NgIf } from '@angular/common';
 
 @Component({
-  selector: 'app-registration-form',
-  standalone: true,
-  imports: [
-    ReactiveFormsModule,
-    NgIf
-  ],
-  templateUrl: './registration-form.component.html',
-  styleUrls: ['./registration-form.component.css']
+    selector: 'app-registration-form',
+    imports: [
+        ReactiveFormsModule,
+        NgIf
+    ],
+    templateUrl: './registration-form.component.html',
+    styleUrls: ['./registration-form.component.css']
 })
 export class RegistrationFormComponent implements OnInit{
   @Input() currentStep: number = 1;

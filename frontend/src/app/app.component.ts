@@ -5,17 +5,16 @@ import {NavbarComponent} from "./core/components/navbar/navbar.component";
 import {NgIf} from "@angular/common";
 
 @Component({
-  selector: 'app-root',
-  standalone: true,
-  imports: [
-      RouterOutlet,
-      HomeComponent,
-      NavbarComponent,
-      NgIf,
-  ],
-  templateUrl: './app.component.html',
-  styleUrl: './app.component.css',
-  encapsulation: ViewEncapsulation.None,
+    selector: 'app-root',
+    imports: [
+        RouterOutlet,
+        HomeComponent,
+        NavbarComponent,
+        NgIf,
+    ],
+    templateUrl: './app.component.html',
+    styleUrl: './app.component.css',
+    encapsulation: ViewEncapsulation.None
 })
 export class AppComponent implements OnInit{
   title = 'frontend';

@@ -5,15 +5,14 @@ import { CommonModule, DatePipe, NgClass } from '@angular/common';
 import { interval, Subscription } from 'rxjs';
 
 @Component({
-  selector: 'app-drivers-availability',
-  standalone: true,
-  imports: [
-    NgClass,
-    DatePipe,
-    CommonModule
-  ],
-  templateUrl: './drivers-availability.component.html',
-  styleUrl: './drivers-availability.component.css'
+    selector: 'app-drivers-availability',
+    imports: [
+        NgClass,
+        DatePipe,
+        CommonModule
+    ],
+    templateUrl: './drivers-availability.component.html',
+    styleUrl: './drivers-availability.component.css'
 })
 export class DriversAvailabilityComponent implements OnInit, OnDestroy {
   drivers: Driver[] = [];

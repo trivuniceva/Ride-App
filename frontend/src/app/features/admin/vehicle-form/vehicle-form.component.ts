@@ -3,15 +3,14 @@ import {FormBuilder, FormGroup, ReactiveFormsModule, Validators} from '@angular/
 import {NgForOf, NgIf} from '@angular/common';
 
 @Component({
-  selector: 'app-vehicle-form',
-  standalone: true,
-  imports: [
-    ReactiveFormsModule,
-    NgIf,
-    NgForOf
-  ],
-  templateUrl: './vehicle-form.component.html',
-  styleUrl: './vehicle-form.component.css'
+    selector: 'app-vehicle-form',
+    imports: [
+        ReactiveFormsModule,
+        NgIf,
+        NgForOf
+    ],
+    templateUrl: './vehicle-form.component.html',
+    styleUrl: './vehicle-form.component.css'
 })
 export class VehicleFormComponent implements OnInit{
   @Input() currentStep: number = 1;
