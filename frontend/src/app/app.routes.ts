@@ -16,7 +16,6 @@ export const routes: Routes = [
     {path: 'ride', component: RideOrderComponent},
     {path: 'profile', component: UserProfileComponent},
     {path: 'order-ride', component: RideOrderComponent},
-    {path: 'order-ride', component: RideOrderComponent},
     {path: 'forgot-password', component: ForgotPasswordComponent},
     { path: 'reset-password', component: ResetPasswordComponent },
     { path: 'create-driver', component: CreateDriverComponent },
