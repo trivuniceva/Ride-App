@@ -4,6 +4,7 @@ import {RouteFormComponent} from "../route-form/route-form.component";
 import {AuthService} from '../../../core/services/auth/auth.service';
 import {NgIf} from '@angular/common';
 import {AdvancedRouteFormComponent} from '../advanced-route-form/advanced-route-form.component';
+import {DriversAvailabilityComponent} from '../../drivers/drivers-availability/drivers-availability.component';
 
 @Component({
   selector: 'app-ride-order',
@@ -13,6 +14,7 @@ import {AdvancedRouteFormComponent} from '../advanced-route-form/advanced-route-
     RouteFormComponent,
     NgIf,
     AdvancedRouteFormComponent,
+    DriversAvailabilityComponent,
   ],
   templateUrl: './ride-order.component.html',
   styleUrl: './ride-order.component.css'
