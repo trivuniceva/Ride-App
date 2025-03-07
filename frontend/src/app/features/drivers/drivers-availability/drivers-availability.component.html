@@ -11,25 +11,17 @@
     </div>
   </div>
   <div class="driver-list">
-    <div class="driver-item">
+    <div *ngFor="let driver of drivers" class="driver-item">
       <div class="driver-info">
         <div class="driver-image">
-          <img src="assets/pics/nina.jpg" alt="Johnnie Walker">
-          <div class="status-circle green"></div>
+          <img src="assets/pics/nina.jpg" alt="{{ driver.firstname }} {{ driver.lastname }}">
+          <div class="status-circle" [ngClass]="{'green': driver.isAvailable, 'red': !driver.isAvailable}"></div>
         </div>
-        <div class="driver-name">Johnnie Walker</div>
+        <div class="driver-name">{{ driver.firstname }} {{ driver.lastname }}</div>
       </div>
-      <div class="driver-time">21</div>
-    </div>
-    <div class="driver-item">
-      <div class="driver-info">
-        <div class="driver-image">
-          <img src="assets/pics/nina.jpg" alt="Carolyne Smiths">
-          <div class="status-circle red"></div>
-        </div>
-        <div class="driver-name">Carolyne Smiths</div>
+      <div class="driver-time">
+        {{ driver.timeOfLogin ? (driver.timeOfLogin | date:'short') : 'N/A' }}
       </div>
-      <div class="driver-time"></div>
     </div>
   </div>
 </div>

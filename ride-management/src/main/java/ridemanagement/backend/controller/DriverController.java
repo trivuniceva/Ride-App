@@ -5,24 +5,24 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import ridemanagement.backend.dto.DriverDTO;
 import ridemanagement.backend.model.Driver;
 import ridemanagement.backend.service.DriverService;
 
 import java.util.List;
 
 @RestController
-@RequestMapping("/driver")
+@RequestMapping("/drivers")
 public class DriverController {
 
     @Autowired
     private DriverService driverService;
 
     @GetMapping
-    public ResponseEntity<List<Driver>> getAllDrivers() {
-        List<Driver> drivers = driverService.getAllDrivers();
-        return ResponseEntity.ok(drivers);
+    public List<DriverDTO> getDrivers() {
+        System.out.println("elooo");
+        System.out.println(driverService.getAllDrivers());
+        return driverService.getAllDrivers();
     }
-
-
 
 }
