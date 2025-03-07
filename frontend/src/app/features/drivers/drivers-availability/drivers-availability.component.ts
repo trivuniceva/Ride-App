@@ -19,6 +19,8 @@ export class DriversAvailabilityComponent implements OnInit, OnDestroy{
   drivers: Driver[] = [];
   remainingTimes: { [key: number]: string } = {};
   private intervalSubscription: Subscription | undefined;
+  filter: string = 'all'; // default
+  filteredDrivers: Driver[] = [];
 
   constructor(private driverService: DriverService) {}
 
@@ -69,5 +71,17 @@ export class DriversAvailabilityComponent implements OnInit, OnDestroy{
   pad(num: number): string {
     return num < 10 ? '0' + num : num.toString();
   }
+
+  filterDrivers(filter: string): void {
+    this.filter = filter;
+    if (filter === 'available') {
+      this.filteredDrivers = this.drivers.filter(driver => driver.available);
+    } else if (filter === 'onWay') {
+      this.filteredDrivers = this.drivers.filter(driver => !driver.available);
+    } else {
+      this.filteredDrivers = this.drivers;
+    }
+  }
+
 
 }
