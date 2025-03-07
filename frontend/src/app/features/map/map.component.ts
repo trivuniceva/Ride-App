@@ -1,5 +1,7 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import * as L from 'leaflet';
+import {RideService} from '../../core/services/ride/ride.service';
+import {Driver} from '../../core/models/driver.model';
 
 @Component({
   selector: 'app-map',
@@ -8,31 +10,33 @@ import * as L from 'leaflet';
   templateUrl: './map.component.html',
   styleUrl: './map.component.css'
 })
-export class MapComponent {
+export class MapComponent implements OnInit {
   map: any;
   vehicleMarkers: any = {};
-  vehicles = [
-    { id: 1, lat: 45.2671, lng: 19.8335, status: 'slobodno' },
-    { id: 2, lat: 45.2695, lng: 19.8325, status: 'zauzeto' }
-  ];
+  vehicles: any[] = []; // Niz za podatke o vozilima sa backend-a
+  vehiclePaths: { [key: number]: [number, number][] } = {};
+  currentPathIndex: { [key: number]: number } = {};
 
-  vehiclePaths: { [key: number]: [number, number][] } = {
-    1: [
-      [45.2671, 19.8335], [45.2680, 19.8340], [45.2690, 19.8350], [45.2700, 19.8360],
-      [45.2715, 19.8370], [45.2730, 19.8380], [45.2745, 19.8390], [45.2760, 19.8400],
-      [45.2780, 19.8415], [45.2800, 19.8430]
-    ],
-    2: [
-      [45.2695, 19.8325], [45.2705, 19.8320], [45.2715, 19.8310], [45.2725, 19.8300],
-      [45.2740, 19.8290], [45.2760, 19.8280], [45.2780, 19.8270], [45.2800, 19.8260],
-      [45.2820, 19.8250], [45.2840, 19.8240]
-    ]
-  };
-
-  currentPathIndex: { [key: number]: number } = { 1: 0, 2: 0 };
+  constructor(private rideService: RideService) { } // Dodajte RideService u konstruktor
 
   ngOnInit(): void {
     this.initializeMap();
+    this.loadActiveRides(); // Preuzmite aktivne vožnje
+  }
+
+  loadActiveRides(): void {
+    this.rideService.getActiveRides().subscribe(
+      (vehicles) => {
+        this.vehicles = vehicles;
+        this.vehicles.forEach(vehicle => {
+          this.addVehicleMarker(vehicle);
+        });
+        this.startVehicleMovement();
+      },
+      (error) => {
+        console.error('Greška pri preuzimanju aktivnih vožnji:', error);
+      }
+    );
   }
 
   initializeMap(): void {
@@ -41,7 +45,9 @@ export class MapComponent {
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
     }).addTo(this.map);
+  }
 
+  addVehicleMarker(vehicle: Driver): void {
     const customIcon = L.icon({
       iconUrl: 'assets/pics/car-red.png',
       iconSize: [25, 41],
@@ -51,35 +57,26 @@ export class MapComponent {
       shadowSize: [41, 41]
     });
 
-    this.vehicles.forEach(vehicle => {
-      const marker = L.marker([vehicle.lat, vehicle.lng], { icon: customIcon }).addTo(this.map);
-      marker.bindPopup(`<b>Vozilo ID: ${vehicle.id}</b><br>Status: ${vehicle.status}`);
+    if (vehicle.location && vehicle.location.latitude && vehicle.location.longitude) {
+      const marker = L.marker([vehicle.location.latitude, vehicle.location.longitude], { icon: customIcon }).addTo(this.map);
+      marker.bindPopup(`<b>Vozilo ID: ${vehicle.id}</b><br>Status: ${vehicle.available ? 'slobodno' : 'zauzeto'}`);
       this.vehicleMarkers[vehicle.id] = marker;
-    });
-
-    this.startVehicleMovement();
+    } else {
+      console.warn(`Vozilo ${vehicle.id} nema validnu lokaciju. Vozilo ID: ${vehicle.id}, Lokacija:`, vehicle.location);
+    }
   }
 
   startVehicleMovement(): void {
-    setInterval(() => {
-      this.vehicles.forEach(vehicle => {
-        const path = this.vehiclePaths[vehicle.id];
-        if (path && this.currentPathIndex[vehicle.id] < path.length - 1) {
-          this.currentPathIndex[vehicle.id]++;
-          const [newLat, newLng] = path[this.currentPathIndex[vehicle.id]];
-          vehicle.lat = newLat;
-          vehicle.lng = newLng;
-          this.updateVehiclePosition(vehicle.id, newLat, newLng);
-        }
-      });
-      this.map.invalidateSize();
-    }, 2000);
+    // Implementirajte logiku za kretanje vozila na osnovu podataka sa backend-a
+    // Možete koristiti vehiclePaths i currentPathIndex ako imate podatke o putanjama
   }
 
   updateVehiclePosition(vehicleId: number, lat: number, lng: number): void {
     const marker = this.vehicleMarkers[vehicleId];
     if (marker) {
       marker.setLatLng([lat, lng]).bindPopup(`<b>Vozilo ID: ${vehicleId}</b><br>Nova pozicija!`).openPopup();
+    } else {
+      console.warn(`Marker za vozilo ${vehicleId} ne postoji!`);
     }
   }
 }

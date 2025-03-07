@@ -1,8 +1,8 @@
-import {Component, OnDestroy, OnInit} from '@angular/core';
-import {DriverService} from '../../../core/services/drivers/driver.service';
-import {Driver} from '../../../core/models/driver.model';
-import {CommonModule, DatePipe, NgClass} from '@angular/common';
-import {interval, Subscription} from 'rxjs';
+import { Component, OnDestroy, OnInit } from '@angular/core';
+import { DriverService } from '../../../core/services/drivers/driver.service';
+import { Driver } from '../../../core/models/driver.model';
+import { CommonModule, DatePipe, NgClass } from '@angular/common';
+import { interval, Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-drivers-availability',
@@ -15,18 +15,19 @@ import {interval, Subscription} from 'rxjs';
   templateUrl: './drivers-availability.component.html',
   styleUrl: './drivers-availability.component.css'
 })
-export class DriversAvailabilityComponent implements OnInit, OnDestroy{
+export class DriversAvailabilityComponent implements OnInit, OnDestroy {
   drivers: Driver[] = [];
+  filteredDrivers: Driver[] = [];
   remainingTimes: { [key: number]: string } = {};
   private intervalSubscription: Subscription | undefined;
-  filter: string = 'all'; // default
-  filteredDrivers: Driver[] = [];
+  filter: string = 'all'; // Default filter
 
-  constructor(private driverService: DriverService) {}
+  constructor(private driverService: DriverService) { }
 
   ngOnInit(): void {
     this.driverService.getDrivers().subscribe((data) => {
       this.drivers = data;
+      this.filteredDrivers = data; // Inicijalno prikaži sve vozače
       this.calculateRemainingTimes();
       this.startTimer();
     });
@@ -34,18 +35,22 @@ export class DriversAvailabilityComponent implements OnInit, OnDestroy{
 
   ngOnDestroy(): void {
     if (this.intervalSubscription) {
-      this.intervalSubscription.unsubscribe(); // Prekini interval kada se komponenta uništi
+      this.intervalSubscription.unsubscribe();
     }
   }
 
   calculateRemainingTimes(): void {
-    this.drivers.forEach(driver => {
-      if (driver.timeOfLogin) {
-        const loginTime = new Date(driver.timeOfLogin).getTime();
-        const endTime = loginTime + 8 * 60 * 60 * 1000; // 8 sati u milisekundama
-        this.updateRemainingTime(driver.id, endTime);
-      }
-    });
+    if (this.drivers) {
+      this.drivers.forEach(driver => {
+        if (driver.timeOfLogin) {
+          const loginTime = new Date(driver.timeOfLogin).getTime();
+          const endTime = loginTime + 8 * 60 * 60 * 1000; // 8 sati u milisekundama
+          this.updateRemainingTime(driver.id, endTime);
+        }
+      });
+    } else {
+      console.warn("Niz vozača je null ili undefined.");
+    }
   }
 
   startTimer(): void {
@@ -82,6 +87,4 @@ export class DriversAvailabilityComponent implements OnInit, OnDestroy{
       this.filteredDrivers = this.drivers;
     }
   }
-
-
 }

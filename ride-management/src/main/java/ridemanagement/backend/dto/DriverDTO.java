@@ -1,7 +1,8 @@
 package ridemanagement.backend.dto;
 
-import java.sql.Timestamp;
+import ridemanagement.backend.model.Point;
 
+import java.sql.Timestamp;
 
 public class DriverDTO {
     private Long id;
@@ -12,8 +13,9 @@ public class DriverDTO {
     private boolean isAvailable;
     private Timestamp timeOfLogin;
     private Boolean hasFutureDrive;
+    private PointDTO location;
 
-    public DriverDTO(Long id, String email, String firstname, String lastname, boolean isBlocked, boolean isAvailable, Timestamp timeOfLogin, Boolean hasFutureDrive) {
+    public DriverDTO(Long id, String email, String firstname, String lastname, boolean isBlocked, boolean isAvailable, Timestamp timeOfLogin, Boolean hasFutureDrive, PointDTO location) {
         this.id = id;
         this.email = email;
         this.firstname = firstname;
@@ -22,6 +24,10 @@ public class DriverDTO {
         this.isAvailable = isAvailable;
         this.timeOfLogin = timeOfLogin;
         this.hasFutureDrive = hasFutureDrive;
+        this.location = location;
+    }
+
+    public DriverDTO(Long id, String email, String firstname, String lastname, boolean blocked, boolean available, Timestamp timeOfLogin, Boolean hasFutureDrive, Point location) {
     }
 
     public Long getId() {
@@ -86,5 +92,13 @@ public class DriverDTO {
 
     public void setHasFutureDrive(Boolean hasFutureDrive) {
         this.hasFutureDrive = hasFutureDrive;
+    }
+
+    public PointDTO getLocation() {
+        return location;
+    }
+
+    public void setLocation(PointDTO location) {
+        this.location = location;
     }
 }

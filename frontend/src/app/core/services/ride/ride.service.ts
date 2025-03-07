@@ -6,14 +6,12 @@ import {Driver} from '../../models/driver.model';
 @Injectable({
   providedIn: 'root'
 })
-export class DriverService {
-  private apiUrl = 'http://localhost:8080/drivers';
+export class RideService {
+  private apiUrl = 'http://localhost:8080/rides/active';
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) { }
 
-  getDrivers(): Observable<any[]> {
-    return this.http.get<any[]>(this.apiUrl);
+  getActiveRides(): Observable<Driver[]> {
+    return this.http.get<Driver[]>(this.apiUrl);
   }
-
-
 }
