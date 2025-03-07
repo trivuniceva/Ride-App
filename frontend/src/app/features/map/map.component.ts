@@ -75,17 +75,17 @@ export class MapComponent implements OnInit {
   }
 
   addVehicleMarker(vehicle: Driver): void {
-    const customIcon = L.icon({
-      iconUrl: 'assets/pics/car-red.png',
-      iconSize: [25, 41],
-      iconAnchor: [12, 41],
-      popupAnchor: [1, -34],
-      shadowUrl: 'assets/leaflet-icons/marker-shadow.png',
-      shadowSize: [41, 41]
-    });
+    // const customIcon = L.icon({
+    //   iconUrl: 'public/assets/pics/car-red.png',
+    //   iconSize: [25, 41],
+    //   iconAnchor: [12, 41],
+    //   popupAnchor: [1, -34],
+    //   shadowSize: [41, 41]
+    // });
+
 
     if (vehicle.location && vehicle.location.latitude && vehicle.location.longitude) {
-      const marker = L.marker([vehicle.location.latitude, vehicle.location.longitude], { icon: customIcon }).addTo(this.map);
+      const marker = L.marker([vehicle.location.latitude, vehicle.location.longitude], { }).addTo(this.map);
       marker.bindPopup(`<b>Vozilo ID: ${vehicle.id}</b><br>Status: ${vehicle.available ? 'slobodno' : 'zauzeto'}`);
       this.vehicleMarkers[vehicle.id] = marker;
     } else {

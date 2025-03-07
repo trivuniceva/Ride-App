@@ -8,7 +8,6 @@ import { interval, Subscription } from 'rxjs';
     selector: 'app-drivers-availability',
     imports: [
         NgClass,
-        DatePipe,
         CommonModule
     ],
     templateUrl: './drivers-availability.component.html',

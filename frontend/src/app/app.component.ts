@@ -8,7 +8,6 @@ import {NgIf} from "@angular/common";
     selector: 'app-root',
     imports: [
         RouterOutlet,
-        HomeComponent,
         NavbarComponent,
         NgIf,
     ],
