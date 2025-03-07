@@ -15,9 +15,10 @@
       <div class="driver-info">
         <div class="driver-image">
           <img src="assets/pics/nina.jpg" alt="{{ driver.firstname }} {{ driver.lastname }}">
-          <div class="status-circle" [ngClass]="{'green': driver.isAvailable, 'red': !driver.isAvailable}"></div>
+          <div class="status-circle" [ngClass]="{'green': driver.available, 'red': !driver.available}"></div>
         </div>
-        <div class="driver-name">{{ driver.firstname }} {{ driver.lastname }}</div>
+        <div class="driver-name">{{ driver.firstname }} {{ driver.lastname }} </div>
+
       </div>
       <div class="driver-time">
 <!--        {{ driver.timeOfLogin ? (driver.timeOfLogin | date:'short') : 'N/A' }}-->

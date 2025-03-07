@@ -8,7 +8,7 @@ export interface Driver {
   lastname: string;
   email: string;
   isBlocked: boolean;
-  isAvailable: boolean;
+  available: boolean;
   vehicle: Vehicle;
   location: Point;
   timeOfLogin: string;
