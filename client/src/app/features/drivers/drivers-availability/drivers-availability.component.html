@@ -1,0 +1,27 @@
+<div class="drivers-container">
+  <h2>Drivers</h2>
+  <div class="header">
+    <div class="status-tabs">
+      <div class="tab" [class.active]="filter === 'available'" (click)="filterDrivers('available')">Available</div>
+      <div class="tab" [class.active]="filter === 'onWay'" (click)="filterDrivers('onWay')">On Way</div>
+      <div class="tab" [class.active]="filter === 'all'" (click)="filterDrivers('all')">All</div>
+    </div>
+    <div class="search-bar">
+      <input type="text" placeholder="Find driver">
+    </div>
+  </div>
+  <div class="driver-list">
+    <div *ngFor="let driver of filteredDrivers" class="driver-item">
+      <div class="driver-info">
+        <div class="driver-image">
+          <img src="assets/pics/nina.jpg" alt="{{ driver.firstname }} {{ driver.lastname }}">
+          <div class="status-circle" [ngClass]="{'green': driver.available, 'red': !driver.available}"></div>
+        </div>
+        <div class="driver-name">{{ driver.firstname }} {{ driver.lastname }} </div>
+      </div>
+      <div class="driver-time">
+        <p>{{ remainingTimes[driver.id] || 'N/A' }}</p>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,104 @@
+.drivers-container {
+  width: 300px;
+  padding: 10px;
+}
+
+h2{
+  margin-left: 10px;
+}
+
+.header {
+  margin-bottom: 10px;
+  margin-top: 30px;
+
+}
+
+.status-tabs {
+  display: flex;
+  justify-content: space-around;
+  margin-bottom: 10px;
+}
+
+.tab {
+  padding: 5px 20px;
+  border-radius: 25px;
+  cursor: pointer;
+}
+
+.tab:hover{
+  background-color: black;
+  color: white;
+}
+
+.tab.active {
+  background-color: black;
+  color: white;
+}
+
+.search-bar input {
+  width: 93%;
+  padding: 10px;
+  /*border: 1px solid #ddd;*/
+  border: none;
+  border-radius: 25px;
+  margin-top: 10px;
+}
+
+.driver-list {
+  border-top: 1px solid #eee;
+  padding-top: 10px;
+}
+
+.driver-item {
+  display: flex;
+  justify-content: space-between;
+  padding: 5px 0;
+  border-bottom: 1px solid #eee;
+}
+
+.driver-item:last-child {
+  border-bottom: none;
+}
+
+.driver-name {
+  font-weight: bold;
+}
+
+.driver-time {
+  color: #555;
+}
+
+
+.driver-info {
+  display: flex;
+  align-items: center;
+}
+
+.driver-image {
+  position: relative;
+  margin-right: 10px;
+}
+
+.driver-image img {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.status-circle {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+}
+
+.status-circle.green {
+  background-color: green;
+}
+
+.status-circle.red {
+  background-color: red;
+}
