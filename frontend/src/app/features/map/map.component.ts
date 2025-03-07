@@ -1,27 +1,55 @@
 import { Component, OnInit } from '@angular/core';
 import * as L from 'leaflet';
-import {RideService} from '../../core/services/ride/ride.service';
-import {Driver} from '../../core/models/driver.model';
+import 'leaflet-routing-machine'
+import { RideService } from '../../core/services/ride/ride.service';
+import { Driver } from '../../core/models/driver.model';
+import { RouteService } from '../../core/services/route/route.service';
+import { Point } from '../../core/models/point.model';
 
 @Component({
   selector: 'app-map',
   standalone: true,
   imports: [],
   templateUrl: './map.component.html',
-  styleUrl: './map.component.css'
+  styleUrls: ['./map.component.css']
 })
 export class MapComponent implements OnInit {
   map: any;
   vehicleMarkers: any = {};
-  vehicles: any[] = []; // Niz za podatke o vozilima sa backend-a
+  vehicles: any[] = [];
   vehiclePaths: { [key: number]: [number, number][] } = {};
   currentPathIndex: { [key: number]: number } = {};
 
-  constructor(private rideService: RideService) { } // Dodajte RideService u konstruktor
+  constructor(private rideService: RideService, private routeService: RouteService) { }
 
   ngOnInit(): void {
     this.initializeMap();
-    this.loadActiveRides(); // Preuzmite aktivne vožnje
+    this.loadActiveRides();
+    this.loadRoute(1);  // Učitajte rutu sa ID-om 1
+  }
+
+  loadRoute(routeId: number): void {
+    this.routeService.getRoutePoints(routeId).subscribe(
+      (points: Point[]) => {
+        console.log(points); // Dodato za debagovanje
+        if (points && points.length > 0) {
+          const latlngs = points.map(point => L.latLng(point.latitude, point.longitude));
+
+          // Koristi Leaflet Routing Machine za generisanje rute
+          L.Routing.control({
+            waypoints: latlngs,
+            routeWhileDragging: true,
+            createMarker: () => null,
+            addWaypoints: false
+          }).addTo(this.map);
+        } else {
+          console.warn(`Nema tačaka za rutu sa ID-om ${routeId}`);
+        }
+      },
+      (error) => {
+        console.error(`Greška pri učitavanju rute sa ID-om ${routeId}:`, error);
+      }
+    );
   }
 
   loadActiveRides(): void {
