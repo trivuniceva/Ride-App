@@ -35,12 +35,27 @@ export class MapComponent {
         if (points && points.length > 0) {
           const latlngs = points.map(point => L.latLng(point.latitude, point.longitude));
 
-          // Kreiraj L.polyline objekat
-          const polyline = L.polyline(latlngs, { color: 'blue' }).addTo(this.map);
+          const plan = new L.Routing.Plan(latlngs, {
+            createMarker: () => false
+          });
 
-          // Ako zelis da se mapa automatski prilagodi ruti
-          this.map.fitBounds(polyline.getBounds());
+          L.Routing.control({
+            plan: plan,
+            routeWhileDragging: true,
+            lineOptions: {
+              styles: [{ color: 'blue', weight: 4 }],
+              extendToWaypoints: true,
+              missingRouteTolerance: 10
+            },
+            show: false
+          }).addTo(this.map);
 
+          setTimeout(() => {
+            document.querySelector('.leaflet-routing-container')?.remove();
+          }, 100);
+
+          // Podesi da mapa automatski prikaže celu rutu
+          this.map.fitBounds(L.latLngBounds(latlngs));
         } else {
           console.warn(`Nema tačaka za rutu sa ID-om ${routeId}`);
         }
