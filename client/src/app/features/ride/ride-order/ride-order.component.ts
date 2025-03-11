@@ -8,6 +8,7 @@ import {DriversAvailabilityComponent} from '../../drivers/drivers-availability/d
 
 @Component({
     selector: 'app-ride-order',
+    standalone: true,
     imports: [
         MapComponent,
         RouteFormComponent,
