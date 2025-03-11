@@ -120,7 +120,10 @@ export class RouteFormComponent {
     this.routeDataSubmitted.emit({ startAddress: address, destinationAddress: address });
   }
 
-  submitRouteData(startAddress: string, destinationAddress: string): void {
-    this.routeDataSubmitted.emit({ startAddress, destinationAddress });
+  submitRouteData(event: Event): void {
+    event.preventDefault();
+    this.routeDataSubmitted.emit({ startAddress: this.currentAddress, destinationAddress: this.currentAddress });
   }
+
+
 }

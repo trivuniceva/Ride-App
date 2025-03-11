@@ -32,9 +32,10 @@ export class RideOrderComponent implements OnInit{
 
 
   handleRouteData(routeData: { startAddress: string, destinationAddress: string }): void {
-    console.log('Polazište:', routeData.startAddress);
-    console.log('Destinacija:', routeData.destinationAddress);
+    
+
   }
+
 
   handleAdvancedRoutePreferences(preferences: any) {
     console.log('User preferences:', preferences);
