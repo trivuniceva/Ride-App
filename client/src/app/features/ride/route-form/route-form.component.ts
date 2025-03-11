@@ -4,6 +4,7 @@ import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { MatInputModule } from '@angular/material/input';
 import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
+import {RouteService} from '../../../core/services/route/route.service';
 
 @Component({
   selector: 'app-route-form',
@@ -23,11 +24,14 @@ export class RouteFormComponent {
   startAddressOptions: string[] = [];
   destinationAddressOptions: string[] = [];
   addressWarning: string = '';
-  currentAddress: string = '';
+  startAddressValue: string = '';
+  destinationAddressValue: string = '';
+  startInput: any;
+  destinationInput: any;
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient, private routeService: RouteService) {}
 
-  getAddressSuggestions(query: string): void {
+  getAddressSuggestions(query: string): Promise<string[]> {
     let searchQuery = query;
 
     if (!query.toLowerCase().includes('novi sad')) {
@@ -36,27 +40,31 @@ export class RouteFormComponent {
 
     const API_URL = `https://photon.komoot.io/api/?q=${searchQuery}`;
 
-    this.http.get(API_URL).subscribe((data: any) => {
+    return this.http.get(API_URL).toPromise().then((data: any) => {
       if (data.features) {
-        this.startAddressOptions = data.features.map((item: any) => {
+        return data.features.map((item: any) => {
           const street = item.properties.name;
-          const city = item.properties.city || item.properties.town || item.properties.village;  // Searching for city/town/village
+          const city = item.properties.city || item.properties.town || item.properties.village;
           const country = item.properties.country;
 
           return `${street}, ${city || 'Unknown'}, ${country || 'Unknown'}`;
         });
       }
+      return [];
     }, (error) => {
       console.error('Error during search:', error);
+      return [];
     });
   }
 
   onStartAddressInput(event: any): void {
     const input = event.target.value;
-    this.currentAddress = input;
+    this.startInput = event.target;
 
     if (input.length > 2) {
-      this.getAddressSuggestions(input);
+      this.getAddressSuggestions(input).then(suggestions => {
+        this.startAddressOptions = suggestions;
+      });
     } else {
       this.startAddressOptions = [];
     }
@@ -70,9 +78,12 @@ export class RouteFormComponent {
 
   onDestinationAddressInput(event: any): void {
     const input = event.target.value;
+    this.destinationInput = event.target;
 
     if (input.length > 2) {
-      this.getDestinationSuggestions(input);
+      this.getAddressSuggestions(input).then(suggestions => {
+        this.destinationAddressOptions = suggestions;
+      });
     } else {
       this.destinationAddressOptions = [];
     }
@@ -84,46 +95,38 @@ export class RouteFormComponent {
     }
   }
 
-  getDestinationSuggestions(query: string): void {
-    let searchQuery = query;
-
-    // If the user has not entered Novi Sad, we add "Novi Sad" as a prefix
-    if (!query.toLowerCase().includes('novi sad')) {
-      searchQuery = `Novi Sad ${query}`;
-    }
-
-    const API_URL = `https://photon.komoot.io/api/?q=${searchQuery}`;
-
-    this.http.get(API_URL).subscribe((data: any) => {
-      if (data.features) {
-        this.destinationAddressOptions = data.features.map((item: any) => {
-          const street = item.properties.name;
-          const city = item.properties.city || item.properties.town || item.properties.village;  // Searching for city/town/village
-          const country = item.properties.country;
-
-          // Format suggestion as "Street, City, Country"
-          return `${street}, ${city || 'Unknown'}, ${country || 'Unknown'}`;
-        });
-      }
-    }, (error) => {
-      console.error('Error during search:', error);
-    });
-  }
-
   hasStreetNumber(address: string): boolean {
     const regex = /\d+/;
     return regex.test(address);
   }
 
-  onAddressSelect(address: string): void {
-    this.currentAddress = address;
-    this.routeDataSubmitted.emit({ startAddress: address, destinationAddress: address });
-  }
-
   submitRouteData(event: Event): void {
     event.preventDefault();
-    this.routeDataSubmitted.emit({ startAddress: this.currentAddress, destinationAddress: this.currentAddress });
+    // this.routeDataSubmitted.emit({ startAddress: this.startAddressValue, destinationAddress: this.destinationAddressValue });
+
+    this.routeService.getShortestRoutes(this.startAddressValue, this.destinationAddressValue).subscribe(
+      (routes) => {
+        console.log('Pronađene putanje:', routes);
+        // Emitujemo rezultate prema roditeljskoj komponenti
+        this.routeDataSubmitted.emit({ startAddress: this.startAddressValue, destinationAddress: this.destinationAddressValue });
+      },
+      (error) => {
+        console.error('Greška pri dobavljanju putanja:', error);
+      }
+    );
   }
 
+  onStartAddressSelect(address: string): void {
+    this.startAddressValue = address;
+    if(this.startInput){
+      this.startInput.value = address;
+    }
+  }
 
+  onDestinationAddressSelect(address: string): void {
+    this.destinationAddressValue = address;
+    if(this.destinationInput){
+      this.destinationInput.value = address;
+    }
+  }
 }

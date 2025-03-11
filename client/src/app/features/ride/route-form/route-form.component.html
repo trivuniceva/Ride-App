@@ -2,7 +2,7 @@
   <h2>Prikazi putanje</h2>
 
   <form (submit)="submitRouteData($event)">
-  <div class="form-group">
+    <div class="form-group">
       <input
         type="text"
         id="startAddress"
@@ -13,7 +13,7 @@
         [matAutocomplete]="startAuto"
       >
       <mat-autocomplete #startAuto="matAutocomplete">
-        <mat-option *ngFor="let address of startAddressOptions" [value]="address" (onSelectionChange)="onAddressSelect(address)">
+        <mat-option *ngFor="let address of startAddressOptions" [value]="address" (onSelectionChange)="onStartAddressSelect(address)">
           {{ address }}
         </mat-option>
       </mat-autocomplete>
@@ -30,7 +30,7 @@
         [matAutocomplete]="destinationAuto"
       >
       <mat-autocomplete #destinationAuto="matAutocomplete">
-        <mat-option *ngFor="let address of destinationAddressOptions" [value]="address" (onSelectionChange)="onAddressSelect(address)">
+        <mat-option *ngFor="let address of destinationAddressOptions" [value]="address" (onSelectionChange)="onDestinationAddressSelect(address)">
           {{ address }}
         </mat-option>
       </mat-autocomplete>

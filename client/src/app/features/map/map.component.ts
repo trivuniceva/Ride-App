@@ -13,7 +13,7 @@ import { Point } from '../../core/models/point.model';
   templateUrl: './map.component.html',
   styleUrls: ['./map.component.css']
 })
-export class MapComponent {
+export class MapComponent implements OnInit {
   map: any;
   vehicleMarkers: any = {};
   vehicles: any[] = [];
@@ -25,7 +25,7 @@ export class MapComponent {
   ngOnInit(): void {
     this.initializeMap();
     this.loadActiveRides();
-    this.loadRoute(1);  // Učitajte rutu sa ID-om 1
+    // this.loadRoute(1);  // Učitajte rutu sa ID-om 1
   }
 
   loadRoute(routeId: number): void {
@@ -66,7 +66,6 @@ export class MapComponent {
     );
   }
 
-
   loadActiveRides(): void {
     this.rideService.getActiveRides().subscribe(
       (vehicles) => {
@@ -99,9 +98,8 @@ export class MapComponent {
       shadowSize: [41, 41]
     });
 
-
     if (vehicle.location && vehicle.location.latitude && vehicle.location.longitude) {
-      const marker = L.marker([vehicle.location.latitude, vehicle.location.longitude], { }).addTo(this.map);
+      const marker = L.marker([vehicle.location.latitude, vehicle.location.longitude]).addTo(this.map);
       marker.bindPopup(`<b>Vozilo ID: ${vehicle.id}</b><br>Status: ${vehicle.available ? 'slobodno' : 'zauzeto'}`);
       this.vehicleMarkers[vehicle.id] = marker;
     } else {
