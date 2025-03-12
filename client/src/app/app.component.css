@@ -14,7 +14,6 @@
 .right {
   width: 93%;
   margin-left: 8%;
-  padding: 20px;
   box-sizing: border-box;
   background-color: white;
   position: fixed;
@@ -22,8 +21,6 @@
   justify-content: center;
   bottom: 0;
   height: 100%;
-
-  border: solid blue;
 }
 
 .video-background {
