@@ -5,11 +5,12 @@ import axios from 'axios';
 import * as L from 'leaflet';
 import {DriversAvailabilityComponent} from '../../drivers/drivers-availability/drivers-availability.component';
 import * as polyline from '@mapbox/polyline';
+import {RouteInfoComponent} from '../route-info/route-info.component';
 
 @Component({
   selector: 'app-ride-order',
   standalone: true,
-  imports: [MapTestComponent, RouteFormComponent, DriversAvailabilityComponent, MapTestComponent],
+  imports: [MapTestComponent, RouteFormComponent, DriversAvailabilityComponent, MapTestComponent, RouteInfoComponent],
   templateUrl: './ride-order.component.html',
   styleUrls: ['./ride-order.component.css'],
 })

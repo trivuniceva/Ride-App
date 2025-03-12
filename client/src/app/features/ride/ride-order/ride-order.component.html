@@ -17,15 +17,32 @@
           <app-drivers-availability></app-drivers-availability>
         </div>
 
-        <div class="map">
-<!--            <app-map></app-map>-->
-          <app-map-test
-            [startCoords]="startCoords"
-            [destinationCoords]="destinationCoords"
-            [alternativeRoutes]="alternativeRoutes"
-          ></app-map-test>
+      <div class="map-section">
+        <div class="map-container">
+                  <div class="map">
+                    <app-map-test
+                      [startCoords]="startCoords"
+                      [destinationCoords]="destinationCoords"
+                      [alternativeRoutes]="alternativeRoutes"
+                    ></app-map-test>
+                  </div>
+        </div>
+
+        <div class="ride-info">
+          <app-route-info></app-route-info>
 
         </div>
+
+      </div>
+<!--        <div class="map">-->
+<!--&lt;!&ndash;            <app-map></app-map>&ndash;&gt;-->
+<!--          <app-map-test-->
+<!--            [startCoords]="startCoords"-->
+<!--            [destinationCoords]="destinationCoords"-->
+<!--            [alternativeRoutes]="alternativeRoutes"-->
+<!--          ></app-map-test>-->
+
+<!--        </div>-->
 
     </div>
 </div>
