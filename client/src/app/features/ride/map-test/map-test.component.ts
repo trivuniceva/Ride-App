@@ -39,8 +39,10 @@ export class MapTestComponent implements OnInit, OnChanges {
 
   initializeMap(): void {
     this.map = L.map('map').setView([45.2671, 19.8335], 13);
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}{r}.png', {
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
+      subdomains: 'abcd',
+      maxZoom: 20
     }).addTo(this.map);
   }
 
@@ -55,7 +57,7 @@ export class MapTestComponent implements OnInit, OnChanges {
     if (this.alternativeRoutes && this.alternativeRoutes.length > 0) {
       console.log('alternativeRoutes:', this.alternativeRoutes);
 
-      this.routeLine = L.polyline(this.alternativeRoutes, { color: 'blue' }).addTo(this.map);
+      this.routeLine = L.polyline(this.alternativeRoutes, { color: 'green' }).addTo(this.map);
       this.map.fitBounds(L.latLngBounds(this.alternativeRoutes));
     }
   }
