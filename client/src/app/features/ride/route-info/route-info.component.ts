@@ -11,6 +11,8 @@ export class RouteInfoComponent {
   @Input() distance: number | undefined;
   @Input() duration: number | undefined;
   @Input() price: number | undefined;
+  @Input() startAddress: string | undefined;
+  @Input() destinationAddress: string | undefined;
 
 
 }

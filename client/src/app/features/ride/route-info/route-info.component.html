@@ -1,18 +1,42 @@
-<div class="information-container">
-  <div class="info-item">
-    <i class="fas fa-clock"></i>
-    <span>Time: {{ duration }} min</span>
-  </div>
-  <div class="info-item">
-    <i class="fas fa-money-bill-wave"></i>
-    <span>Price: {{ price }} RSD</span>
-  </div>
-  <div class="info-item">
-    <i class="fas fa-route"></i>
-    <span>Distance: {{ distance }} km</span>
-  </div>
-  <div class="info-item">
-    <i class="fas fa-user-friends"></i>
-    <span>Broj putnika: 2</span>
+<div class="ride-info">
+  <div class="info-container">
+    <div class="info-item">
+      <div class="location-points">
+        <div class="point start-point"></div>
+        <div class="point end-point"></div>
+      </div>
+      <div class="location-details">
+        <span class="location-address">{{ startAddress }}</span> <span class="location-address">{{ destinationAddress }}</span>
+      </div>
+      <span class="distance">{{ distance }} km</span>
+    </div>
+
+    <div class="info-item price-item">
+      <span class="price">${{ price }}</span>
+    </div>
+
+    <div class="info-item driver-info">
+<!--      <div class="driver-avatar">-->
+<!--        <img src="path/to/avatar.png" alt="Driver Avatar">-->
+<!--      </div>-->
+<!--      <div class="driver-details">-->
+<!--        <span class="driver-name">John Wick</span>-->
+<!--        <span class="driver-rating">★4.9</span>-->
+<!--      </div>-->
+    </div>
+
+    <div class="info-item time-actions">
+      <div class="edit-details">
+        <i class="fas fa-pencil-alt"></i>
+        <span>Edit Details</span>
+      </div>
+      <div class="time-remaining">
+        <span>{{ duration }} min</span>
+      </div>
+      <div class="cancel-ride">
+        <i class="fas fa-times"></i>
+        <span>Cancel</span>
+      </div>
+    </div>
   </div>
 </div>

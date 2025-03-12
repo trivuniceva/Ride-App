@@ -22,6 +22,8 @@ export class RideOrderComponent implements OnInit {
   distance: number | undefined;
   duration: number | undefined;
   price: number | undefined;
+  startAddress: string | undefined;
+  destinationAddress: string | undefined;
 
   ngOnInit(): void {}
 
@@ -41,6 +43,8 @@ export class RideOrderComponent implements OnInit {
       if (startCoords && destinationCoords) {
         this.startCoords = startCoords;
         this.destinationCoords = destinationCoords;
+        this.startAddress = routeData.startAddress;
+        this.destinationAddress = routeData.destinationAddress;
         const routes = await this.getRoutes(startCoords, destinationCoords);
 
         console.log('routes:', routes); // logovanje routes
