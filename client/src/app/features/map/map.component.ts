@@ -25,7 +25,7 @@ export class MapComponent implements OnInit {
   ngOnInit(): void {
     this.initializeMap();
     this.loadActiveRides();
-    // this.loadRoute(1);  // Učitajte rutu sa ID-om 1
+    this.loadRoute(11);  // Učitajte rutu sa ID-om 1
   }
 
   loadRoute(routeId: number): void {

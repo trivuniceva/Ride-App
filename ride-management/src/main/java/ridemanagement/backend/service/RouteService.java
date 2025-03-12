@@ -22,6 +22,14 @@ public class RouteService {
     private RouteAlgorithm routeAlgorithm;
 
     public List<PointDTO> getRoutePoints(Integer routeId) {
+        System.out.println(routeRepository.findAll().toString());
+        for(Route route: routeRepository.findAll()){
+            System.out.println(route.toString());
+
+        }
+        System.out.println("all ^");
+
+
         Route route = routeRepository.findById(routeId).orElse(null);
         if (route != null) {
             return route.getWaypoints().stream()

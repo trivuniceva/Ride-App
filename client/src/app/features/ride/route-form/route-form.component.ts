@@ -102,18 +102,20 @@ export class RouteFormComponent {
 
   submitRouteData(event: Event): void {
     event.preventDefault();
+    this.routeDataSubmitted.emit({ startAddress: this.startAddressValue, destinationAddress: this.destinationAddressValue });
+
     // this.routeDataSubmitted.emit({ startAddress: this.startAddressValue, destinationAddress: this.destinationAddressValue });
 
-    this.routeService.getShortestRoutes(this.startAddressValue, this.destinationAddressValue).subscribe(
-      (routes) => {
-        console.log('Pronađene putanje:', routes);
-        // Emitujemo rezultate prema roditeljskoj komponenti
-        this.routeDataSubmitted.emit({ startAddress: this.startAddressValue, destinationAddress: this.destinationAddressValue });
-      },
-      (error) => {
-        console.error('Greška pri dobavljanju putanja:', error);
-      }
-    );
+    // this.routeService.getShortestRoutes(this.startAddressValue, this.destinationAddressValue).subscribe(
+    //   (routes) => {
+    //     console.log('Pronađene putanje:', routes);
+    //     // Emitujemo rezultate prema roditeljskoj komponenti
+    //     this.routeDataSubmitted.emit({ startAddress: this.startAddressValue, destinationAddress: this.destinationAddressValue });
+    //   },
+    //   (error) => {
+    //     console.error('Greška pri dobavljanju putanja:', error);
+    //   }
+    // );
   }
 
   onStartAddressSelect(address: string): void {
