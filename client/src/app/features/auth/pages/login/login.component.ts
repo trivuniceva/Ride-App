@@ -7,6 +7,7 @@ import {MatSnackBar} from '@angular/material/snack-bar';
 
 @Component({
     selector: 'app-login',
+    standalone: true,
     imports: [
         LoginFormComponent
     ],

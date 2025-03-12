@@ -3,6 +3,7 @@ import {FormsModule} from '@angular/forms';
 
 @Component({
     selector: 'app-login-form',
+    standalone: true,
     imports: [
         FormsModule
     ],
