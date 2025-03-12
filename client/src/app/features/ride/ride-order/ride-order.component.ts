@@ -19,6 +19,10 @@ export class RideOrderComponent implements OnInit {
   destinationCoords: [number, number] | null = null;
   alternativeRoutes: [number, number][] = [];
 
+  distance: number | undefined;
+  duration: number | undefined;
+  price: number | undefined;
+
   ngOnInit(): void {}
 
   async handleRouteData(routeData: {
@@ -51,6 +55,14 @@ export class RideOrderComponent implements OnInit {
             this.alternativeRoutes = decoded.map(
               (coord: [number, number]) => [coord[0], coord[1]] // obrnuto [lat, lng]
             );
+
+            this.distance = Math.round(routes[0].summary.distance / 100) / 10;
+            this.duration = Math.round(routes[0].summary.duration / 60);
+            this.price = await this.calculatePrice(this.distance, this.duration);
+
+            console.log('Udaljenost:', this.distance, 'km');
+            console.log('Trajanje:', this.duration, 'min');
+
             console.log('- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - ');
             console.log('alternativeRoutes:', this.alternativeRoutes);
           } else {
@@ -67,6 +79,15 @@ export class RideOrderComponent implements OnInit {
     }
   }
 
+  async calculatePrice(distance: number, duration: number): Promise<number> {
+    // const response = await axios.post('/api/calculate-price', {
+    //   distance: distance,
+    //   duration: duration,
+    // });
+    // return response.data.price;
+
+    return 32;
+  }
 
 
   async geocodeAddress(address: string): Promise<[number, number] | null> {

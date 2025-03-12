@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import {Component, Input} from '@angular/core';
 
 @Component({
   selector: 'app-route-info',
@@ -8,5 +8,9 @@ import { Component } from '@angular/core';
   styleUrl: './route-info.component.css'
 })
 export class RouteInfoComponent {
+  @Input() distance: number | undefined;
+  @Input() duration: number | undefined;
+  @Input() price: number | undefined;
+
 
 }

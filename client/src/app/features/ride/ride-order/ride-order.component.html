@@ -2,17 +2,13 @@
     <div class="ride-left">
       <app-route-form (routeDataSubmitted)="handleRouteData($event)"></app-route-form>
 
-
       <!--        <app-advanced-route-form-->
 <!--          *ngIf="userRole === 'REGISTERED_USER'"-->
 <!--          (routePreferencesSubmitted)="handleAdvancedRoutePreferences($event)">-->
 <!--        </app-advanced-route-form>-->
-
     </div>
 
-
     <div class="ride-right">
-
         <div class="driver-part">
           <app-drivers-availability></app-drivers-availability>
         </div>
@@ -29,21 +25,13 @@
         </div>
 
         <div class="ride-info">
-          <app-route-info></app-route-info>
-
+          <app-route-info
+            [distance]="distance"
+            [duration]="duration"
+            [price]="price"
+          ></app-route-info>
         </div>
-
       </div>
-<!--        <div class="map">-->
-<!--&lt;!&ndash;            <app-map></app-map>&ndash;&gt;-->
-<!--          <app-map-test-->
-<!--            [startCoords]="startCoords"-->
-<!--            [destinationCoords]="destinationCoords"-->
-<!--            [alternativeRoutes]="alternativeRoutes"-->
-<!--          ></app-map-test>-->
-
-<!--        </div>-->
-
     </div>
 </div>
 
