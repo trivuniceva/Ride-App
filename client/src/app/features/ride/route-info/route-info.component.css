@@ -5,13 +5,13 @@
 .info-container {
   padding: 20px;
   border-radius: 12px;
-  background-color: #1a1a1a;
+  /*background-color: #1a1a1a;*/
   color: #fff;
   margin: 20px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
 
-  /*background-color: rgba(26, 26, 26, 0.7);*/
-  /*backdrop-filter: blur(3px);*/
+  background-color: rgba(26, 26, 26, 0.7);
+  backdrop-filter: blur(3px);
 }
 
 .info-item {
