@@ -29,6 +29,8 @@ export class RouteFormComponent {
   startInput: any;
   destinationInput: any;
 
+  selectedClass: string | null = null;
+
   constructor(private http: HttpClient, private routeService: RouteService) {}
 
   getAddressSuggestions(query: string): Promise<string[]> {
@@ -131,4 +133,10 @@ export class RouteFormComponent {
       this.destinationInput.value = address;
     }
   }
+
+  selectClass(className: string): void {
+    this.selectedClass = className;
+    console.log('Odabrana klasa:', this.selectedClass);
+  }
+
 }

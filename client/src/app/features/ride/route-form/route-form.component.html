@@ -1,5 +1,5 @@
 <div class="route-form-container">
-  <h2>Prikazi putanje</h2>
+  <h2>Route Details</h2>
 
   <form (submit)="submitRouteData($event)">
     <div class="form-group">
@@ -7,7 +7,7 @@
         type="text"
         id="startAddress"
         #startAddress
-        placeholder="Unesite polazište"
+        placeholder="Pickup"
         class="form-control"
         (input)="onStartAddressInput($event)"
         [matAutocomplete]="startAuto"
@@ -24,7 +24,7 @@
         type="text"
         id="destinationAddress"
         #destinationAddress
-        placeholder="Unesite destinaciju"
+        placeholder="Destination"
         class="form-control"
         (input)="onDestinationAddressInput($event)"
         [matAutocomplete]="destinationAuto"
@@ -36,6 +36,20 @@
       </mat-autocomplete>
     </div>
 
-    <button type="submit" class="btn btn-primary">Prikazi putanje</button>
+    <div class="choose-class">
+      <h2>Choose Class</h2>
+      <div class="class-option" (click)="selectClass('Business')">
+        Luxury <span class="price">$30</span>
+      </div>
+      <div class="class-option" (click)="selectClass('Standard')">
+        Standard <span class="price">$22</span>
+      </div>
+      <div class="class-option" (click)="selectClass('Premium')">
+        Van <span class="price">$15</span>
+      </div>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Request</button>
   </form>
+
 </div>
