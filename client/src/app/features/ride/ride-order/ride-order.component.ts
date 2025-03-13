@@ -12,7 +12,6 @@ import {NgIf} from '@angular/common';
 import {environment} from '../../../../environments/environment';
 
 
-
 @Component({
   selector: 'app-ride-order',
   standalone: true,
@@ -129,9 +128,17 @@ export class RideOrderComponent implements OnInit {
 
   async geocodeAddress(address: string): Promise<[number, number] | null> {
     const response = await axios.get(
-      `https://api.openrouteservice.org/geocode/search?api_key=<span class="math-inline">\{this\.apiKey\}&text\=</span>{encodeURIComponent(
-        address
-      )}`
+      `https://api.openrouteservice.org/geocode/search`,
+      {
+        params: {
+          api_key: this.apiKey,
+          text: address
+        },
+        headers: {
+          'Accept': 'application/json',
+        },
+        timeout: 5000
+      }
     );
 
     if (response.data.features && response.data.features.length > 0) {
@@ -167,10 +174,13 @@ export class RideOrderComponent implements OnInit {
           },
         }
       );
+
       console.log('Odgovor sa rutiranjem:', response.data);
       return response.data.routes; // Vraćanje routes
-    } catch (error) {
+    } catch (error: any) {
       console.error('Greška tokom izračunavanja rute:', error);
+      console.error('Detalji greške:', error.message, error.code, error.response);
+
       return [];
     }
   }
