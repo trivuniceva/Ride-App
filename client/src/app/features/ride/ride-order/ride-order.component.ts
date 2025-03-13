@@ -6,11 +6,22 @@ import * as L from 'leaflet';
 import {DriversAvailabilityComponent} from '../../drivers/drivers-availability/drivers-availability.component';
 import * as polyline from '@mapbox/polyline';
 import {RouteInfoComponent} from '../route-info/route-info.component';
+import {AdvancedRouteFormComponent} from '../advanced-route-form/advanced-route-form.component';
+import {AuthService} from '../../../core/services/auth/auth.service';
+import {NgIf} from '@angular/common';
 
 @Component({
   selector: 'app-ride-order',
   standalone: true,
-  imports: [MapTestComponent, RouteFormComponent, DriversAvailabilityComponent, MapTestComponent, RouteInfoComponent],
+  imports: [
+    MapTestComponent,
+    RouteFormComponent,
+    DriversAvailabilityComponent,
+    MapTestComponent,
+    RouteInfoComponent,
+    AdvancedRouteFormComponent,
+    NgIf
+  ],
   templateUrl: './ride-order.component.html',
   styleUrls: ['./ride-order.component.css'],
 })
@@ -24,8 +35,15 @@ export class RideOrderComponent implements OnInit {
   price: number | undefined;
   startAddress: string | undefined;
   destinationAddress: string | undefined;
+  userRole: string = '';
 
-  ngOnInit(): void {}
+  constructor(private authService: AuthService) {}
+
+  ngOnInit(): void {
+    this.authService.userRole$.subscribe((role) => {
+      this.userRole = role;
+    });
+  }
 
   async handleRouteData(routeData: {
     startAddress: string;
@@ -93,7 +111,6 @@ export class RideOrderComponent implements OnInit {
     return 32;
   }
 
-
   async geocodeAddress(address: string): Promise<[number, number] | null> {
     const response = await axios.get(
       `https://api.openrouteservice.org/geocode/search?api_key=5b3ce3597851110001cf624851a1e060196148248c82526abcb25d4f&text=${encodeURIComponent(
@@ -143,6 +160,7 @@ export class RideOrderComponent implements OnInit {
   }
 
 
+  handleAdvancedRoutePreferences($event: any) {
 
-
+  }
 }

@@ -36,7 +36,8 @@
       </mat-autocomplete>
     </div>
 
-    <div class="choose-class">
+
+    <div *ngIf="userRole === ''" class="choose-class">
       <h2>Choose Class</h2>
       <div class="class-option" (click)="selectClass('Business')">
         Luxury <span class="price">$30</span>

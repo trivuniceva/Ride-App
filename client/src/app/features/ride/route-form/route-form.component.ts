@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Output } from '@angular/core';
+import {Component, EventEmitter, Input, Output} from '@angular/core';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { MatInputModule } from '@angular/material/input';
@@ -20,6 +20,7 @@ import {RouteService} from '../../../core/services/route/route.service';
 })
 export class RouteFormComponent {
   @Output() routeDataSubmitted = new EventEmitter<{ startAddress: string, destinationAddress: string }>();
+  @Input() userRole = '';
 
   startAddressOptions: string[] = [];
   destinationAddressOptions: string[] = [];

@@ -1,11 +1,14 @@
 <div class="ride-container">
     <div class="ride-left">
-      <app-route-form (routeDataSubmitted)="handleRouteData($event)"></app-route-form>
+      <app-route-form
+        (routeDataSubmitted)="handleRouteData($event)"
+        [userRole]="userRole"
+      ></app-route-form>
 
-      <!--        <app-advanced-route-form-->
-<!--          *ngIf="userRole === 'REGISTERED_USER'"-->
-<!--          (routePreferencesSubmitted)="handleAdvancedRoutePreferences($event)">-->
-<!--        </app-advanced-route-form>-->
+      <app-advanced-route-form
+        *ngIf="userRole === 'REGISTERED_USER'"
+        (routePreferencesSubmitted)="handleAdvancedRoutePreferences($event)">
+      </app-advanced-route-form>
     </div>
 
     <div class="ride-right">
