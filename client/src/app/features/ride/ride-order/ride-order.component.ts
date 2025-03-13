@@ -9,7 +9,9 @@ import {RouteInfoComponent} from '../route-info/route-info.component';
 import {AdvancedRouteFormComponent} from '../advanced-route-form/advanced-route-form.component';
 import {AuthService} from '../../../core/services/auth/auth.service';
 import {NgIf} from '@angular/common';
-import {readTsconfig} from '@angular-devkit/build-angular/src/utils/read-tsconfig';
+import {environment} from '../../../../environments/environment';
+
+
 
 @Component({
   selector: 'app-ride-order',
@@ -27,6 +29,8 @@ import {readTsconfig} from '@angular-devkit/build-angular/src/utils/read-tsconfi
   styleUrls: ['./ride-order.component.css'],
 })
 export class RideOrderComponent implements OnInit {
+  apiKey: string = '';
+
   startCoords: [number, number] | null = null;
   destinationCoords: [number, number] | null = null;
   alternativeRoutes: [number, number][] = [];
@@ -44,6 +48,8 @@ export class RideOrderComponent implements OnInit {
     this.authService.userRole$.subscribe((role) => {
       this.userRole = role;
     });
+
+    this.apiKey = environment.openrouteserviceApiKey;
   }
 
   async handleRouteData(routeData: {
@@ -123,7 +129,7 @@ export class RideOrderComponent implements OnInit {
 
   async geocodeAddress(address: string): Promise<[number, number] | null> {
     const response = await axios.get(
-      `https://api.openrouteservice.org/geocode/search?api_key=5b3ce3597851110001cf624851a1e060196148248c82526abcb25d4f&text=${encodeURIComponent(
+      `https://api.openrouteservice.org/geocode/search?api_key=<span class="math-inline">\{this\.apiKey\}&text\=</span>{encodeURIComponent(
         address
       )}`
     );
@@ -156,7 +162,7 @@ export class RideOrderComponent implements OnInit {
         },
         {
           headers: {
-            Authorization: '5b3ce3597851110001cf624851a1e060196148248c82526abcb25d4f',
+            Authorization: this.apiKey,
             'Content-Type': 'application/json',
           },
         }

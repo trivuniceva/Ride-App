@@ -4,7 +4,8 @@
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
-    "build": "ng build",
+    "build": "cross-env OPENROUTESERVICE_API_KEY=5b3ce3597851110001cf624851a1e060196148248c82526abcb25d4f ng build",
+    "build:prod": "cross-env OPENROUTESERVICE_API_KEY=5b3ce3597851110001cf624851a1e060196148248c82526abcb25d4f ng build --configuration=production",
     "watch": "ng build --watch --configuration development",
     "test": "ng test"
   },
@@ -34,6 +35,8 @@
     "@types/jasmine": "~5.1.0",
     "@types/leaflet-routing-machine": "^3.2.8",
     "@types/mapbox__polyline": "^1.0.5",
+    "@types/node": "^22.13.10",
+    "cross-env": "^7.0.3",
     "jasmine-core": "~5.5.0",
     "karma": "~6.4.0",
     "karma-chrome-launcher": "~3.2.0",
