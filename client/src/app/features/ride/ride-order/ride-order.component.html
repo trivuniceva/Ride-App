@@ -1,24 +1,42 @@
 <div class="ride-container">
     <div class="ride-left">
-        <app-route-form (routeDataSubmitted)="handleRouteData($event)"></app-route-form>
+      <app-route-form
+        (routeDataSubmitted)="handleRouteData($event)"
+        [userRole]="userRole"
+      ></app-route-form>
 
-        <app-advanced-route-form
-          *ngIf="userRole === 'REGISTERED_USER'"
-          (routePreferencesSubmitted)="handleAdvancedRoutePreferences($event)">
-        </app-advanced-route-form>
-
+      <app-advanced-route-form
+        *ngIf="userRole === 'REGISTERED_USER'"
+        (routePreferencesSubmitted)="handleAdvancedRoutePreferences($event)">
+      </app-advanced-route-form>
     </div>
 
-
     <div class="ride-right">
-
         <div class="driver-part">
           <app-drivers-availability></app-drivers-availability>
         </div>
 
-        <div class="map">
-            <app-map></app-map>
+      <div class="map-section">
+        <div class="map-container">
+                  <div class="map">
+                    <app-map-test
+                      [startCoords]="startCoords"
+                      [destinationCoords]="destinationCoords"
+                      [alternativeRoutes]="alternativeRoutes"
+                    ></app-map-test>
+                  </div>
         </div>
 
+        <div class="ride-info">
+          <app-route-info
+            [distance]="distance"
+            [duration]="duration"
+            [price]="price"
+            [startAddress]="startAddress"
+            [destinationAddress]="destinationAddress"
+          ></app-route-info>
+        </div>
+      </div>
     </div>
 </div>
+

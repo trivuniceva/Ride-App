@@ -80,4 +80,16 @@ public class Route {
     public void setRouteIdx(int routeIdx) {
         this.routeIdx = routeIdx;
     }
+
+    @Override
+    public String toString() {
+        return "Route{" +
+                "id=" + id +
+                ", routeName='" + routeName + '\'' +
+                ", waypoints=" + waypoints +
+                ", expectedTime=" + expectedTime +
+                ", length=" + length +
+                ", routeIdx=" + routeIdx +
+                '}';
+    }
 }

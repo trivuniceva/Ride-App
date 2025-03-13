@@ -3,7 +3,7 @@
   padding: 10px;
 }
 
-h2{
+h3{
   margin-left: 10px;
 }
 
@@ -23,6 +23,7 @@ h2{
   padding: 5px 20px;
   border-radius: 25px;
   cursor: pointer;
+  font-size: 14px;
 }
 
 .tab:hover{
@@ -42,6 +43,7 @@ h2{
   border: none;
   border-radius: 25px;
   margin-top: 10px;
+  font-size: 12px;
 }
 
 .driver-list {
@@ -62,6 +64,7 @@ h2{
 
 .driver-name {
   font-weight: bold;
+  font-size: 14px;
 }
 
 .driver-time {

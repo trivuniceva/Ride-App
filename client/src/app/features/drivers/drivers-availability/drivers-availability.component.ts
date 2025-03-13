@@ -6,6 +6,7 @@ import { interval, Subscription } from 'rxjs';
 
 @Component({
     selector: 'app-drivers-availability',
+    standalone: true,
     imports: [
         NgClass,
         CommonModule
