@@ -120,6 +120,11 @@ mat-option:active {
   color: white;
 }
 
+.class-option.active {
+  background-color: #111111;
+  color: white;
+}
+
 .price {
   font-weight: bold;
   font-size: 16px;

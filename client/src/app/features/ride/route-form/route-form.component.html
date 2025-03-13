@@ -39,14 +39,14 @@
 
     <div *ngIf="userRole === ''" class="choose-class">
       <h2>Choose Class</h2>
-      <div class="class-option" (click)="selectClass('Business')">
-        Luxury <span class="price">$30</span>
-      </div>
-      <div class="class-option" (click)="selectClass('Standard')">
+      <div class="class-option" (click)="selectClass('Standard')" [class.active]="activeClass === 'Standard'">
         Standard <span class="price">$22</span>
       </div>
-      <div class="class-option" (click)="selectClass('Premium')">
+      <div class="class-option" (click)="selectClass('Van')" [class.active]="activeClass === 'Van'">
         Van <span class="price">$15</span>
+      </div>
+      <div class="class-option" (click)="selectClass('Luxury')" [class.active]="activeClass === 'Luxury'">
+        Luxury <span class="price">$30</span>
       </div>
     </div>
 

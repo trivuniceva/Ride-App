@@ -19,7 +19,7 @@ import {RouteService} from '../../../core/services/route/route.service';
   styleUrls: ['./route-form.component.css']
 })
 export class RouteFormComponent {
-  @Output() routeDataSubmitted = new EventEmitter<{ startAddress: string, destinationAddress: string }>();
+  @Output() routeDataSubmitted = new EventEmitter<{ startAddress: string, destinationAddress: string, selectedClass: string | null  }>();
   @Input() userRole = '';
 
   startAddressOptions: string[] = [];
@@ -31,6 +31,7 @@ export class RouteFormComponent {
   destinationInput: any;
 
   selectedClass: string | null = null;
+  activeClass: string | null = null;
 
   constructor(private http: HttpClient, private routeService: RouteService) {}
 
@@ -105,7 +106,11 @@ export class RouteFormComponent {
 
   submitRouteData(event: Event): void {
     event.preventDefault();
-    this.routeDataSubmitted.emit({ startAddress: this.startAddressValue, destinationAddress: this.destinationAddressValue });
+    this.routeDataSubmitted.emit({
+      startAddress: this.startAddressValue,
+      destinationAddress: this.destinationAddressValue,
+      selectedClass: this.selectedClass
+    });
 
     // this.routeDataSubmitted.emit({ startAddress: this.startAddressValue, destinationAddress: this.destinationAddressValue });
 
@@ -137,7 +142,7 @@ export class RouteFormComponent {
 
   selectClass(className: string): void {
     this.selectedClass = className;
-    console.log('Odabrana klasa:', this.selectedClass);
+    this.activeClass = className;
   }
 
 }

@@ -14,5 +14,4 @@ export class RouteInfoComponent {
   @Input() startAddress: string | undefined;
   @Input() destinationAddress: string | undefined;
 
-
 }

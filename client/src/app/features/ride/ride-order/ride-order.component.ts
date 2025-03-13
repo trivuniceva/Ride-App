@@ -9,6 +9,7 @@ import {RouteInfoComponent} from '../route-info/route-info.component';
 import {AdvancedRouteFormComponent} from '../advanced-route-form/advanced-route-form.component';
 import {AuthService} from '../../../core/services/auth/auth.service';
 import {NgIf} from '@angular/common';
+import {readTsconfig} from '@angular-devkit/build-angular/src/utils/read-tsconfig';
 
 @Component({
   selector: 'app-ride-order',
@@ -48,6 +49,7 @@ export class RideOrderComponent implements OnInit {
   async handleRouteData(routeData: {
     startAddress: string;
     destinationAddress: string;
+    selectedClass: string | null;
   }): Promise<void> {
     try {
       const startCoords = await this.geocodeAddress(routeData.startAddress);
@@ -80,7 +82,7 @@ export class RideOrderComponent implements OnInit {
 
             this.distance = Math.round(routes[0].summary.distance / 100) / 10;
             this.duration = Math.round(routes[0].summary.duration / 60);
-            this.price = await this.calculatePrice(this.distance, this.duration);
+            this.price = await this.calculatePrice(this.distance, this.duration, routeData.selectedClass);
 
             console.log('Udaljenost:', this.distance, 'km');
             console.log('Trajanje:', this.duration, 'min');
@@ -101,14 +103,22 @@ export class RideOrderComponent implements OnInit {
     }
   }
 
-  async calculatePrice(distance: number, duration: number): Promise<number> {
+  async calculatePrice(distance: number, duration: number, selectedClass: string | null): Promise<number> {
     // const response = await axios.post('/api/calculate-price', {
     //   distance: distance,
     //   duration: duration,
     // });
     // return response.data.price;
 
-    return 32;
+    if (selectedClass === 'Standard') {
+      return 22;
+    } else if (selectedClass === 'Van') {
+      return 15;
+    } else if (selectedClass === 'Luxury') {
+      return 30;
+    } else {
+      return 0;
+    }
   }
 
   async geocodeAddress(address: string): Promise<[number, number] | null> {
