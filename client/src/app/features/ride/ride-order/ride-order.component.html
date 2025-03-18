@@ -27,7 +27,7 @@
                   </div>
         </div>
 
-        <div class="ride-info">
+        <div class="ride-info" *ngIf="distance !== undefined && duration !== undefined && price !== undefined && startAddress && destinationAddress">
           <app-route-info
             [distance]="distance"
             [duration]="duration"
