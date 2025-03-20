@@ -6,7 +6,6 @@ import * as L from 'leaflet';
 import {DriversAvailabilityComponent} from '../../drivers/drivers-availability/drivers-availability.component';
 import * as polyline from '@mapbox/polyline';
 import {RouteInfoComponent} from '../route-info/route-info.component';
-import {AdvancedRouteFormComponent} from '../advanced-route-form/advanced-route-form.component';
 import {AuthService} from '../../../core/services/auth/auth.service';
 import {NgIf} from '@angular/common';
 import {environment} from '../../../../environments/environment';
@@ -21,7 +20,6 @@ import {environment} from '../../../../environments/environment';
     DriversAvailabilityComponent,
     MapTestComponent,
     RouteInfoComponent,
-    AdvancedRouteFormComponent,
     NgIf
   ],
   templateUrl: './ride-order.component.html',

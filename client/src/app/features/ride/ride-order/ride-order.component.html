@@ -5,10 +5,6 @@
         [userRole]="userRole"
       ></app-route-form>
 
-      <app-advanced-route-form
-        *ngIf="userRole === 'REGISTERED_USER'"
-        (routePreferencesSubmitted)="handleAdvancedRoutePreferences($event)">
-      </app-advanced-route-form>
     </div>
 
     <div class="ride-right">
