@@ -19,12 +19,14 @@ import {RouteService} from '../../../../core/services/route/route.service';
   styleUrls: ['./route-form.component.css']
 })
 export class RouteFormComponent {
-  @Output() routeDataSubmitted = new EventEmitter<{ startAddress: string, destinationAddress: string}>();
+  @Output() routeDataSubmitted = new EventEmitter<{ startAddress: string, stops: string[], destinationAddress: string}>();
   @Input() userRole = '';
 
   startAddressOptions: string[] = [];
   destinationAddressOptions: string[] = [];
-  addressWarning: string = '';
+  stopAddressOptions: string[][] = [];
+  stops: string[] = [];
+
   startAddressValue: string = '';
   destinationAddressValue: string = '';
   startInput: any;
@@ -34,20 +36,16 @@ export class RouteFormComponent {
 
   getAddressSuggestions(query: string): Promise<string[]> {
     let searchQuery = query;
-
     if (!query.toLowerCase().includes('novi sad')) {
       searchQuery = `Novi Sad ${query}`;
     }
-
     const API_URL = `https://photon.komoot.io/api/?q=${searchQuery}`;
-
     return this.http.get(API_URL).toPromise().then((data: any) => {
       if (data.features) {
         return data.features.map((item: any) => {
           const street = item.properties.name;
           const city = item.properties.city || item.properties.town || item.properties.village;
           const country = item.properties.country;
-
           return `${street}, ${city || 'Unknown'}, ${country || 'Unknown'}`;
         });
       }
@@ -61,7 +59,6 @@ export class RouteFormComponent {
   onStartAddressInput(event: any): void {
     const input = event.target.value;
     this.startInput = event.target;
-
     if (input.length > 2) {
       this.getAddressSuggestions(input).then(suggestions => {
         this.startAddressOptions = suggestions;
@@ -69,18 +66,11 @@ export class RouteFormComponent {
     } else {
       this.startAddressOptions = [];
     }
-
-    if (!this.hasStreetNumber(input)) {
-      this.addressWarning = 'Please enter the street number, e.g., Bulevar Evrope 21';
-    } else {
-      this.addressWarning = '';
-    }
   }
 
   onDestinationAddressInput(event: any): void {
     const input = event.target.value;
     this.destinationInput = event.target;
-
     if (input.length > 2) {
       this.getAddressSuggestions(input).then(suggestions => {
         this.destinationAddressOptions = suggestions;
@@ -88,39 +78,53 @@ export class RouteFormComponent {
     } else {
       this.destinationAddressOptions = [];
     }
+  }
 
-    if (!this.hasStreetNumber(input)) {
-      this.addressWarning = 'Please enter the street number, e.g., Bulevar Evrope 21';
+  onStopAddressInput(event: any, index: number): void {
+    const input = event.target.value;
+    if (input.length > 2) {
+      this.getAddressSuggestions(input).then(suggestions => {
+        this.stopAddressOptions[index] = suggestions;
+      });
     } else {
-      this.addressWarning = '';
+      this.stopAddressOptions[index] = [];
     }
   }
 
-  hasStreetNumber(address: string): boolean {
-    const regex = /\d+/;
-    return regex.test(address);
+  addStop(): void {
+    this.stops.push('');
+    this.stopAddressOptions.push([]);
+  }
+
+  removeStop(index: number): void {
+    this.stops.splice(index, 1);
+    this.stopAddressOptions.splice(index, 1);
   }
 
   submitRouteData(event: Event): void {
     event.preventDefault();
     this.routeDataSubmitted.emit({
       startAddress: this.startAddressValue,
+      stops: this.stops,
       destinationAddress: this.destinationAddressValue
     });
   }
 
   onStartAddressSelect(address: string): void {
     this.startAddressValue = address;
-    if(this.startInput){
+    if (this.startInput) {
       this.startInput.value = address;
     }
   }
 
   onDestinationAddressSelect(address: string): void {
     this.destinationAddressValue = address;
-    if(this.destinationInput){
+    if (this.destinationInput) {
       this.destinationInput.value = address;
     }
   }
 
+  onStopAddressSelect(address: string, index: number): void {
+    this.stops[index] = address;
+  }
 }
