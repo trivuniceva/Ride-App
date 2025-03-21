@@ -4,6 +4,7 @@ import { RouteFormComponent } from '../../components/route-form/route-form.compo
 import { VehicleTypeComponent } from '../../components/vehicle-type/vehicle-type.component';
 import { AdditionalOptionsComponent } from '../../components/additional-options/additional-options.component';
 import { SplitFareComponent } from '../../components/split-fare/split-fare.component';
+import { RideSummaryComponent } from '../../components/ride-summary/ride-summary.component';
 
 @Component({
   selector: 'app-advanced-form-page',
@@ -14,6 +15,7 @@ import { SplitFareComponent } from '../../components/split-fare/split-fare.compo
     VehicleTypeComponent,
     AdditionalOptionsComponent,
     SplitFareComponent,
+    RideSummaryComponent,
   ],
   templateUrl: './advanced-form-page.component.html',
   styleUrl: './advanced-form-page.component.css',
@@ -23,6 +25,8 @@ export class AdvancedFormPageComponent implements AfterViewInit {
   additionalOptions: { carriesBabies: boolean; carriesPets: boolean } = { carriesBabies: false, carriesPets: false };
   passengers: string[] = [];
   vehicleType: string | null = null;
+  showPopup = false;
+  splitFareEmails: string[] = [];
 
   @ViewChild('routeForm') routeForm!: RouteFormComponent;
 
@@ -44,7 +48,7 @@ export class AdvancedFormPageComponent implements AfterViewInit {
   }
 
   processPayment() {
-    // Implementirajte logiku plaćanja
+    this.showPopup = true;
   }
 
   handleOptionsChange(options: { carriesBabies: boolean; carriesPets: boolean }) {
@@ -87,7 +91,7 @@ export class AdvancedFormPageComponent implements AfterViewInit {
     vehicleType: string | null;
   }): void {
     this.routeData = routeData;
-    console.log('routeData u advanced-form-page', this.routeData);
+    console.log('Route Data:', this.routeData);
     this.routeDataSubmitted.emit(routeData);
   }
 
@@ -97,5 +101,13 @@ export class AdvancedFormPageComponent implements AfterViewInit {
     if (this.routeForm) {
       this.showRoute();
     }
+  }
+
+  handlePaymentConfirmation() {
+    console.log('Payment has been confirmed');
+  }
+
+  handlePopupClosed() {
+    this.showPopup = false;
   }
 }

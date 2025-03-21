@@ -1,0 +1,40 @@
+<div *ngIf="showPopup" class="overlay" (click)="closePopup()">
+  <div class="summary-container" (click)="$event.stopPropagation()">
+    <h2>Payment Summary</h2>
+
+    <div class="route-details">
+      <h3>Route Details</h3>
+      <p><strong>Start Address:</strong> {{ routeData.startAddress }}</p>
+      <p><strong>Stops:</strong> {{ routeData.stops.join(', ') }}</p>
+      <p><strong>Destination Address:</strong> {{ routeData.destinationAddress }}</p>
+      <p><strong>Vehicle Type:</strong> {{ routeData.vehicleType }}</p>
+    </div>
+
+    <div class="additional-options">
+      <h3>Additional Options</h3>
+      <p><strong>Carrying Babies:</strong> {{ additionalOptions.carriesBabies ? 'Yes' : 'No' }}</p>
+      <p><strong>Carrying Pets:</strong> {{ additionalOptions.carriesPets ? 'Yes' : 'No' }}</p>
+    </div>
+
+    <div class="passenger-list">
+      <h3>Passengers</h3>
+      <ul>
+        <li *ngFor="let passenger of passengers">{{ passenger }}</li>
+      </ul>
+    </div>
+
+    <div class="split-fare-status">
+      <h3>Split Fare Notifications</h3>
+      <ul>
+        <li *ngFor="let email of splitFareEmails">
+          <span>{{ email }} - Status: {{ getPaymentStatus(email) }}</span>
+        </li>
+      </ul>
+    </div>
+
+    <div class="action-buttons">
+      <button (click)="confirmPayment()" class="btn btn-confirm">Confirm Payment</button>
+      <button (click)="closePopup()" class="btn btn-close">X</button>
+    </div>
+  </div>
+</div>
