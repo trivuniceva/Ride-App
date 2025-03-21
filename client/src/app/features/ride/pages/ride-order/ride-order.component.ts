@@ -1,16 +1,15 @@
-import { Component, OnInit } from '@angular/core';
+import {Component, OnInit, SimpleChanges} from '@angular/core';
 import { MapTestComponent } from '../../components/map-test/map-test.component';
 import { RouteFormComponent } from '../../components/route-form/route-form.component';
 import axios from 'axios';
 import * as L from 'leaflet';
-import {DriversAvailabilityComponent} from '../../../drivers/drivers-availability/drivers-availability.component';
+import { DriversAvailabilityComponent } from '../../../drivers/drivers-availability/drivers-availability.component';
 import * as polyline from '@mapbox/polyline';
-import {RouteInfoComponent} from '../../route-info/route-info.component';
-import {AuthService} from '../../../../core/services/auth/auth.service';
-import {NgIf} from '@angular/common';
-import {environment} from '../../../../../environments/environment';
-import {AdvancedFormPageComponent} from '../advanced-form-page/advanced-form-page.component';
-
+import { RouteInfoComponent } from '../../route-info/route-info.component';
+import { AuthService } from '../../../../core/services/auth/auth.service';
+import { NgIf } from '@angular/common';
+import { environment } from '../../../../../environments/environment';
+import { AdvancedFormPageComponent } from '../advanced-form-page/advanced-form-page.component';
 
 @Component({
   selector: 'app-ride-order',
@@ -22,7 +21,7 @@ import {AdvancedFormPageComponent} from '../advanced-form-page/advanced-form-pag
     MapTestComponent,
     RouteInfoComponent,
     NgIf,
-    AdvancedFormPageComponent
+    AdvancedFormPageComponent,
   ],
   templateUrl: './ride-order.component.html',
   styleUrls: ['./ride-order.component.css'],
@@ -113,41 +112,34 @@ export class RideOrderComponent implements OnInit {
   }
 
   async calculatePrice(distance: number, duration: number, selectedClass: string | null): Promise<number> {
-    // const response = await axios.post('/api/calculate-price', {
-    //   distance: distance,
-    //   duration: duration,
-    // });
-    // return response.data.price;
-
+    console.log(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>", distance)
+    let price = distance*120;
     if (selectedClass === 'Standard') {
-      return 22;
+      return price + 22;
     } else if (selectedClass === 'Van') {
-      return 15;
+      return price + 15;
     } else if (selectedClass === 'Luxury') {
-      return 30;
+      return price + 30;
     } else {
       return 0;
     }
   }
 
   async geocodeAddress(address: string): Promise<[number, number] | null> {
-    const response = await axios.get(
-      `https://api.openrouteservice.org/geocode/search`,
-      {
-        params: {
-          api_key: this.apiKey,
-          text: address
-        },
-        headers: {
-          'Accept': 'application/json',
-        },
-        timeout: 5000
-      }
-    );
+    const response = await axios.get(`https://api.openrouteservice.org/geocode/search`, {
+      params: {
+        api_key: this.apiKey,
+        text: address,
+      },
+      headers: {
+        Accept: 'application/json',
+      },
+      timeout: 5000,
+    });
 
     if (response.data.features && response.data.features.length > 0) {
       const coords = response.data.features[0].geometry.coordinates;
-      return [coords[1], coords[0]]; // [latitude, longitude]
+      return [coords[1], coords[0]];
     }
     return null;
   }
@@ -183,8 +175,15 @@ export class RideOrderComponent implements OnInit {
     }
   }
 
-
-  handleRouteDataFromAdvancedForm(routeData: { startAddress: string; stops: string[]; destinationAddress: string, vehicleType: string | null }): void {
+  handleRouteDataFromAdvancedForm(routeData: {
+    startAddress: string;
+    stops: string[];
+    destinationAddress: string;
+    vehicleType: string | null;
+  }): void {
     this.handleRouteData(routeData);
+    console.log(
+      '.........................................................................................................'
+    );
   }
 }

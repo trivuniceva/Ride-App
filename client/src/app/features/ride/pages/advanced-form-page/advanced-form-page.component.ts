@@ -1,4 +1,4 @@
-import {Component, EventEmitter, Output, ViewChild} from '@angular/core';
+import { Component, EventEmitter, Output, ViewChild, AfterViewInit } from '@angular/core';
 import { NgIf } from '@angular/common';
 import { RouteFormComponent } from '../../components/route-form/route-form.component';
 import { VehicleTypeComponent } from '../../components/vehicle-type/vehicle-type.component';
@@ -18,7 +18,7 @@ import { SplitFareComponent } from '../../components/split-fare/split-fare.compo
   templateUrl: './advanced-form-page.component.html',
   styleUrl: './advanced-form-page.component.css',
 })
-export class AdvancedFormPageComponent {
+export class AdvancedFormPageComponent implements AfterViewInit {
   currentStep: number = 1;
   additionalOptions: { carriesBabies: boolean; carriesPets: boolean } = { carriesBabies: false, carriesPets: false };
   passengers: string[] = [];
@@ -33,6 +33,11 @@ export class AdvancedFormPageComponent {
     vehicleType: string | null;
   }>();
 
+  ngAfterViewInit(): void {
+    if (this.vehicleType) {
+      this.showRoute();
+    }
+  }
 
   goToStep(step: number): void {
     this.currentStep = step;
@@ -52,32 +57,45 @@ export class AdvancedFormPageComponent {
   }
 
   showRoute(): void {
-    const routeData = {
-      startAddress: this.routeForm.startAddressValue,
-      stops: this.routeForm.stops,
-      destinationAddress: this.routeForm.destinationAddressValue,
-      vehicleType: this.vehicleType,
-    };
-    this.handleRouteData(routeData);
+    if (this.routeForm) {
+      const routeData = {
+        startAddress: this.routeForm.startAddressValue,
+        stops: this.routeForm.stops,
+        destinationAddress: this.routeForm.destinationAddressValue,
+        vehicleType: this.vehicleType,
+      };
+      this.handleRouteData(routeData);
+    }
   }
 
-  routeData: { startAddress: string; stops: string[]; destinationAddress: string, vehicleType: string | null; } = {
+  routeData: {
+    startAddress: string;
+    stops: string[];
+    destinationAddress: string;
+    vehicleType: string | null;
+  } = {
     startAddress: '',
     stops: [],
     destinationAddress: '',
     vehicleType: null,
-
   };
 
-  handleRouteData(routeData: { startAddress: string; stops: string[]; destinationAddress: string, vehicleType: string | null }): void {
+  handleRouteData(routeData: {
+    startAddress: string;
+    stops: string[];
+    destinationAddress: string;
+    vehicleType: string | null;
+  }): void {
     this.routeData = routeData;
     console.log('routeData u advanced-form-page', this.routeData);
     this.routeDataSubmitted.emit(routeData);
   }
 
   handleVehicleTypeSelected(selectedType: string) {
-    console.log(".........................................................................................................")
-    console.log(selectedType)
+    console.log(selectedType);
     this.vehicleType = selectedType;
+    if (this.routeForm) {
+      this.showRoute();
+    }
   }
 }
