@@ -8,6 +8,7 @@
 
   <div *ngIf="currentStep === 2">
     <app-vehicle-type></app-vehicle-type>
+    <app-additional-options (optionsChanged)="handleOptionsChange($event)"></app-additional-options>
     <button type="button" (click)="goToStep(1)" class="btn btn-back">Back</button>
     <button type="button" (click)="goToStep(3)" class="btn btn-next">Next</button>
   </div>
