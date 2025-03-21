@@ -1,0 +1,18 @@
+<div class="split-fare-container">
+  <h2>Add Passengers for Split Fare</h2>
+
+  <div class="input-container">
+    <input type="email" [(ngModel)]="newPassengerEmail" placeholder="Enter passenger email">
+    <button (click)="addPassenger()">Add</button>
+  </div>
+
+  <div *ngIf="passengerEmails.length > 0">
+    <ul class="passenger-list">
+      <li *ngFor="let email of passengerEmails">
+        <span>{{ email }}</span>
+        <button (click)="removePassenger(email)">Remove</button>
+      </li>
+    </ul>
+    <button (click)="emitPassengers()" class="confirm-btn">Confirm Passengers</button>
+  </div>
+</div>

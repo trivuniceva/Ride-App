@@ -14,6 +14,8 @@
   </div>
 
   <div *ngIf="currentStep === 3">
+    <app-split-fare (passengersAdded)="handlePassengersAdded($event)"></app-split-fare>
+
     <button type="button" (click)="goToStep(1)" class="btn btn-back">Back</button>
     <button type="button" (click)="processPayment()" class="btn btn-pay">Pay</button>
   </div>
