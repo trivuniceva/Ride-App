@@ -1,0 +1,38 @@
+.route-form-container {
+  flex-direction: column;
+  position: relative;
+  margin: 8% auto;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+}
+
+h2 {
+  margin-bottom: 20px;
+}
+
+.btn {
+  padding: 10px 34px;
+  border: none;
+  border-radius: 4px;
+  font-size: 1em;
+  cursor: pointer;
+  margin-right: 10px;
+  margin-top: 100px;
+
+}
+
+.btn-next {
+  background-color: #ccc;
+  color: white;
+}
+
+.btn-back {
+  background-color: #6c757d;
+  color: white;
+}
+
+.btn-pay {
+  background-color: #28a745;
+  color: white;
+}

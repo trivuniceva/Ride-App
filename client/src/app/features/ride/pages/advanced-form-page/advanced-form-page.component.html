@@ -1,0 +1,24 @@
+<div class="route-form-container">
+  <h2>Route Details</h2>
+
+  <div *ngIf="currentStep === 1">
+    <app-vehicle-type (classSelected)="handleVehicleTypeSelected($event)"></app-vehicle-type>
+    <app-additional-options (optionsChanged)="handleOptionsChange($event)"></app-additional-options>
+
+    <button type="button" (click)="goToStep(2)" class="btn btn-next">Next</button>
+  </div>
+
+  <div *ngIf="currentStep === 2">
+    <app-route-form #routeForm></app-route-form>
+    <button type="button" (click)="showRoute()" class="btn btn-show-route">Show Route</button>
+    <button type="button" (click)="goToStep(1)" class="btn btn-back">Back</button>
+    <button type="button" (click)="goToStep(3)" class="btn btn-next">Next</button>
+  </div>
+
+  <div *ngIf="currentStep === 3">
+    <app-split-fare (passengersAdded)="handlePassengersAdded($event)"></app-split-fare>
+
+    <button type="button" (click)="goToStep(2)" class="btn btn-back">Back</button>
+    <button type="button" (click)="processPayment()" class="btn btn-pay">Pay</button>
+  </div>
+</div>

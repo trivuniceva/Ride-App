@@ -1,0 +1,20 @@
+<div class="stops-container">
+  <h3>Stops</h3>
+  <div *ngFor="let stop of stops; let i = index" class="form-group">
+    <input
+      type="text"
+      [id]="'stopAddress' + i"
+      placeholder="Stop address"
+      class="form-control"
+      (input)="onStopAddressInput($event, i)"
+      [matAutocomplete]="stopAuto"
+    >
+    <mat-autocomplete #stopAuto="matAutocomplete">
+      <mat-option *ngFor="let address of stopAddressOptions[i]" [value]="address" (onSelectionChange)="onStopAddressSelect(address, i)">
+        {{ address }}
+      </mat-option>
+    </mat-autocomplete>
+    <button (click)="removeStop(i)" class="btn btn-danger">Remove</button>
+  </div>
+  <button (click)="addStop()" class="btn btn-secondary">Add Stop</button>
+</div>
