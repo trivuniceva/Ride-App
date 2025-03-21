@@ -108,24 +108,6 @@ export class RideOrderComponent implements OnInit {
     }
   }
 
-  async calculatePrice(distance: number, duration: number, selectedClass: string | null): Promise<number> {
-    // const response = await axios.post('/api/calculate-price', {
-    //   distance: distance,
-    //   duration: duration,
-    // });
-    // return response.data.price;
-
-    if (selectedClass === 'Standard') {
-      return 22;
-    } else if (selectedClass === 'Van') {
-      return 15;
-    } else if (selectedClass === 'Luxury') {
-      return 30;
-    } else {
-      return 0;
-    }
-  }
-
   async geocodeAddress(address: string): Promise<[number, number] | null> {
     const response = await axios.get(
       `https://api.openrouteservice.org/geocode/search`,
