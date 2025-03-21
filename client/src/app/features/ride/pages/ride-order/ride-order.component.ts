@@ -40,6 +40,7 @@ export class RideOrderComponent implements OnInit {
   startAddress: string | undefined;
   destinationAddress: string | undefined;
   userRole: string = '';
+  waypointsCoords: [number, number][] = [];
 
   constructor(private authService: AuthService) {}
 
@@ -53,45 +54,45 @@ export class RideOrderComponent implements OnInit {
 
   async handleRouteData(routeData: {
     startAddress: string;
+    stops: string[];
     destinationAddress: string;
   }): Promise<void> {
     try {
       const startCoords = await this.geocodeAddress(routeData.startAddress);
       const destinationCoords = await this.geocodeAddress(routeData.destinationAddress);
+      let waypointsCoords: [number, number][] = [];
 
-      console.log('nnnnn');
-      console.log(startCoords);
-      console.log(destinationCoords);
-      console.log(routeData);
+      if (routeData.stops && routeData.stops.length > 0) {
+        for (let stop of routeData.stops) {
+          const stopCoords = await this.geocodeAddress(stop);
+          if (stopCoords) {
+            waypointsCoords.push(stopCoords);
+          }
+        }
+      }
 
       if (startCoords && destinationCoords) {
         this.startCoords = startCoords;
         this.destinationCoords = destinationCoords;
         this.startAddress = routeData.startAddress;
         this.destinationAddress = routeData.destinationAddress;
-        const routes = await this.getRoutes(startCoords, destinationCoords);
+        this.waypointsCoords = waypointsCoords; // Dodato dodeljivanje waypointsCoords
 
-        console.log('routes:', routes); // logovanje routes
+        const routes = await this.getRoutes(startCoords, waypointsCoords, destinationCoords);
+
+        console.log('routes:', routes);
 
         if (routes && routes.length > 0 && routes[0].geometry) {
-          console.log('routes[0].geometry:', routes[0].geometry); // logovanje routes[0].geometry
-
           const decoded = polyline.decode(routes[0].geometry);
 
           if (decoded && decoded.length > 0) {
-            console.log('Uslov ispunjen');
-            this.alternativeRoutes = decoded.map(
-              (coord: [number, number]) => [coord[0], coord[1]] // obrnuto [lat, lng]
-            );
+            this.alternativeRoutes = decoded.map((coord: [number, number]) => [coord[0], coord[1]]);
 
             this.distance = Math.round(routes[0].summary.distance / 100) / 10;
             this.duration = Math.round(routes[0].summary.duration / 60);
-            // this.price = await this.calculatePrice(this.distance, this.duration, routeData.selectedClass);
 
             console.log('Udaljenost:', this.distance, 'km');
             console.log('Trajanje:', this.duration, 'min');
-
-            console.log('- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - ');
             console.log('alternativeRoutes:', this.alternativeRoutes);
           } else {
             console.log('Dekodiranje nije uspelo');
@@ -149,22 +150,19 @@ export class RideOrderComponent implements OnInit {
 
   async getRoutes(
     startCoords: [number, number],
+    waypointsCoords: [number, number][],
     destinationCoords: [number, number]
   ): Promise<any[]> {
     try {
-      console.log('Zahtev za rutiranje:', {
-        coordinates: [
-          [startCoords[1], startCoords[0]],
-          [destinationCoords[1], destinationCoords[0]],
-        ],
-      });
+      let coordinates = [[startCoords[1], startCoords[0]]];
+      for (let waypoint of waypointsCoords) {
+        coordinates.push([waypoint[1], waypoint[0]]);
+      }
+      coordinates.push([destinationCoords[1], destinationCoords[0]]);
       const response = await axios.post(
         'https://api.openrouteservice.org/v2/directions/driving-car',
         {
-          coordinates: [
-            [startCoords[1], startCoords[0]],
-            [destinationCoords[1], destinationCoords[0]],
-          ],
+          coordinates: coordinates,
         },
         {
           headers: {
@@ -174,14 +172,15 @@ export class RideOrderComponent implements OnInit {
         }
       );
 
-      console.log('Odgovor sa rutiranjem:', response.data);
-      return response.data.routes; // Vraćanje routes
+      return response.data.routes;
     } catch (error: any) {
       console.error('Greška tokom izračunavanja rute:', error);
-      console.error('Detalji greške:', error.message, error.code, error.response);
-
       return [];
     }
   }
 
+
+  handleRouteDataFromAdvancedForm(routeData: { startAddress: string; stops: string[]; destinationAddress: string }): void {
+    this.handleRouteData(routeData);
+  }
 }
