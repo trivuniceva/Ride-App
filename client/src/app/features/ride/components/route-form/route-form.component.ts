@@ -1,10 +1,11 @@
-import {Component, EventEmitter, Input, Output} from '@angular/core';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { MatInputModule } from '@angular/material/input';
 import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
-import {RouteService} from '../../../../core/services/route/route.service';
+import { RouteService } from '../../../../core/services/route/route.service';
+import { StopsFormComponent } from '../stops-form/stops-form.component';
 
 @Component({
   selector: 'app-route-form',
@@ -13,13 +14,18 @@ import {RouteService} from '../../../../core/services/route/route.service';
     MatFormFieldModule,
     MatAutocompleteModule,
     MatInputModule,
-    CommonModule
+    CommonModule,
+    StopsFormComponent,
   ],
   templateUrl: './route-form.component.html',
-  styleUrls: ['./route-form.component.css']
+  styleUrls: ['./route-form.component.css'],
 })
 export class RouteFormComponent {
-  @Output() routeDataSubmitted = new EventEmitter<{ startAddress: string, stops: string[], destinationAddress: string}>();
+  @Output() routeDataSubmitted = new EventEmitter<{
+    startAddress: string;
+    stops: string[];
+    destinationAddress: string;
+  }>();
   @Input() userRole = '';
 
   startAddressOptions: string[] = [];
@@ -40,27 +46,36 @@ export class RouteFormComponent {
       searchQuery = `Novi Sad ${query}`;
     }
     const API_URL = `https://photon.komoot.io/api/?q=${searchQuery}`;
-    return this.http.get(API_URL).toPromise().then((data: any) => {
-      if (data.features) {
-        return data.features.map((item: any) => {
-          const street = item.properties.name;
-          const city = item.properties.city || item.properties.town || item.properties.village;
-          const country = item.properties.country;
-          return `${street}, ${city || 'Unknown'}, ${country || 'Unknown'}`;
-        });
-      }
-      return [];
-    }, (error) => {
-      console.error('Error during search:', error);
-      return [];
-    });
+    return this.http
+      .get(API_URL)
+      .toPromise()
+      .then(
+        (data: any) => {
+          if (data.features) {
+            return data.features.map((item: any) => {
+              const street = item.properties.name;
+              const city =
+                item.properties.city ||
+                item.properties.town ||
+                item.properties.village;
+              const country = item.properties.country;
+              return `${street}, ${city || 'Unknown'}, ${country || 'Unknown'}`;
+            });
+          }
+          return [];
+        },
+        (error) => {
+          console.error('Error during search:', error);
+          return [];
+        }
+      );
   }
 
   onStartAddressInput(event: any): void {
     const input = event.target.value;
     this.startInput = event.target;
     if (input.length > 2) {
-      this.getAddressSuggestions(input).then(suggestions => {
+      this.getAddressSuggestions(input).then((suggestions) => {
         this.startAddressOptions = suggestions;
       });
     } else {
@@ -72,7 +87,7 @@ export class RouteFormComponent {
     const input = event.target.value;
     this.destinationInput = event.target;
     if (input.length > 2) {
-      this.getAddressSuggestions(input).then(suggestions => {
+      this.getAddressSuggestions(input).then((suggestions) => {
         this.destinationAddressOptions = suggestions;
       });
     } else {
@@ -80,25 +95,16 @@ export class RouteFormComponent {
     }
   }
 
-  onStopAddressInput(event: any, index: number): void {
-    const input = event.target.value;
-    if (input.length > 2) {
-      this.getAddressSuggestions(input).then(suggestions => {
-        this.stopAddressOptions[index] = suggestions;
-      });
-    } else {
-      this.stopAddressOptions[index] = [];
-    }
+  onStopsChanged(stops: string[]): void {
+    this.stops = stops;
   }
 
-  addStop(): void {
-    this.stops.push('');
-    this.stopAddressOptions.push([]);
+  onStopAddressSelected(event: { address: string; index: number }): void {
+    this.stops[event.index] = event.address;
   }
 
-  removeStop(index: number): void {
-    this.stops.splice(index, 1);
-    this.stopAddressOptions.splice(index, 1);
+  onStopAddressInputted(event: { event: any; index: number }): void {
+    this.onStopAddressInput(event.event, event.index);
   }
 
   submitRouteData(event: Event): void {
@@ -106,7 +112,7 @@ export class RouteFormComponent {
     this.routeDataSubmitted.emit({
       startAddress: this.startAddressValue,
       stops: this.stops,
-      destinationAddress: this.destinationAddressValue
+      destinationAddress: this.destinationAddressValue,
     });
   }
 
@@ -124,7 +130,14 @@ export class RouteFormComponent {
     }
   }
 
-  onStopAddressSelect(address: string, index: number): void {
-    this.stops[index] = address;
+  onStopAddressInput(event: any, index: number): void {
+    const input = event.target.value;
+    if (input.length > 2) {
+      this.getAddressSuggestions(input).then((suggestions) => {
+        this.stopAddressOptions[index] = suggestions;
+      });
+    } else {
+      this.stopAddressOptions[index] = [];
+    }
   }
 }

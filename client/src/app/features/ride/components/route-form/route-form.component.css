@@ -43,14 +43,12 @@ h2 {
 
 .btn-primary {
   background-color: #28a745;
-  /*background-color: #ccc;*/
   color: white;
-  /*width: 80%;*/
   padding: 10px 30px;
   cursor: pointer;
 }
 
-.btn-primary:hover{
+.btn-primary:hover {
   background-color: darkgreen;
 }
 
