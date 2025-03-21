@@ -41,6 +41,7 @@ export class RideOrderComponent implements OnInit {
   destinationAddress: string | undefined;
   userRole: string = '';
   waypointsCoords: [number, number][] = [];
+  vehicleType: string | null = null;
 
   constructor(private authService: AuthService) {}
 
@@ -56,6 +57,7 @@ export class RideOrderComponent implements OnInit {
     startAddress: string;
     stops: string[];
     destinationAddress: string;
+    vehicleType?: string | null;
   }): Promise<void> {
     try {
       const startCoords = await this.geocodeAddress(routeData.startAddress);
@@ -76,7 +78,8 @@ export class RideOrderComponent implements OnInit {
         this.destinationCoords = destinationCoords;
         this.startAddress = routeData.startAddress;
         this.destinationAddress = routeData.destinationAddress;
-        this.waypointsCoords = waypointsCoords; // Dodato dodeljivanje waypointsCoords
+        this.waypointsCoords = waypointsCoords;
+        this.vehicleType = routeData.vehicleType || null;
 
         const routes = await this.getRoutes(startCoords, waypointsCoords, destinationCoords);
 
@@ -90,6 +93,7 @@ export class RideOrderComponent implements OnInit {
 
             this.distance = Math.round(routes[0].summary.distance / 100) / 10;
             this.duration = Math.round(routes[0].summary.duration / 60);
+            this.price = await this.calculatePrice(this.distance, this.duration, this.vehicleType);
 
             console.log('Udaljenost:', this.distance, 'km');
             console.log('Trajanje:', this.duration, 'min');
@@ -105,6 +109,24 @@ export class RideOrderComponent implements OnInit {
       }
     } catch (error) {
       console.error('Error during route calculation:', error);
+    }
+  }
+
+  async calculatePrice(distance: number, duration: number, selectedClass: string | null): Promise<number> {
+    // const response = await axios.post('/api/calculate-price', {
+    //   distance: distance,
+    //   duration: duration,
+    // });
+    // return response.data.price;
+
+    if (selectedClass === 'Standard') {
+      return 22;
+    } else if (selectedClass === 'Van') {
+      return 15;
+    } else if (selectedClass === 'Luxury') {
+      return 30;
+    } else {
+      return 0;
     }
   }
 
@@ -162,7 +184,7 @@ export class RideOrderComponent implements OnInit {
   }
 
 
-  handleRouteDataFromAdvancedForm(routeData: { startAddress: string; stops: string[]; destinationAddress: string }): void {
+  handleRouteDataFromAdvancedForm(routeData: { startAddress: string; stops: string[]; destinationAddress: string, vehicleType: string | null }): void {
     this.handleRouteData(routeData);
   }
 }

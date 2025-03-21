@@ -22,6 +22,7 @@ export class AdvancedFormPageComponent {
   currentStep: number = 1;
   additionalOptions: { carriesBabies: boolean; carriesPets: boolean } = { carriesBabies: false, carriesPets: false };
   passengers: string[] = [];
+  vehicleType: string | null = null;
 
   @ViewChild('routeForm') routeForm!: RouteFormComponent;
 
@@ -29,6 +30,7 @@ export class AdvancedFormPageComponent {
     startAddress: string;
     stops: string[];
     destinationAddress: string;
+    vehicleType: string | null;
   }>();
 
 
@@ -54,19 +56,28 @@ export class AdvancedFormPageComponent {
       startAddress: this.routeForm.startAddressValue,
       stops: this.routeForm.stops,
       destinationAddress: this.routeForm.destinationAddressValue,
+      vehicleType: this.vehicleType,
     };
     this.handleRouteData(routeData);
   }
 
-  routeData: { startAddress: string; stops: string[]; destinationAddress: string } = {
+  routeData: { startAddress: string; stops: string[]; destinationAddress: string, vehicleType: string | null; } = {
     startAddress: '',
     stops: [],
     destinationAddress: '',
+    vehicleType: null,
+
   };
 
-  handleRouteData(routeData: { startAddress: string; stops: string[]; destinationAddress: string }): void {
+  handleRouteData(routeData: { startAddress: string; stops: string[]; destinationAddress: string, vehicleType: string | null }): void {
     this.routeData = routeData;
     console.log('routeData u advanced-form-page', this.routeData);
     this.routeDataSubmitted.emit(routeData);
+  }
+
+  handleVehicleTypeSelected(selectedType: string) {
+    console.log(".........................................................................................................")
+    console.log(selectedType)
+    this.vehicleType = selectedType;
   }
 }
