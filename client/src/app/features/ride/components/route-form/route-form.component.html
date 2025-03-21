@@ -34,7 +34,7 @@
       </mat-autocomplete>
     </div>
 
-    <button type="submit" class="btn btn-primary">Request</button>
+    <button *ngIf="userRole!==''" type="submit" class="btn btn-primary">Request</button>
   </form>
 
 </div>

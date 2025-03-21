@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import {NgIf} from '@angular/common';
-import {RouteFormComponent} from '../../route-form/route-form.component';
-import {VehicleTypeComponent} from '../../vehicle-type/vehicle-type.component';
+import {RouteFormComponent} from '../../components/route-form/route-form.component';
+import {VehicleTypeComponent} from '../../components/vehicle-type/vehicle-type.component';
 
 @Component({
   selector: 'app-advanced-form-page',

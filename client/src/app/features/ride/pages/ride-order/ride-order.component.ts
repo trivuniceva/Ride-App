@@ -1,15 +1,15 @@
 import { Component, OnInit } from '@angular/core';
-import { MapTestComponent } from '../map-test/map-test.component';
-import { RouteFormComponent } from '../route-form/route-form.component';
+import { MapTestComponent } from '../../components/map-test/map-test.component';
+import { RouteFormComponent } from '../../components/route-form/route-form.component';
 import axios from 'axios';
 import * as L from 'leaflet';
-import {DriversAvailabilityComponent} from '../../drivers/drivers-availability/drivers-availability.component';
+import {DriversAvailabilityComponent} from '../../../drivers/drivers-availability/drivers-availability.component';
 import * as polyline from '@mapbox/polyline';
-import {RouteInfoComponent} from '../route-info/route-info.component';
-import {AuthService} from '../../../core/services/auth/auth.service';
+import {RouteInfoComponent} from '../../route-info/route-info.component';
+import {AuthService} from '../../../../core/services/auth/auth.service';
 import {NgIf} from '@angular/common';
-import {environment} from '../../../../environments/environment';
-import {AdvancedFormPageComponent} from '../advanced-route-form/advanced-form-page/advanced-form-page.component';
+import {environment} from '../../../../../environments/environment';
+import {AdvancedFormPageComponent} from '../advanced-form-page/advanced-form-page.component';
 
 
 @Component({
@@ -54,7 +54,6 @@ export class RideOrderComponent implements OnInit {
   async handleRouteData(routeData: {
     startAddress: string;
     destinationAddress: string;
-    selectedClass: string | null;
   }): Promise<void> {
     try {
       const startCoords = await this.geocodeAddress(routeData.startAddress);
@@ -87,7 +86,7 @@ export class RideOrderComponent implements OnInit {
 
             this.distance = Math.round(routes[0].summary.distance / 100) / 10;
             this.duration = Math.round(routes[0].summary.duration / 60);
-            this.price = await this.calculatePrice(this.distance, this.duration, routeData.selectedClass);
+            // this.price = await this.calculatePrice(this.distance, this.duration, routeData.selectedClass);
 
             console.log('Udaljenost:', this.distance, 'km');
             console.log('Trajanje:', this.duration, 'min');
@@ -185,8 +184,4 @@ export class RideOrderComponent implements OnInit {
     }
   }
 
-
-  handleAdvancedRoutePreferences($event: any) {
-
-  }
 }
