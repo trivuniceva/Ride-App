@@ -4,6 +4,7 @@ import { NgIf } from '@angular/common';
 
 @Component({
     selector: 'app-registration-form',
+    standalone: true,
     imports: [
         ReactiveFormsModule,
         NgIf

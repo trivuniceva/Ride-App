@@ -5,7 +5,7 @@
   text-align: center;
   display: flex;
   flex-direction: column;
-  min-height: 100vh;
+  z-index: 1;
 }
 
 h2 {
@@ -102,27 +102,6 @@ mat-option:active {
 .choose-class {
   margin-top: 80px;
   margin-bottom: 45px;
-}
-
-
-.class-option {
-  padding: 14px;
-  border-radius: 25px;
-  margin-top: 15px;
-  cursor: pointer;
-  display: flex;
-  justify-content: space-between;
-  font-size: 14px;
-}
-
-.class-option:hover{
-  background-color: #111111;
-  color: white;
-}
-
-.class-option.active {
-  background-color: #111111;
-  color: white;
 }
 
 .price {

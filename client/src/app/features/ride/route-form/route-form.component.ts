@@ -19,7 +19,7 @@ import {RouteService} from '../../../core/services/route/route.service';
   styleUrls: ['./route-form.component.css']
 })
 export class RouteFormComponent {
-  @Output() routeDataSubmitted = new EventEmitter<{ startAddress: string, destinationAddress: string, selectedClass: string | null  }>();
+  @Output() routeDataSubmitted = new EventEmitter<{ startAddress: string, destinationAddress: string}>();
   @Input() userRole = '';
 
   startAddressOptions: string[] = [];
@@ -29,9 +29,6 @@ export class RouteFormComponent {
   destinationAddressValue: string = '';
   startInput: any;
   destinationInput: any;
-
-  selectedClass: string | null = null;
-  activeClass: string | null = null;
 
   constructor(private http: HttpClient, private routeService: RouteService) {}
 
@@ -108,22 +105,8 @@ export class RouteFormComponent {
     event.preventDefault();
     this.routeDataSubmitted.emit({
       startAddress: this.startAddressValue,
-      destinationAddress: this.destinationAddressValue,
-      selectedClass: this.selectedClass
+      destinationAddress: this.destinationAddressValue
     });
-
-    // this.routeDataSubmitted.emit({ startAddress: this.startAddressValue, destinationAddress: this.destinationAddressValue });
-
-    // this.routeService.getShortestRoutes(this.startAddressValue, this.destinationAddressValue).subscribe(
-    //   (routes) => {
-    //     console.log('Pronađene putanje:', routes);
-    //     // Emitujemo rezultate prema roditeljskoj komponenti
-    //     this.routeDataSubmitted.emit({ startAddress: this.startAddressValue, destinationAddress: this.destinationAddressValue });
-    //   },
-    //   (error) => {
-    //     console.error('Greška pri dobavljanju putanja:', error);
-    //   }
-    // );
   }
 
   onStartAddressSelect(address: string): void {
@@ -138,11 +121,6 @@ export class RouteFormComponent {
     if(this.destinationInput){
       this.destinationInput.value = address;
     }
-  }
-
-  selectClass(className: string): void {
-    this.selectedClass = className;
-    this.activeClass = className;
   }
 
 }

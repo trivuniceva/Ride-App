@@ -1,0 +1,20 @@
+
+.class-option {
+  padding: 14px;
+  border-radius: 25px;
+  margin-top: 15px;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  font-size: 14px;
+}
+
+.class-option:hover{
+  background-color: #111111;
+  color: white;
+}
+
+.class-option.active {
+  background-color: #111111;
+  color: white;
+}

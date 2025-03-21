@@ -9,6 +9,7 @@ import {RouteInfoComponent} from '../route-info/route-info.component';
 import {AuthService} from '../../../core/services/auth/auth.service';
 import {NgIf} from '@angular/common';
 import {environment} from '../../../../environments/environment';
+import {AdvancedFormPageComponent} from '../advanced-route-form/advanced-form-page/advanced-form-page.component';
 
 
 @Component({
@@ -20,7 +21,8 @@ import {environment} from '../../../../environments/environment';
     DriversAvailabilityComponent,
     MapTestComponent,
     RouteInfoComponent,
-    NgIf
+    NgIf,
+    AdvancedFormPageComponent
   ],
   templateUrl: './ride-order.component.html',
   styleUrls: ['./ride-order.component.css'],

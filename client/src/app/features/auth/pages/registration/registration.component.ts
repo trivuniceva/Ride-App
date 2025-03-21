@@ -6,6 +6,7 @@ import {NgIf} from '@angular/common';
 
 @Component({
     selector: 'app-registration',
+    standalone: true,
     imports: [
         RegistrationFormComponent,
         NgIf
