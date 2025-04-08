@@ -1,0 +1,17 @@
+<div *ngIf="showTrackingPopup" class="overlay" (click)="closeTrackingPopup()">
+  <div class="summary-container" (click)="$event.stopPropagation()">
+    <h2>Status Uplate</h2>
+
+    <p>{{ message }}</p>
+
+    <div *ngIf="splitFareEmails.length > 0">
+      <ul>
+        <li *ngFor="let email of splitFareEmails">
+          {{ email }} - Status: {{ getPaymentStatus(email) }}
+        </li>
+      </ul>
+    </div>
+
+    <button (click)="closeTrackingPopup()" class="btn btn-close">Zatvori</button>
+  </div>
+</div>
