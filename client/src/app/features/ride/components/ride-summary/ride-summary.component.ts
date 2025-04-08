@@ -37,7 +37,7 @@ export class RideSummaryComponent {
 
     if (this.passengers.length > 0) {
       this.showTrackingPopup = true;
-      this.trackingMessage = 'Čekamo potvrdu uplate od ostalih korisnika...';
+      // this.trackingMessage = 'Čekamo potvrdu uplate od ostalih korisnika...';
     } else {
       this.showTrackingPopup = true;
       this.trackingMessage = 'Hvala na porudžbini! Vaše vozilo uskoro stiže na adresu.';
