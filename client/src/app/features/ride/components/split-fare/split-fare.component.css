@@ -65,3 +65,10 @@
   color: white;
   padding: 10px 30px;
 }
+
+.passenger-list-wrapper {
+  max-height: 260px;
+  overflow-y: auto;
+  margin-bottom: 10px;
+}
+

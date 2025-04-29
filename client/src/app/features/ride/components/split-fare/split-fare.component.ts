@@ -32,5 +32,6 @@ export class SplitFareComponent {
 
   emitPassengers() {
     this.passengersAdded.emit(this.passengerEmails);
+    alert('Payment request sent successfully!');
   }
 }

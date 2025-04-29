@@ -1,6 +1,8 @@
 import {Component, EventEmitter, Input, Output} from '@angular/core';
 import {NgForOf, NgIf} from '@angular/common';
 import {PaymentTrackingComponent} from '../payment-tracking/payment-tracking.component';
+import {RideService} from '../../../../core/services/ride/ride.service';
+import {Router} from '@angular/router';
 
 @Component({
   selector: 'app-ride-summary',
@@ -24,6 +26,10 @@ export class RideSummaryComponent {
   showTrackingPopup: boolean = false;
   trackingMessage: string = '';
 
+  constructor(
+    private rideService: RideService,
+  ) { }
+
   getPaymentStatus(email: string): string {
     return "Paid";
   }
@@ -35,13 +41,33 @@ export class RideSummaryComponent {
 
     this.showPopup = false;
 
-    if (this.passengers.length > 0) {
-      this.showTrackingPopup = true;
-      // this.trackingMessage = 'Čekamo potvrdu uplate od ostalih korisnika...';
-    } else {
-      this.showTrackingPopup = true;
-      this.trackingMessage = 'Hvala na porudžbini! Vaše vozilo uskoro stiže na adresu.';
-    }
+    const rideRequestData = {
+      startAddress: this.routeData.startAddress,
+      stops: this.routeData.stops,
+      destinationAddress: this.routeData.destinationAddress,
+      vehicleType: this.routeData.vehicleType,
+      carriesBabies: this.additionalOptions.carriesBabies,
+      carriesPets: this.additionalOptions.carriesPets,
+      passengers: this.passengers,
+      splitFareEmails: this.splitFareEmails,
+      paymentStatus: this.splitFareEmails.length > 0 ? 'pending' : 'paid', // Postavite odgovarajući status plaćanja
+    };
+
+    this.rideService.createRide(rideRequestData).subscribe({
+      next: (response) => {
+        console.log('Uspešno naručena vožnja:', response);
+        this.showTrackingPopup = true;
+        this.trackingMessage = 'Hvala na porudžbini! Vaše vozilo uskoro stiže na adresu.';
+        // Ovde možete uraditi dodatne akcije nakon uspešne porudžbine, npr. preusmeravanje na drugu stranicu
+        // this.router.navigate(['/order-confirmation']);
+      },
+      error: (error) => {
+        console.error('Greška prilikom naručivanja vožnje:', error);
+        this.trackingMessage = 'Došlo je do greške prilikom naručivanja vožnje. Molimo pokušajte ponovo.';
+        this.showTrackingPopup = true;
+        // Ovde možete prikazati korisniku poruku o grešci
+      }
+    });
   }
 
   closePopup() {
