@@ -1,0 +1,36 @@
+<div *ngIf="showTrackingPopup" class="overlay" (click)="closeTrackingPopup()">
+  <div class="summary-container" (click)="$event.stopPropagation()">
+    <div class="header">
+      <h2>Payment Status</h2>
+      <button (click)="closeTrackingPopup()" class="close-button">
+        <svg viewBox="0 0 24 24" fill="currentColor">
+          <path fill-rule="evenodd" d="M5.47 5.47a.75.75 0 0 1 1.06 0L12 10.94l5.47-5.47a.75.75 0 1 1 1.06 1.06L13.06 12l5.47 5.47a.75.75 0 0 1-1.06-1.06L10.94 12 5.47 6.53a.75.75 0 0 1 0-1.06Z" clip-rule="evenodd" />
+        </svg>
+      </button>
+    </div>
+
+    <p class="general-message">{{ message }}</p>
+
+    <div *ngIf="passengers.length > 0" class="payment-progress">
+      <h3 class="progress-title">Čekamo uplate:</h3>
+      <ul class="user-progress-list">
+        <li *ngFor="let email of passengers" class="user-progress-item">
+          <div class="user-info">
+            <div class="avatar">{{ getInitials(email) }}</div>
+            <span class="email">{{ email }}</span>
+          </div>
+          <div class="progress-indicator" [ngClass]="{'paid': getPaymentStatus(email) === 'Paid', 'pending': getPaymentStatus(email) !== 'Paid'}">
+            <svg *ngIf="getPaymentStatus(email) === 'Paid'" viewBox="0 0 24 24" fill="currentColor">
+              <path fill-rule="evenodd" d="M19.94 11.94a.75.75 0 0 1-1.06 0l-7.25-7.25a.75.75 0 0 1 1.06-1.06l6.72 6.72 10.22-10.22a.75.75 0 1 1 1.06 1.06l-10.75 10.75a.75.75 0 0 1 0 1.06l-3.5 3.5a.75.75 0 0 1-1.06 0l-3.5-3.5a.75.75 0 0 1 1.06-1.06l2.97 2.97 6.75-6.75a.75.75 0 0 1 1.06 0l3.5 3.5a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L4.31 13.47a.75.75 0 0 1 1.06-1.06L12 19.44l7.94-7.94a.75.75 0 0 1 0-1.06Z" clip-rule="evenodd" />
+            </svg>
+            <div *ngIf="getPaymentStatus(email) !== 'Paid'" class="spinner"></div>
+          </div>
+        </li>
+      </ul>
+      <p class="summary" *ngIf="splitFareEmails.length === 1">Čeka se uplata od <strong>1 korisnika</strong>.</p>
+      <p class="summary" *ngIf="splitFareEmails.length > 1">Čeka se uplata od <strong>{{ splitFareEmails.length }} korisnika</strong>.</p>
+    </div>
+
+    <button (click)="closeTrackingPopup()" class="btn primary-button">Zatvori</button>
+  </div>
+</div>

@@ -1,11 +1,12 @@
 package ridemanagement.backend.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 import ridemanagement.backend.dto.DriverDTO;
 import ridemanagement.backend.dto.PointDTO;
+import ridemanagement.backend.dto.RideRequestDTO;
 import ridemanagement.backend.model.Driver;
 import ridemanagement.backend.model.Point;
 import ridemanagement.backend.service.RideService;
@@ -30,5 +31,7 @@ public class RideController {
                 .map(rideService::convertToDTO) // Koristimo metodu iz RideService
                 .collect(Collectors.toList());
     }
+
+
 
 }
