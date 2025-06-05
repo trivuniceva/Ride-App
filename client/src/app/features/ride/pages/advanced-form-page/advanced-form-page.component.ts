@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Output, ViewChild, AfterViewInit } from '@angular/core';
+import {Component, EventEmitter, Output, ViewChild, AfterViewInit, Input} from '@angular/core';
 import { NgIf } from '@angular/common';
 import { RouteFormComponent } from '../../components/route-form/route-form.component';
 import { VehicleTypeComponent } from '../../components/vehicle-type/vehicle-type.component';
@@ -21,6 +21,8 @@ import { RideSummaryComponent } from '../../components/ride-summary/ride-summary
   styleUrl: './advanced-form-page.component.css',
 })
 export class AdvancedFormPageComponent implements AfterViewInit {
+  @Input() fullPrice: number | undefined;
+
   currentStep: number = 1;
   additionalOptions: { carriesBabies: boolean; carriesPets: boolean } = { carriesBabies: false, carriesPets: false };
   passengers: string[] = [];

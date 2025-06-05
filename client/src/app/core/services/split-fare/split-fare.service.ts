@@ -10,7 +10,7 @@ export class SplitFareService {
 
   constructor(private http: HttpClient) {}
 
-  sendPassengerEmails(emails: string[]): Observable<any> {
-    return this.http.post(this.apiUrl, { emails });
+  sendPassengerEmails(emails: string[], fullPrice: number | undefined): Observable<any> {
+    return this.http.post(this.apiUrl, { emails, fullPrice });
   }
 }

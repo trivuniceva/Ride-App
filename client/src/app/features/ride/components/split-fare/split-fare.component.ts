@@ -1,4 +1,4 @@
-import { Component, Output, EventEmitter } from '@angular/core';
+import {Component, Output, EventEmitter, Input} from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import {NgForOf, NgIf} from '@angular/common';
 import {SplitFareService} from '../../../../core/services/split-fare/split-fare.service';
@@ -16,6 +16,7 @@ import {SplitFareService} from '../../../../core/services/split-fare/split-fare.
 })
 export class SplitFareComponent {
   @Output() passengersAdded = new EventEmitter<string[]>();
+  @Input() fullPrice: number | undefined;
 
   passengerEmails: string[] = [];
   newPassengerEmail: string = '';
@@ -35,7 +36,8 @@ export class SplitFareComponent {
   }
 
   emitPassengers() {
-    this.splitFareService.sendPassengerEmails(this.passengerEmails).subscribe({
+    console.log('Cena:', this.fullPrice);
+    this.splitFareService.sendPassengerEmails(this.passengerEmails, this.fullPrice).subscribe({
       next: () => {
         alert('Payment request sent successfully!');
         this.passengersAdded.emit(this.passengerEmails);
@@ -46,5 +48,6 @@ export class SplitFareComponent {
       }
     });
   }
+
 
 }
