@@ -5,13 +5,12 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ridemanagement.backend.dto.DriverDTO;
-import ridemanagement.backend.dto.PointDTO;
 import ridemanagement.backend.dto.RideRequestDTO;
 import ridemanagement.backend.model.Driver;
-import ridemanagement.backend.model.Point;
 import ridemanagement.backend.service.RideService;
 
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @RestController
@@ -28,8 +27,16 @@ public class RideController {
                 .collect(Collectors.toList());
 
         return drivers.stream()
-                .map(rideService::convertToDTO) // Koristimo metodu iz RideService
+                .map(rideService::convertToDTO)
                 .collect(Collectors.toList());
+    }
+
+    @PostMapping
+    public ResponseEntity<Map<String, String>> createRide(@RequestBody RideRequestDTO rideRequestDTO) {
+        System.out.println("Primljen zahtev za vožnju: " + rideRequestDTO.toString());
+
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(Map.of("message", "Ride created successfully"));
     }
 
 

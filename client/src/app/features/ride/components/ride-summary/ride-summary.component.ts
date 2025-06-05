@@ -50,7 +50,7 @@ export class RideSummaryComponent {
       carriesPets: this.additionalOptions.carriesPets,
       passengers: this.passengers,
       splitFareEmails: this.splitFareEmails,
-      paymentStatus: this.splitFareEmails.length > 0 ? 'pending' : 'paid', // Postavite odgovarajući status plaćanja
+      paymentStatus: this.splitFareEmails.length > 0 ? 'pending' : 'paid',
     };
 
     this.rideService.createRide(rideRequestData).subscribe({

@@ -12,6 +12,7 @@ public class RideRequestDTO {
     private boolean carriesPets;
     private List<String> passengers;
     private List<String> splitFareEmails;
+    private String paymentStatus;
 
     public String getStartAddress() {
         return startAddress;
@@ -75,5 +76,28 @@ public class RideRequestDTO {
 
     public void setSplitFareEmails(List<String> splitFareEmails) {
         this.splitFareEmails = splitFareEmails;
+    }
+
+    public String getPaymentStatus() {
+        return paymentStatus;
+    }
+
+    public void setPaymentStatus(String paymentStatus) {
+        this.paymentStatus = paymentStatus;
+    }
+
+    @Override
+    public String toString() {
+        return "RideRequestDTO{" +
+                "startAddress='" + startAddress + '\'' +
+                ", stops=" + stops +
+                ", destinationAddress='" + destinationAddress + '\'' +
+                ", vehicleType='" + vehicleType + '\'' +
+                ", carriesBabies=" + carriesBabies +
+                ", carriesPets=" + carriesPets +
+                ", passengers=" + passengers +
+                ", splitFareEmails=" + splitFareEmails +
+                ", paymentStatus='" + paymentStatus + '\'' +
+                '}';
     }
 }
