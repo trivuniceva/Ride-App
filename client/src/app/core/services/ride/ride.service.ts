@@ -16,6 +16,8 @@ export class RideService {
   }
 
   createRide(rideData: any): Observable<any> {
-    return this.http.post(this.apiUrl, rideData);
+    console.log("------------------")
+    console.log(rideData)
+    return this.http.post<any>(this.apiUrl, rideData);
   }
 }

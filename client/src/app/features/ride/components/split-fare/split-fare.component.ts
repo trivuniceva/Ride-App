@@ -1,6 +1,7 @@
-import { Component, Output, EventEmitter } from '@angular/core';
+import {Component, Output, EventEmitter, Input} from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import {NgForOf, NgIf} from '@angular/common';
+import {SplitFareService} from '../../../../core/services/split-fare/split-fare.service';
 
 @Component({
   selector: 'app-split-fare',
@@ -15,9 +16,13 @@ import {NgForOf, NgIf} from '@angular/common';
 })
 export class SplitFareComponent {
   @Output() passengersAdded = new EventEmitter<string[]>();
+  @Input() fullPrice: number | undefined;
 
   passengerEmails: string[] = [];
   newPassengerEmail: string = '';
+
+  constructor(private splitFareService: SplitFareService) {}
+
 
   addPassenger() {
     if (this.newPassengerEmail) {
@@ -31,7 +36,18 @@ export class SplitFareComponent {
   }
 
   emitPassengers() {
-    this.passengersAdded.emit(this.passengerEmails);
-    alert('Payment request sent successfully!');
+    console.log('Cena:', this.fullPrice);
+    this.splitFareService.sendPassengerEmails(this.passengerEmails, this.fullPrice).subscribe({
+      next: () => {
+        alert('Payment request sent successfully!');
+        this.passengersAdded.emit(this.passengerEmails);
+      },
+      error: err => {
+        console.error('Error sending emails:', err);
+        alert('Failed to send payment request!');
+      }
+    });
   }
+
+
 }

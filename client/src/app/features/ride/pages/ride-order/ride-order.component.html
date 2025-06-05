@@ -1,7 +1,10 @@
 <div class="ride-container">
   <div class="ride-left">
     <div *ngIf="userRole !== 'REGISTERED_USER'">
-      <app-advanced-form-page (routeDataSubmitted)="handleRouteDataFromAdvancedForm($event)"></app-advanced-form-page>
+      <app-advanced-form-page
+        (routeDataSubmitted)="handleRouteDataFromAdvancedForm($event)"
+        [fullPrice]="price"
+      ></app-advanced-form-page>
     </div>
 
     <div *ngIf="userRole === 'REGISTERED_USER'">
