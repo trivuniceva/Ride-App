@@ -28,25 +28,28 @@ export class SplitFareComponent {
     if (this.newPassengerEmail) {
       this.passengerEmails.push(this.newPassengerEmail);
       this.newPassengerEmail = '';
+      this.emitPassengers();
     }
   }
 
   removePassenger(email: string) {
     this.passengerEmails = this.passengerEmails.filter(e => e !== email);
+    this.emitPassengers();
   }
 
   emitPassengers() {
     console.log('Cena:', this.fullPrice);
-    this.splitFareService.sendPassengerEmails(this.passengerEmails, this.fullPrice).subscribe({
-      next: () => {
-        alert('Payment request sent successfully!');
-        this.passengersAdded.emit(this.passengerEmails);
-      },
-      error: err => {
-        console.error('Error sending emails:', err);
-        alert('Failed to send payment request!');
-      }
-    });
+    this.passengersAdded.emit([...this.passengerEmails]);
+    // this.splitFareService.sendPassengerEmails(this.passengerEmails, this.fullPrice).subscribe({
+    //   next: () => {
+    //     alert('Payment request sent successfully!');
+    //     this.passengersAdded.emit(this.passengerEmails);
+    //   },
+    //   error: err => {
+    //     console.error('Error sending emails:', err);
+    //     alert('Failed to send payment request!');
+    //   }
+    // });
   }
 
 

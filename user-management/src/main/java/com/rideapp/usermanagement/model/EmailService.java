@@ -6,6 +6,8 @@ import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
+
 
 @Service
 public class EmailService {
@@ -32,6 +34,21 @@ public class EmailService {
         String text = "To reset your password, click the link below:\n\n" +
                 "http://localhost:4200/reset-password?token=" + token;
         sendEmail(email, "Password Reset Request", text);
+    }
+
+    public void sendPaymentConfirmation(String email, String token, BigDecimal price){
+        System.out.println(email + " " + price + " " + token );
+
+        String text = "Dear user,\n\n" +
+                "The shared cost of your ride is: " + price + " RSD.\n\n" +
+                "To confirm your payment, please click the following link:\n\n" +
+                "http://localhost:4200/confirm-payment?token=" + token + "\n\n" +
+                "Thank you for using our service!\n\n" +
+                "The RideApp Team";
+
+
+        sendEmail(email, "Confirmation of payment for the ride", text);
+
     }
 }
 

@@ -3,7 +3,6 @@ package ridemanagement.backend.dto;
 import java.util.List;
 
 public class RideRequestDTO {
-
     private String startAddress;
     private List<String> stops;
     private String destinationAddress;
@@ -11,8 +10,8 @@ public class RideRequestDTO {
     private boolean carriesBabies;
     private boolean carriesPets;
     private List<String> passengers;
-    private List<String> splitFareEmails;
     private String paymentStatus;
+    private double fullPrice;
 
     public String getStartAddress() {
         return startAddress;
@@ -70,20 +69,20 @@ public class RideRequestDTO {
         this.passengers = passengers;
     }
 
-    public List<String> getSplitFareEmails() {
-        return splitFareEmails;
-    }
-
-    public void setSplitFareEmails(List<String> splitFareEmails) {
-        this.splitFareEmails = splitFareEmails;
-    }
-
     public String getPaymentStatus() {
         return paymentStatus;
     }
 
     public void setPaymentStatus(String paymentStatus) {
         this.paymentStatus = paymentStatus;
+    }
+
+    public double getFullPrice() {
+        return fullPrice;
+    }
+
+    public void setFullPrice(double fullPrice) {
+        this.fullPrice = fullPrice;
     }
 
     @Override
@@ -96,8 +95,8 @@ public class RideRequestDTO {
                 ", carriesBabies=" + carriesBabies +
                 ", carriesPets=" + carriesPets +
                 ", passengers=" + passengers +
-                ", splitFareEmails=" + splitFareEmails +
                 ", paymentStatus='" + paymentStatus + '\'' +
+                ", fullPrice=" + fullPrice +
                 '}';
     }
 }
