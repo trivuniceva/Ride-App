@@ -22,6 +22,8 @@ export class RideSummaryComponent {
   @Input() splitFareEmails: string[] = [];
   @Input() showPopup: boolean = false;
   @Output() popupClosed = new EventEmitter<void>();
+  @Input() fullPrice: number | undefined;
+
 
   showTrackingPopup: boolean = false;
   trackingMessage: string = '';
@@ -51,15 +53,17 @@ export class RideSummaryComponent {
       passengers: this.passengers,
       splitFareEmails: this.splitFareEmails,
       paymentStatus: this.splitFareEmails.length > 0 ? 'pending' : 'paid',
+      fullPrice: this.fullPrice,
     };
 
     this.rideService.createRide(rideRequestData).subscribe({
       next: (response) => {
         console.log('Uspešno naručena vožnja:', response);
         this.showTrackingPopup = true;
-        this.trackingMessage = 'Hvala na porudžbini! Vaše vozilo uskoro stiže na adresu.';
+        this.trackingMessage = 'Waiting for payments from other users.';
         // Ovde možete uraditi dodatne akcije nakon uspešne porudžbine, npr. preusmeravanje na drugu stranicu
         // this.router.navigate(['/order-confirmation']);
+
       },
       error: (error) => {
         console.error('Greška prilikom naručivanja vožnje:', error);
