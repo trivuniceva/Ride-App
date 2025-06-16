@@ -17,7 +17,7 @@
 
   <div class="ride-right">
     <div class="driver-part">
-      <app-drivers-availability></app-drivers-availability>
+<!--      <app-drivers-availability></app-drivers-availability>-->
     </div>
 
     <div class="map-section">
@@ -28,7 +28,7 @@
             [destinationCoords]="destinationCoords"
             [alternativeRoutes]="alternativeRoutes"
             [waypointsCoords]="waypointsCoords"
-          ></app-map-test>
+            [drivers]="allDrivers" ></app-map-test>
         </div>
       </div>
 

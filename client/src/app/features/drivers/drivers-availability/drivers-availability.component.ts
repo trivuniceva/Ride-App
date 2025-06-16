@@ -26,7 +26,7 @@ export class DriversAvailabilityComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.driverService.getDrivers().subscribe((data) => {
       this.drivers = data;
-      this.filteredDrivers = data; // Inicijalno prikaži sve vozače
+      this.filteredDrivers = data;
       this.calculateRemainingTimes();
       this.startTimer();
     });
@@ -43,7 +43,7 @@ export class DriversAvailabilityComponent implements OnInit, OnDestroy {
       this.drivers.forEach(driver => {
         if (driver.timeOfLogin) {
           const loginTime = new Date(driver.timeOfLogin).getTime();
-          const endTime = loginTime + 8 * 60 * 60 * 1000; // 8 sati u milisekundama
+          const endTime = loginTime + 8 * 60 * 60 * 1000;
           this.updateRemainingTime(driver.id, endTime);
         }
       });
