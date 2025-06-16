@@ -8,10 +8,12 @@
       class="form-control"
       (input)="onStopAddressInput($event, i)"
       [matAutocomplete]="stopAuto"
-    >
-    <mat-autocomplete #stopAuto="matAutocomplete">
-      <mat-option *ngFor="let address of stopAddressOptions[i]" [value]="address" (onSelectionChange)="onStopAddressSelect(address, i)">
-        {{ address }}
+      [value]="stops[i]" >
+    <mat-autocomplete #stopAuto="matAutocomplete" (optionSelected)="onStopAddressSelect($event.option.value, i)">
+      <mat-option
+        *ngFor="let addressLoc of stopAddressOptions[i]"
+        [value]="addressLoc" >
+        {{ addressLoc.address }}
       </mat-option>
     </mat-autocomplete>
     <button (click)="removeStop(i)" class="btn btn-danger">Remove</button>

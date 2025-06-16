@@ -21,8 +21,13 @@ public class DriverController {
     @GetMapping
     public List<DriverDTO> getDrivers() {
         System.out.println("elooo");
-        System.out.println(driverService.getAllDrivers());
-        return driverService.getAllDrivers();
+        List<DriverDTO> allDrivers = driverService.getAllDrivers();
+
+        System.out.println("Broj vozaca u DTO listi: " + allDrivers.size());
+
+        return allDrivers;
     }
+
+
 
 }

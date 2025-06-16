@@ -101,4 +101,19 @@ public class DriverDTO {
     public void setLocation(PointDTO location) {
         this.location = location;
     }
+
+    @Override
+    public String toString() {
+        return "DriverDTO{" +
+                "id=" + id +
+                ", email='" + email + '\'' +
+                ", firstname='" + firstname + '\'' +
+                ", lastname='" + lastname + '\'' +
+                ", isBlocked=" + isBlocked +
+                ", isAvailable=" + isAvailable +
+                ", timeOfLogin=" + timeOfLogin +
+                ", hasFutureDrive=" + hasFutureDrive +
+                ", location=" + location +
+                '}';
+    }
 }

@@ -4,6 +4,7 @@ import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { MatInputModule } from '@angular/material/input';
 import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
+import {AddressLocation} from '../route-form/route-form.component';
 
 @Component({
   selector: 'app-stops-form',
@@ -19,15 +20,15 @@ import { HttpClient } from '@angular/common/http';
 })
 export class StopsFormComponent {
   @Output() stopsChanged = new EventEmitter<string[]>();
-  @Output() stopAddressSelected = new EventEmitter<{ address: string, index: number }>();
+  @Output() stopAddressSelected = new EventEmitter<{ addressLocation: AddressLocation, index: number }>();
   @Output() stopAddressInputted = new EventEmitter<{ event: any, index: number }>();
 
   @Input() stops: string[] = [];
-  @Input() stopAddressOptions: string[][] = [];
+  @Input() stopAddressOptions: AddressLocation[][] = [];
 
   constructor(private http: HttpClient) {}
 
-  getAddressSuggestions(query: string): Promise<string[]> {
+  getAddressSuggestions(query: string): Promise<AddressLocation[]> {
     let searchQuery = query;
     if (!query.toLowerCase().includes('novi sad')) {
       searchQuery = `Novi Sad ${query}`;
@@ -39,7 +40,17 @@ export class StopsFormComponent {
           const street = item.properties.name;
           const city = item.properties.city || item.properties.town || item.properties.village;
           const country = item.properties.country;
-          return `${street}, ${city || 'Unknown'}, ${country || 'Unknown'}`;
+          const formattedAddress = `${street}, ${city || 'Unknown'}, ${country || 'Unknown'}`;
+
+          // Photon API vraća koordinate kao [longitude, latitude]
+          const longitude = item.geometry.coordinates[0];
+          const latitude = item.geometry.coordinates[1];
+
+          return {
+            address: formattedAddress,
+            latitude: latitude,
+            longitude: longitude,
+          } as AddressLocation;
         });
       }
       return [];
@@ -53,6 +64,10 @@ export class StopsFormComponent {
     const input = event.target.value;
     if (input.length > 2) {
       this.getAddressSuggestions(input).then(suggestions => {
+        // Osiguraj da je stopAddressOptions[index] inicijalizovan
+        if (!this.stopAddressOptions[index]) {
+          this.stopAddressOptions[index] = [];
+        }
         this.stopAddressOptions[index] = suggestions;
         this.stopAddressInputted.emit({ event, index });
       });
@@ -64,19 +79,19 @@ export class StopsFormComponent {
 
   addStop(): void {
     this.stops.push('');
-    this.stopAddressOptions.push([]);
+    this.stopAddressOptions.push([]); // Dodaj prazan niz za opcije nove stope
     this.stopsChanged.emit(this.stops);
   }
 
   removeStop(index: number): void {
     this.stops.splice(index, 1);
-    this.stopAddressOptions.splice(index, 1);
+    this.stopAddressOptions.splice(index, 1); // Ukloni i opcije za tu stopu
     this.stopsChanged.emit(this.stops);
   }
 
-  onStopAddressSelect(address: string, index: number): void {
-    this.stops[index] = address;
-    this.stopAddressSelected.emit({ address, index });
-    this.stopsChanged.emit(this.stops);
+  onStopAddressSelect(selectedAddressLocation: AddressLocation, index: number): void {
+    this.stops[index] = selectedAddressLocation.address; // Za prikaz ostaje string adresa
+    this.stopAddressSelected.emit({ addressLocation: selectedAddressLocation, index });
+    this.stopsChanged.emit(this.stops); // Ovo emituje listu stringova, što je ok za prikaz
   }
 }
