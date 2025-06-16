@@ -6,12 +6,8 @@ import { AdditionalOptionsComponent } from '../../components/additional-options/
 import { SplitFareComponent } from '../../components/split-fare/split-fare.component';
 import { RideSummaryComponent } from '../../components/ride-summary/ride-summary.component';
 import { RideService } from '../../../../core/services/ride/ride.service';
+import {PointDTO} from '../../../../core/models/PointDTO.model';
 
-interface PointDTO {
-  id?: number;
-  latitude: number;
-  longitude: number;
-}
 
 @Component({
   selector: 'app-advanced-form-page',

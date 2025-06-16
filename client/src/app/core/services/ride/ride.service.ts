@@ -3,7 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Driver } from '../../models/driver.model'; // Proveri putanju!
 
-// Definisi PointDTO i RideRequestDTO interfejse
+// Definisi PointDTO.model.ts i RideRequestDTO interfejse
 // Najbolje ih je prebaciti u zajednički fajl, npr. src/app/shared/models/interfaces.ts
 interface PointDTO {
   latitude: number;
