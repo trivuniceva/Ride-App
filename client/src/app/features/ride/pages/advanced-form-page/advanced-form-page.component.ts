@@ -5,6 +5,13 @@ import { VehicleTypeComponent } from '../../components/vehicle-type/vehicle-type
 import { AdditionalOptionsComponent } from '../../components/additional-options/additional-options.component';
 import { SplitFareComponent } from '../../components/split-fare/split-fare.component';
 import { RideSummaryComponent } from '../../components/ride-summary/ride-summary.component';
+import { RideService } from '../../../../core/services/ride/ride.service';
+
+interface PointDTO {
+  id?: number;
+  latitude: number;
+  longitude: number;
+}
 
 @Component({
   selector: 'app-advanced-form-page',
@@ -29,6 +36,7 @@ export class AdvancedFormPageComponent implements AfterViewInit {
   vehicleType: string | null = null;
   showPopup = false;
   splitFareEmails: string[] = [];
+  private requestorEmail: string = '';
 
   @ViewChild('routeForm') routeForm!: RouteFormComponent;
 
@@ -36,8 +44,31 @@ export class AdvancedFormPageComponent implements AfterViewInit {
     startAddress: string;
     stops: string[];
     destinationAddress: string;
+    startLocation: PointDTO | null;
+    stopLocations: PointDTO[];
+    destinationLocation: PointDTO | null;
     vehicleType: string | null;
   }>();
+
+  routeData: {
+    startAddress: string;
+    stops: string[];
+    destinationAddress: string;
+    startLocation: PointDTO | null;
+    stopLocations: PointDTO[];
+    destinationLocation: PointDTO | null;
+    vehicleType: string | null;
+  } = {
+    startAddress: '',
+    stops: [],
+    destinationAddress: '',
+    startLocation: null,
+    stopLocations: [],
+    destinationLocation: null,
+    vehicleType: null,
+  };
+
+  constructor(private rideService: RideService) {}
 
   ngAfterViewInit(): void {
     if (this.vehicleType) {
@@ -68,32 +99,26 @@ export class AdvancedFormPageComponent implements AfterViewInit {
         startAddress: this.routeForm.startAddressValue,
         stops: this.routeForm.stops,
         destinationAddress: this.routeForm.destinationAddressValue,
+        startLocation: this.routeForm.startLocationValue,
+        stopLocations: this.routeForm.stopLocations,
+        destinationLocation: this.routeForm.destinationLocationValue,
         vehicleType: this.vehicleType,
       };
       this.handleRouteData(routeData);
     }
   }
 
-  routeData: {
-    startAddress: string;
-    stops: string[];
-    destinationAddress: string;
-    vehicleType: string | null;
-  } = {
-    startAddress: '',
-    stops: [],
-    destinationAddress: '',
-    vehicleType: null,
-  };
-
   handleRouteData(routeData: {
     startAddress: string;
     stops: string[];
     destinationAddress: string;
+    startLocation: PointDTO | null;
+    stopLocations: PointDTO[];
+    destinationLocation: PointDTO | null;
     vehicleType: string | null;
   }): void {
     this.routeData = routeData;
-    console.log('Route Data:', this.routeData);
+    console.log('Route Data with Coordinates: ->>>>>', this.routeData);
     this.routeDataSubmitted.emit(routeData);
   }
 
@@ -106,7 +131,29 @@ export class AdvancedFormPageComponent implements AfterViewInit {
   }
 
   handlePaymentConfirmation() {
-    console.log('Payment has been confirmed');
+    console.log('Payment has been confirmed in AdvancedFormPageComponent');
+    console.log('Final object to be sent to backend:', this.routeData);
+
+    if (this.routeData.startLocation && this.routeData.destinationLocation) {
+      this.rideService.createRide(
+        this.routeData,
+        this.additionalOptions,
+        this.passengers,
+        this.fullPrice || 0,
+        this.splitFareEmails.length > 0 ? 'PENDING' : 'PAID',
+        this.requestorEmail
+      ).subscribe({
+        next: (response: any) => {
+          console.log('Ride request sent successfully', response);
+          this.handlePopupClosed();
+        },
+        error: (error: any) => {
+          console.error('Error sending ride request', error);
+        }
+      });
+    } else {
+      console.error('Cannot send ride request: Start or destination location coordinates are missing.');
+    }
   }
 
   handlePopupClosed() {

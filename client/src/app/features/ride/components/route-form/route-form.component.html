@@ -4,19 +4,19 @@
       <input
         type="text"
         id="startAddress"
-        #startAddress
-        placeholder="Pickup"
-        class="form-control"
-        (input)="onStartAddressInput($event)"
-        [matAutocomplete]="startAuto"
+        #startAddressInput
+      placeholder="Pickup"
+      class="form-control"
+      (input)="onStartAddressInput($event)"
+      [matAutocomplete]="startAuto"
+      [value]="startAddressValue"
       />
-      <mat-autocomplete #startAuto="matAutocomplete">
+      <mat-autocomplete #startAuto="matAutocomplete" (optionSelected)="onStartAddressSelect($event.option.value)">
         <mat-option
-          *ngFor="let address of startAddressOptions"
-          [value]="address"
-          (onSelectionChange)="onStartAddressSelect(address)"
+          *ngFor="let addressLoc of startAddressOptions"
+          [value]="addressLoc"
         >
-          {{ address }}
+        {{ addressLoc.address }}
         </mat-option>
       </mat-autocomplete>
     </div>
@@ -25,19 +25,19 @@
       <input
         type="text"
         id="destinationAddress"
-        #destinationAddress
-        placeholder="Destination"
-        class="form-control"
-        (input)="onDestinationAddressInput($event)"
-        [matAutocomplete]="destinationAuto"
+        #destinationAddressInput
+      placeholder="Destination"
+      class="form-control"
+      (input)="onDestinationAddressInput($event)"
+      [matAutocomplete]="destinationAuto"
+      [value]="destinationAddressValue"
       />
-      <mat-autocomplete #destinationAuto="matAutocomplete">
+      <mat-autocomplete #destinationAuto="matAutocomplete" (optionSelected)="onDestinationAddressSelect($event.option.value)">
         <mat-option
-          *ngFor="let address of destinationAddressOptions"
-          [value]="address"
-          (onSelectionChange)="onDestinationAddressSelect(address)"
+          *ngFor="let addressLoc of destinationAddressOptions"
+          [value]="addressLoc"
         >
-          {{ address }}
+        {{ addressLoc.address }}
         </mat-option>
       </mat-autocomplete>
     </div>

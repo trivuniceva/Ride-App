@@ -9,8 +9,6 @@ import java.sql.Timestamp;
 @Table(name = "drivers")
 public class Driver extends User {
 
-
-
     @Column(name = "is_blocked", nullable = false)
     private boolean isBlocked;
 
