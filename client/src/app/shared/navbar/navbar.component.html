@@ -1,6 +1,6 @@
 <div *ngIf="!userRole || userRole === ''" [ngClass]="{'sidenav': true, 'sidenav-green': isSearchActive}">
     <a routerLink="">Home</a>
-    <a routerLink="/ride">Ride</a>
+    <a routerLink="/ride-preview">Ride</a>
     <a routerLink="/login">Login</a>
 </div>
 
@@ -27,6 +27,7 @@
 
 <div *ngIf="userRole === 'DRIVER'" class="sidenav">
     <a routerLink="/profile">Profile</a>
+    <a routerLink="/track-ride">Track Ride</a>
     <a routerLink="/notifications">Notifications</a>
     <a routerLink="/ride-history-driver">Ride history</a>
     <a href="#" (click)="logout()">Logout</a>

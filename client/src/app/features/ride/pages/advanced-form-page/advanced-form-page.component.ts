@@ -7,6 +7,7 @@ import { SplitFareComponent } from '../../components/split-fare/split-fare.compo
 import { RideSummaryComponent } from '../../components/ride-summary/ride-summary.component';
 import { RideService } from '../../../../core/services/ride/ride.service';
 import {PointDTO} from '../../../../core/models/PointDTO.model';
+import {PaymentTrackingComponent} from '../../components/payment-tracking/payment-tracking.component';
 
 
 @Component({
@@ -19,6 +20,7 @@ import {PointDTO} from '../../../../core/models/PointDTO.model';
     AdditionalOptionsComponent,
     SplitFareComponent,
     RideSummaryComponent,
+    PaymentTrackingComponent,
   ],
   templateUrl: './advanced-form-page.component.html',
   styleUrl: './advanced-form-page.component.css',
@@ -33,6 +35,9 @@ export class AdvancedFormPageComponent implements AfterViewInit {
   showPopup = false;
   splitFareEmails: string[] = [];
   private requestorEmail: string = '';
+
+  showTrackingPopup: boolean = false;
+  trackingMessage: string = '';
 
   @ViewChild('routeForm') routeForm!: RouteFormComponent;
 
@@ -86,7 +91,9 @@ export class AdvancedFormPageComponent implements AfterViewInit {
 
   handlePassengersAdded(passengers: string[]) {
     this.passengers = passengers;
+    this.splitFareEmails = passengers.filter(email => email !== this.requestorEmail); // Primer: svi osim trenutnog korisnika plaćaju split fare
     console.log('Passengers added:', this.passengers);
+    console.log('Split Fare Emails:', this.splitFareEmails);
   }
 
   showRoute(): void {
@@ -142,17 +149,32 @@ export class AdvancedFormPageComponent implements AfterViewInit {
         next: (response: any) => {
           console.log('Ride request sent successfully', response);
           this.handlePopupClosed();
+          this.showTrackingPopup = true;
+          this.trackingMessage = 'Hvala na porudžbini! Vaše vozilo uskoro stiže na adresu.';
+
         },
         error: (error: any) => {
           console.error('Error sending ride request', error);
+          this.handlePopupClosed();
+          this.showTrackingPopup = true;
+          this.trackingMessage = 'Došlo je do greške prilikom naručivanja vožnje. Molimo pokušajte ponovo.';
+
         }
       });
     } else {
       console.error('Cannot send ride request: Start or destination location coordinates are missing.');
+      this.handlePopupClosed();
+      this.showTrackingPopup = true;
+      this.trackingMessage = 'Nije moguće naručiti vožnju: nedostaju početna ili krajnja lokacija.';
+
     }
   }
 
   handlePopupClosed() {
     this.showPopup = false;
+  }
+
+  onTrackingPopupClosed() {
+    this.showTrackingPopup = false;
   }
 }
