@@ -7,7 +7,6 @@ public class RideRequestDTO {
     private List<String> stops;
     private String destinationAddress;
 
-    // koordinate
     private PointDTO startLocation;
     private List<PointDTO> stopLocations;
     private PointDTO destinationLocation;
@@ -20,107 +19,75 @@ public class RideRequestDTO {
     private double fullPrice;
     private String requestorEmail;
 
-    public String getStartAddress() {
-        return startAddress;
-    }
+    public RideRequestDTO() {}
 
-    public void setStartAddress(String startAddress) {
+    public RideRequestDTO(String startAddress, List<String> stops, String destinationAddress, PointDTO startLocation, List<PointDTO> stopLocations, PointDTO destinationLocation, String vehicleType, boolean carriesBabies, boolean carriesPets, List<String> passengers, String paymentStatus, double fullPrice, String requestorEmail) {
         this.startAddress = startAddress;
-    }
-
-    public List<String> getStops() {
-        return stops;
-    }
-
-    public void setStops(List<String> stops) {
         this.stops = stops;
-    }
-
-    public String getDestinationAddress() {
-        return destinationAddress;
-    }
-
-    public void setDestinationAddress(String destinationAddress) {
         this.destinationAddress = destinationAddress;
-    }
-
-    public PointDTO getStartLocation() {
-        return startLocation;
-    }
-
-    public void setStartLocation(PointDTO startLocation) {
         this.startLocation = startLocation;
-    }
-
-    public List<PointDTO> getStopLocations() {
-        return stopLocations;
-    }
-
-    public void setStopLocations(List<PointDTO> stopLocations) {
         this.stopLocations = stopLocations;
-    }
-
-    public PointDTO getDestinationLocation() {
-        return destinationLocation;
-    }
-
-    public void setDestinationLocation(PointDTO destinationLocation) {
         this.destinationLocation = destinationLocation;
-    }
-
-    public String getVehicleType() {
-        return vehicleType;
-    }
-
-    public void setVehicleType(String vehicleType) {
         this.vehicleType = vehicleType;
-    }
-
-    public boolean isCarriesBabies() {
-        return carriesBabies;
-    }
-
-    public void setCarriesBabies(boolean carriesBabies) {
         this.carriesBabies = carriesBabies;
-    }
-
-    public boolean isCarriesPets() {
-        return carriesPets;
-    }
-
-    public void setCarriesPets(boolean carriesPets) {
         this.carriesPets = carriesPets;
-    }
-
-    public List<String> getPassengers() {
-        return passengers;
-    }
-
-    public void setPassengers(List<String> passengers) {
         this.passengers = passengers;
-    }
-
-    public String getPaymentStatus() {
-        return paymentStatus;
-    }
-
-    public void setPaymentStatus(String paymentStatus) {
         this.paymentStatus = paymentStatus;
-    }
-
-    public double getFullPrice() {
-        return fullPrice;
-    }
-
-    public void setFullPrice(double fullPrice) {
         this.fullPrice = fullPrice;
-    }
-
-    public String getRequestorEmail() {
-        return requestorEmail;
-    }
-
-    public void setRequestorEmail(String requestorEmail) {
         this.requestorEmail = requestorEmail;
+    }
+
+    // Dodao sam konstruktor sa manje argumenata za potrebe kreiranja DTO-a iz Ride objekta u SplitFareService
+    public RideRequestDTO(String startAddress, List<String> stops, String destinationAddress, PointDTO startLocation, PointDTO destinationLocation, String vehicleType, boolean carriesBabies, boolean carriesPets, List<String> passengers, double fullPrice, String requestorEmail) {
+        this.startAddress = startAddress;
+        this.stops = stops;
+        this.destinationAddress = destinationAddress;
+        this.startLocation = startLocation;
+        this.destinationLocation = destinationLocation;
+        this.vehicleType = vehicleType;
+        this.carriesBabies = carriesBabies;
+        this.carriesPets = carriesPets;
+        this.passengers = passengers;
+        this.fullPrice = fullPrice;
+        this.requestorEmail = requestorEmail;
+        // paymentStatus se može postaviti defaultno ili izvan konstruktora
+        this.paymentStatus = "PENDING_DRIVER_CONFIRMATION";
+    }
+
+    public String getStartAddress() { return startAddress; }
+    public void setStartAddress(String startAddress) { this.startAddress = startAddress; }
+    public List<String> getStops() { return stops; }
+    public void setStops(List<String> stops) { this.stops = stops; }
+    public String getDestinationAddress() { return destinationAddress; }
+    public void setDestinationAddress(String destinationAddress) { this.destinationAddress = destinationAddress; }
+    public PointDTO getStartLocation() { return startLocation; }
+    public void setStartLocation(PointDTO startLocation) { this.startLocation = startLocation; }
+    public List<PointDTO> getStopLocations() { return stopLocations; }
+    public void setStopLocations(List<PointDTO> stopLocations) { this.stopLocations = stopLocations; }
+    public PointDTO getDestinationLocation() { return destinationLocation; }
+    public void setDestinationLocation(PointDTO destinationLocation) { this.destinationLocation = destinationLocation; }
+    public String getVehicleType() { return vehicleType; }
+    public void setVehicleType(String vehicleType) { this.vehicleType = vehicleType; }
+    public boolean isCarriesBabies() { return carriesBabies; }
+    public void setCarriesBabies(boolean carriesBabies) { this.carriesBabies = carriesBabies; }
+    public boolean isCarriesPets() { return carriesPets; }
+    public void setCarriesPets(boolean carriesPets) { this.carriesPets = carriesPets; }
+    public List<String> getPassengers() { return passengers; }
+    public void setPassengers(List<String> passengers) { this.passengers = passengers; }
+    public String getPaymentStatus() { return paymentStatus; }
+    public void setPaymentStatus(String paymentStatus) { this.paymentStatus = paymentStatus; }
+    public double getFullPrice() { return fullPrice; }
+    public void setFullPrice(double fullPrice) { this.fullPrice = fullPrice; }
+    public String getRequestorEmail() { return requestorEmail; }
+    public void setRequestorEmail(String requestorEmail) { this.requestorEmail = requestorEmail; }
+
+    @Override
+    public String toString() {
+        return "RideRequestDTO{" +
+                "startAddress='" + startAddress + '\'' +
+                ", destinationAddress='" + destinationAddress + '\'' +
+                ", fullPrice=" + fullPrice +
+                ", requestorEmail='" + requestorEmail + '\'' +
+                '}';
     }
 }

@@ -1,11 +1,11 @@
-import { Component } from '@angular/core';
-import {UserService} from "../../core/services/user/user.service";
-import {Router} from "@angular/router";
-import {AuthService} from "../../core/services/auth/auth.service";
-import {FormsModule} from "@angular/forms";
-import {NgIf} from "@angular/common";
-import {WebSocketService} from '../../core/services/web-socket.service';
-import {RideRequestPopupComponent} from '../drivers/ride-request-popup/ride-request-popup.component';
+import { Component, OnInit } from '@angular/core';
+import { UserService } from "../../core/services/user/user.service";
+import { Router } from "@angular/router";
+import { AuthService } from "../../core/services/auth/auth.service";
+import { FormsModule } from "@angular/forms";
+import { NgIf } from "@angular/common";
+import { WebSocketService } from '../../core/services/web-socket.service';
+import { RideRequestPopupComponent } from '../drivers/ride-request-popup/ride-request-popup.component';
 
 @Component({
   selector: 'app-user-profile',
@@ -18,12 +18,12 @@ import {RideRequestPopupComponent} from '../drivers/ride-request-popup/ride-requ
   templateUrl: './user-profile.component.html',
   styleUrl: './user-profile.component.css'
 })
-export class UserProfileComponent {
+export class UserProfileComponent implements OnInit {
   user: any;
   isEditing = false;
-
   showPopup = false;
   popupMessage = '';
+  currentRideId: number | null = null;
 
   constructor(
     private userService: UserService,
@@ -34,16 +34,15 @@ export class UserProfileComponent {
 
   ngOnInit(): void {
     this.user = this.authService.getLoggedUser();
-    console.log(this.user);
 
     if (this.user && this.user.userRole === 'DRIVER') {
       this.webSocketService.connect(this.user.id, (notification: any) => {
         this.popupMessage = notification.message;
+        this.currentRideId = notification.rideId;
         this.showPopup = true;
       });
     }
   }
-
 
   enableEditing() {
     this.isEditing = true;
@@ -54,38 +53,63 @@ export class UserProfileComponent {
   }
 
   saveChanges() {
-
   }
 
   onFileSelected($event: Event) {
-
   }
 
   deleteAcc() {
   }
 
   acceptRide() {
+    if (!this.currentRideId || !this.user?.id) {
+      alert('Greška: Nedostaju podaci za prihvatanje vožnje.');
+      return;
+    }
+
     this.showPopup = false;
 
-    this.userService.acceptRideAsDriver().subscribe({
+    this.userService.acceptRide(this.currentRideId, this.user.id).subscribe({
       next: (response: any) => {
         alert('✅ ' + response.message);
+        this.currentRideId = null;
       },
       error: (err) => {
-        console.error('Greška pri potvrđivanju vožnje:', err);
+        let errorMessage = '❌ Greška pri potvrđivanju vožnje.';
         if (err.error && err.error.error) {
-          alert('❌ Greška pri potvrđivanju vožnje: ' + err.error.error);
-        } else {
-          alert('❌ Došlo je do nepoznate greške pri potvrđivanju vožnje.');
+          errorMessage = '❌ ' + err.error.error;
+        } else if (err.status === 404) {
+          errorMessage += ' (Endpoint nije pronađen ili je pogrešan URL)';
         }
+        alert(errorMessage);
+        this.currentRideId = null;
       }
     });
   }
 
   rejectRide() {
-    this.showPopup = false;
-    // TODO: Pozovi BE da odbije vožnju
-    alert('❌ Odbio si vožnju.');
-  }
+    if (!this.currentRideId || !this.user?.id) {
+      alert('Greška: Nedostaju podaci za odbijanje vožnje.');
+      return;
+    }
 
+    this.showPopup = false;
+
+    this.userService.rejectRide(this.currentRideId, this.user.id).subscribe({
+      next: (response: any) => {
+        alert('❌ ' + response.message);
+        this.currentRideId = null;
+      },
+      error: (err) => {
+        let errorMessage = '❌ Greška pri odbijanju vožnje.';
+        if (err.error && err.error.error) {
+          errorMessage = '❌ ' + err.error.error;
+        } else if (err.status === 404) {
+          errorMessage += ' (Endpoint nije pronađen ili je pogrešan URL)';
+        }
+        alert(errorMessage);
+        this.currentRideId = null;
+      }
+    });
+  }
 }

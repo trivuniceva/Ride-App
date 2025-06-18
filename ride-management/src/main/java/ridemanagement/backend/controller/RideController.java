@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.*;
 import ridemanagement.backend.dto.DriverDTO;
 import ridemanagement.backend.dto.RideRequestDTO;
 import ridemanagement.backend.model.Driver;
+import ridemanagement.backend.model.Ride;
 import ridemanagement.backend.service.RideService;
 import ridemanagement.backend.service.SplitFareService;
 
@@ -39,12 +40,11 @@ public class RideController {
 
     @PostMapping
     public ResponseEntity<Map<String, String>> createRide(@RequestBody RideRequestDTO rideRequestDTO) {
-        System.out.println("Primljen zahtev za vožnju: " + rideRequestDTO.toString());
-
         try {
-            splitFareService.processRideRequest(rideRequestDTO);
+            Ride newRide = splitFareService.initiateRideRequest(rideRequestDTO);
             return ResponseEntity.status(HttpStatus.CREATED)
-                    .body(Map.of("message", "Zahtev za vožnju uspešno poslat vozaču."));
+                    .body(Map.of("message", "Zahtev za vožnju uspešno poslat vozaču.",
+                            "rideId", newRide.getId().toString()));
         } catch (NoSuchElementException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body(Map.of("error", e.getMessage()));
@@ -54,17 +54,38 @@ public class RideController {
         }
     }
 
-    @PostMapping("/accept")
-    public ResponseEntity<Map<String, String>> acceptRide(@RequestBody RideRequestDTO rideRequestDTO) {
-        System.out.println("Vozač je prihvatio vožnju, izvršavam payment.");
-
+    @PostMapping("/accept/{rideId}/{driverId}")
+    public ResponseEntity<Map<String, String>> acceptRide(
+            @PathVariable Long rideId,
+            @PathVariable Long driverId) {
         try {
-            splitFareService.confirmAndProcessPayment(rideRequestDTO);
-            return ResponseEntity.ok(Map.of("message", "Vožnja uspešno prihvaćena. Plaćanje izvršeno."));
+            splitFareService.acceptRide(rideId);
+            return ResponseEntity.ok(Map.of("message", "Vožnja " + rideId + " uspešno prihvaćena. Plaćanje izvršeno."));
+        } catch (NoSuchElementException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(Map.of("error", e.getMessage()));
+        } catch (IllegalStateException e) {
+            return ResponseEntity.status(HttpStatus.CONFLICT)
+                    .body(Map.of("error", e.getMessage()));
         } catch (Exception e) {
-            System.err.println("Greška prilikom prihvatanja vožnje: " + e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(Map.of("error", "Došlo je do greške prilikom potvrđivanja vožnje i obrade plaćanja: " + e.getMessage()));
+                    .body(Map.of("error", "Došlo je do greške prilikom prihvatanja vožnje: " + e.getMessage()));
+        }
+    }
+
+    @PostMapping("/reject/{rideId}/{driverId}")
+    public ResponseEntity<Map<String, String>> rejectRide(
+            @PathVariable Long rideId,
+            @PathVariable Long driverId) {
+        try {
+            splitFareService.rejectRide(rideId, driverId);
+            return ResponseEntity.ok(Map.of("message", "Vožnja " + rideId + " je odbijena. Traži se sledeći vozač."));
+        } catch (NoSuchElementException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(Map.of("error", e.getMessage()));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("error", "Došlo je do greške prilikom odbijanja vožnje: " + e.getMessage()));
         }
     }
 }
