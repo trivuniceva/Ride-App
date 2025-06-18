@@ -18,6 +18,7 @@ public class RideRequestDTO {
     private List<String> passengers;
     private String paymentStatus;
     private double fullPrice;
+    private String requestorEmail;
 
     public String getStartAddress() {
         return startAddress;
@@ -113,5 +114,13 @@ public class RideRequestDTO {
 
     public void setFullPrice(double fullPrice) {
         this.fullPrice = fullPrice;
+    }
+
+    public String getRequestorEmail() {
+        return requestorEmail;
+    }
+
+    public void setRequestorEmail(String requestorEmail) {
+        this.requestorEmail = requestorEmail;
     }
 }

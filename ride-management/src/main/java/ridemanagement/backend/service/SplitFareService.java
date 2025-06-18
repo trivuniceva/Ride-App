@@ -31,6 +31,7 @@ public class SplitFareService {
         Driver driver = driverService.findEligibleDriver(rideRequestDTO);
         System.out.println(driver);
         System.out.println(" ^ ^ ^ driver ^ ^ ^ ");
+        System.out.println(rideRequestDTO.getRequestorEmail());
 
         if( driver != null){
             confirmPayment(rideRequestDTO.getFullPrice(), rideRequestDTO.getPassengers());

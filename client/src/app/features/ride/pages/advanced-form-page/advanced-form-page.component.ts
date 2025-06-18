@@ -8,6 +8,7 @@ import { RideSummaryComponent } from '../../components/ride-summary/ride-summary
 import { RideService } from '../../../../core/services/ride/ride.service';
 import {PointDTO} from '../../../../core/models/PointDTO.model';
 import {PaymentTrackingComponent} from '../../components/payment-tracking/payment-tracking.component';
+import {AuthService} from '../../../../core/services/auth/auth.service';
 
 
 @Component({
@@ -69,12 +70,13 @@ export class AdvancedFormPageComponent implements AfterViewInit {
     vehicleType: null,
   };
 
-  constructor(private rideService: RideService) {}
+  constructor(private rideService: RideService, private authService: AuthService) {}
 
   ngAfterViewInit(): void {
     if (this.vehicleType) {
       this.showRoute();
     }
+    this.requestorEmail = this.authService.getLoggedUser()?.email || '';
   }
 
   goToStep(step: number): void {
