@@ -23,6 +23,9 @@ public class SplitFareService {
     @Autowired
     private DriverService driverService;
 
+    @Autowired
+    private NotificationService notificationService;
+
     public void makePayment(RideRequestDTO rideRequestDTO) {
 
         System.out.println(rideRequestDTO.getStartLocation());
@@ -35,6 +38,9 @@ public class SplitFareService {
 
         if( driver != null){
             confirmPayment(rideRequestDTO.getFullPrice(), rideRequestDTO.getPassengers());
+
+            String msg = "Imate novu vožnju od korisnika " + rideRequestDTO.getRequestorEmail();
+            notificationService.notifyDriver(driver.getId(), msg);
         }
         else
             System.out.println("nema dostupnih vozaca, odbij voznju");
