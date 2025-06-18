@@ -10,6 +10,7 @@ import ridemanagement.backend.model.Driver;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.List;
+import java.util.NoSuchElementException; // Dodajte import
 
 @Service
 public class SplitFareService {
@@ -26,28 +27,28 @@ public class SplitFareService {
     @Autowired
     private NotificationService notificationService;
 
-    public void makePayment(RideRequestDTO rideRequestDTO) {
+    public void processRideRequest(RideRequestDTO rideRequestDTO) {
+        System.out.println("Processing ride request: " + rideRequestDTO.toString());
 
-        System.out.println(rideRequestDTO.getStartLocation());
-        System.out.println(rideRequestDTO.getDestinationLocation());
-        System.out.println("koordinate");
         Driver driver = driverService.findEligibleDriver(rideRequestDTO);
-        System.out.println(driver);
-        System.out.println(" ^ ^ ^ driver ^ ^ ^ ");
-        System.out.println(rideRequestDTO.getRequestorEmail());
 
-        if( driver != null){
-            confirmPayment(rideRequestDTO.getFullPrice(), rideRequestDTO.getPassengers());
-
-            String msg = "Imate novu vožnju od korisnika " + rideRequestDTO.getRequestorEmail();
-            notificationService.notifyDriver(driver.getId(), msg, rideRequestDTO); // Dodajte rideRequestDTO ovde
+        if (driver != null) {
+            System.out.println("Sistem: Pronadjen vozač: " + driver.getEmail());
+            String msg = "Imate novu vožnju od korisnika " + rideRequestDTO.getRequestorEmail() + ". Detalji: od " +
+                    rideRequestDTO.getStartAddress() + " do " + rideRequestDTO.getDestinationAddress();
+            notificationService.notifyDriver(driver.getId(), msg, rideRequestDTO);
+        } else {
+            System.out.println("Sistem: Nema dostupnih vozača, vožnja se odbija.");
+            throw new NoSuchElementException("Nema dostupnih vozača za ovu vožnju. Zahtev odbijen.");
         }
-        else
-            System.out.println("nema dostupnih vozaca, odbij voznju");
-
     }
 
-    private void confirmPayment(double fullPrice, List<String> passengers) {
+    public void confirmAndProcessPayment(RideRequestDTO rideRequestDTO) {
+        System.out.println("Izvršavam plaćanje za vožnju: " + rideRequestDTO.toString());
+
+        double fullPrice = rideRequestDTO.getFullPrice();
+        List<String> passengers = rideRequestDTO.getPassengers();
+
         System.out.println("fullPrice " + fullPrice);
         System.out.println(passengers.size() + 1);
 
@@ -64,8 +65,6 @@ public class SplitFareService {
         for(String email: passengers) {
 //            emailService.sendPaymentConfirmation(email, token , pricePerPerson);
         }
-
+        // TODO: rideRepository.updateRideStatus(rideRequestDTO.getId(), RideStatus.ACCEPTED);
     }
-
-
 }

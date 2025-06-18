@@ -37,8 +37,8 @@ export class UserProfileComponent {
     console.log(this.user);
 
     if (this.user && this.user.userRole === 'DRIVER') {
-      this.webSocketService.connect(this.user.id, (notification: any) => { // Promenjen tip parametra
-        this.popupMessage = notification.message; // Pristupite poruci iz objekta
+      this.webSocketService.connect(this.user.id, (notification: any) => {
+        this.popupMessage = notification.message;
         this.showPopup = true;
       });
     }
@@ -64,17 +64,20 @@ export class UserProfileComponent {
   deleteAcc() {
   }
 
-  // ...
   acceptRide() {
     this.showPopup = false;
 
     this.userService.acceptRideAsDriver().subscribe({
-      next: () => {
-        alert('✅ Prihvatio si vožnju! Plaćanje pokrenuto.');
+      next: (response: any) => {
+        alert('✅ ' + response.message);
       },
       error: (err) => {
         console.error('Greška pri potvrđivanju vožnje:', err);
-        alert('❌ Greška pri potvrđivanju vožnje.');
+        if (err.error && err.error.error) {
+          alert('❌ Greška pri potvrđivanju vožnje: ' + err.error.error);
+        } else {
+          alert('❌ Došlo je do nepoznate greške pri potvrđivanju vožnje.');
+        }
       }
     });
   }
