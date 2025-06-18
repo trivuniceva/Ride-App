@@ -36,3 +36,11 @@
 <div *ngIf="!user" class="profile-container">
     <p>Nemate prijavljene korisnike.</p>
 </div>
+
+
+<app-ride-request-popup
+  [visible]="showPopup"
+  [message]="popupMessage"
+  (accept)="acceptRide()"
+  (reject)="rejectRide()"
+></app-ride-request-popup>

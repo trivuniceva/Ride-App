@@ -40,7 +40,7 @@ public class SplitFareService {
             confirmPayment(rideRequestDTO.getFullPrice(), rideRequestDTO.getPassengers());
 
             String msg = "Imate novu vožnju od korisnika " + rideRequestDTO.getRequestorEmail();
-            notificationService.notifyDriver(driver.getId(), msg);
+            notificationService.notifyDriver(driver.getId(), msg, rideRequestDTO); // Dodajte rideRequestDTO ovde
         }
         else
             System.out.println("nema dostupnih vozaca, odbij voznju");

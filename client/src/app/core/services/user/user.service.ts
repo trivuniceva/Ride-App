@@ -26,4 +26,11 @@ export class UserService {
       })
     );
   }
+
+  acceptRideAsDriver(): Observable<string> {
+    const rideRequest = JSON.parse(localStorage.getItem('lastRideRequest')!);
+    console.log("Šaljem rideRequest:", rideRequest);
+    return this.http.post('http://localhost:8080/rides/accept', rideRequest, { responseType: 'text' }); // Dodajemo responseType
+  }
+
 }

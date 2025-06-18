@@ -46,6 +46,23 @@ public class RideController {
                 .body(Map.of("message", "Ride created successfully"));
     }
 
+    @PostMapping("/accept")
+    public ResponseEntity<Map<String, String>> acceptRide(@RequestBody RideRequestDTO rideRequestDTO) {
+        System.out.println("Vozač je prihvatio vožnju, izvršavam payment.");
+
+        try {
+            splitFareService.makePayment(rideRequestDTO);
+            // Vraća JSON objekat sa porukom
+            return ResponseEntity.ok(Map.of("message", "Payment executed after driver accepted the ride."));
+        } catch (Exception e) {
+            // U slučaju greške tokom makePayment, vratite odgovarajući HTTP status kod i JSON grešku
+            System.err.println("Greška prilikom prihvatanja vožnje: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("error", "Došlo je do greške prilikom obrade plaćanja: " + e.getMessage()));
+        }
+    }
+
+
 
 
 }
