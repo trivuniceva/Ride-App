@@ -6,24 +6,32 @@ import {catchError, Observable, throwError} from 'rxjs';
   providedIn: 'root'
 })
 export class UserService {
-  private apiUrl = 'http://localhost:8080/user';
+  private apiUrl = 'http://localhost:8080';
 
   constructor(private http: HttpClient) { }
 
   requestPasswordReset(email: string): Observable<any> {
-    return this.http.post(`${this.apiUrl}/forgot-password`, { email });
+    return this.http.post(`${this.apiUrl}/user/forgot-password`, { email });
   }
 
-
   resetPassword(token: string, newPassword: string): Observable<any> {
-    return this.http.post<any>(`${this.apiUrl}/reset-password`, {
+    return this.http.post<any>(`${this.apiUrl}/user/reset-password`, {
       token: token,
       newPassword: newPassword
     }).pipe(
       catchError(error => {
-        console.error('Error:', error);
         return throwError(error);
       })
     );
+  }
+
+  // Ispravljen URL da uključuje rideId i driverId
+  acceptRide(rideId: number, driverId: number): Observable<any> {
+    return this.http.post(`${this.apiUrl}/rides/accept/${rideId}/${driverId}`, {});
+  }
+
+  // Ispravljen URL da uključuje rideId i driverId
+  rejectRide(rideId: number, driverId: number): Observable<any> {
+    return this.http.post(`${this.apiUrl}/rides/reject/${rideId}/${driverId}`, {});
   }
 }

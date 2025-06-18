@@ -1,5 +1,6 @@
 package ridemanagement.backend.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.rideapp.usermanagement.model.User;
 import jakarta.persistence.*;
 
@@ -17,10 +18,12 @@ public class Driver extends User {
 
     @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "vehicle_id")
+    @JsonIgnore
     private Vehicle vehicle;
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "location_id")
+    @JsonIgnore
     private Point location;
 
     @Column(name = "time_of_login")

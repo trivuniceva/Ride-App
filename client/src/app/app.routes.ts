@@ -7,16 +7,22 @@ import {UserProfileComponent} from './features/user-profile/user-profile.compone
 import {ForgotPasswordComponent} from './features/auth/pages/forgot-password/forgot-password.component';
 import {ResetPasswordComponent} from './features/auth/pages/reset-password/reset-password.component';
 import {CreateDriverComponent} from './features/admin/create-driver/create-driver.component';
+import {DriverNotificationsComponent} from './features/drivers/driver-notifications/driver-notifications.component';
+import {
+  DriverRideTrackingMapComponent
+} from './features/drivers/driver-ride-tracking-map/driver-ride-tracking-map.component';
 
 export const routes: Routes = [
   {path: '', component: HomeComponent},
   {path: 'login', component: LoginComponent},
   {path: 'signup', component: RegistrationComponent},
-  {path: 'ride', component: RideOrderComponent},
+  {path: 'ride-preview', component: RideOrderComponent},
   {path: 'profile', component: UserProfileComponent},
   {path: 'order-ride', component: RideOrderComponent},
   {path: 'forgot-password', component: ForgotPasswordComponent},
   { path: 'reset-password', component: ResetPasswordComponent },
   { path: 'create-driver', component: CreateDriverComponent },
+  { path: 'notifications', component: DriverNotificationsComponent },
+  { path: 'track-ride', component: DriverRideTrackingMapComponent },
 
 ];

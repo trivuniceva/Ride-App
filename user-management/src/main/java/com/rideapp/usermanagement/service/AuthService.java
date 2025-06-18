@@ -30,8 +30,16 @@ public class AuthService {
 
         User user = userService.getUserByEmail(email);
         if (user != null && userService.validPassword(user, password)) {
-            System.out.println("dobar korisnik: " + user.getProfilePic());
-            return user;
+            if(user.getUserRole().equals(UserRole.DRIVER)){
+                System.out.println("ovo je driver");
+                System.out.println(user.toString());
+                return user;
+
+            }
+            else {
+                System.out.println("dobar korisnik: " + user.getProfilePic());
+                return user;
+            }
         }
         return null;
     }

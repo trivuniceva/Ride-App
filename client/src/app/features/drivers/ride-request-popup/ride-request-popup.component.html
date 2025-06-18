@@ -1,0 +1,8 @@
+<div class="popup-overlay" *ngIf="visible">
+  <div class="popup">
+    <h3>📢 Nova vožnja</h3>
+    <p>{{ message }}</p>
+    <button (click)="accept.emit()">Prihvati</button>
+    <button (click)="reject.emit()">Odbij</button>
+  </div>
+</div>

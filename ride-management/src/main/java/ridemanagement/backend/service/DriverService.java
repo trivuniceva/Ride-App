@@ -12,6 +12,7 @@ import ridemanagement.backend.repository.DriverRepository;
 import java.util.Comparator;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -20,41 +21,54 @@ public class DriverService {
     @Autowired
     private DriverRepository driverRepository;
 
+    @Autowired
+    private PointService pointService; // Pretpostavljam da imate PointService za dohvatanje Point objekata po ID-u
+
     public Driver findEligibleDriver(RideRequestDTO rideRequestDTO) {
-        List<Driver> allDrivers = getAllDriversFromRepository();
+        return findNextEligibleDriver(rideRequestDTO, null);
+    }
+
+    public Driver findNextEligibleDriver(RideRequestDTO rideRequestDTO, Set<Long> refusedDriverIds) {
+        List<Driver> allDrivers = driverRepository.findAll();
 
         if (allDrivers.isEmpty()) {
-            System.out.println("Sistem: Nema prijavljenih vozaca u sistemu.");
             throw new NoSuchElementException("Nema prijavljenih vozaca u sistemu. Voznja se odbija.");
         }
 
-        PointDTO rideStartLocation = rideRequestDTO.getStartLocation();
-        if (rideStartLocation == null) {
-            System.out.println("Sistem: Koordinate početne lokacije (startLocation) nedostaju u zahtevu za vožnju.");
-            throw new IllegalArgumentException("Koordinate početne lokacije (startLocation) nedostaju u zahtevu za vožnju.");
+        PointDTO rideStartLocationDTO = rideRequestDTO.getStartLocation();
+        if (rideStartLocationDTO == null) {
+            // Ako RideRequestDTO nema PointDTO, dohvati ga iz baze ako imate ID
+            if (rideRequestDTO.getStartLocation() != null && rideRequestDTO.getStartLocation().getId() != null) {
+                Point startPoint = pointService.findById(rideRequestDTO.getStartLocation().getId())
+                        .orElseThrow(() -> new NoSuchElementException("Start location point not found for ID: " + rideRequestDTO.getStartLocation().getId()));
+                rideStartLocationDTO = new PointDTO(startPoint.getId(), startPoint.getLatitude(), startPoint.getLongitude());
+            } else {
+                throw new IllegalArgumentException("Koordinate početne lokacije (startLocation) nedostaju u zahtevu za vožnju.");
+            }
         }
 
-        List<Driver> trulyAvailableDrivers = getTrulyAvailableDrivers(allDrivers);
+
+        List<Driver> availableDriversConsidered = allDrivers.stream()
+                .filter(driver -> refusedDriverIds == null || !refusedDriverIds.contains(driver.getId()))
+                .collect(Collectors.toList());
+
+        if (availableDriversConsidered.isEmpty()) {
+            throw new NoSuchElementException("Nema više vozača za razmatranje (svi su odbili ili nema dostupnih).");
+        }
+
+        List<Driver> trulyAvailableDrivers = getTrulyAvailableDrivers(availableDriversConsidered);
 
         if (!trulyAvailableDrivers.isEmpty()) {
-            System.out.println("Sistem: Pronađeni dostupni vozači. Biram najbližeg.");
-            return findClosestDriverByLocation(trulyAvailableDrivers, rideStartLocation);
+            return findClosestDriverByLocation(trulyAvailableDrivers, rideStartLocationDTO);
         }
 
-        if (areAllDriversBusyOrHaveFutureRides(allDrivers)) {
-            System.out.println("Sistem: Svi vozači su trenutno zauzeti ili imaju već zakazanu buduću vožnju. Vožnja se odbija.");
-            throw new NoSuchElementException("Svi vozači su zauzeti ili imaju zakazanu buduću vožnju.");
-        }
-
-        List<Driver> busyDriversWithoutFutureRides = getBusyDriversWithoutFutureRides(allDrivers);
+        List<Driver> busyDriversWithoutFutureRides = getBusyDriversWithoutFutureRides(availableDriversConsidered);
 
         if (!busyDriversWithoutFutureRides.isEmpty()) {
-            System.out.println("Sistem: Slobodnih vozača nema. Biram najbližeg zauzetog vozača koji nema buduću vožnju.");
-            return findClosestDriverByLocation(busyDriversWithoutFutureRides, rideStartLocation);
+            return findClosestDriverByLocation(busyDriversWithoutFutureRides, rideStartLocationDTO);
         }
 
-        System.out.println("Sistem: Nema vozača koji ispunjavaju kriterijume za vožnju.");
-        throw new NoSuchElementException("Nema dostupnih vozača za ovu vožnju.");
+        throw new NoSuchElementException("Nema više dostupnih vozača za ovu vožnju.");
     }
 
     private List<Driver> getAllDriversFromRepository() {
@@ -66,11 +80,6 @@ public class DriverService {
                 .filter(Driver::isAvailable)
                 .filter(driver -> !driver.getHasFutureDrive())
                 .collect(Collectors.toList());
-    }
-
-    private boolean areAllDriversBusyOrHaveFutureRides(List<Driver> drivers) {
-        return drivers.stream()
-                .allMatch(driver -> !driver.isAvailable() || driver.getHasFutureDrive());
     }
 
     private List<Driver> getBusyDriversWithoutFutureRides(List<Driver> drivers) {
@@ -92,7 +101,6 @@ public class DriverService {
 
     private double calculateDistance(Point driverLocation, PointDTO targetLocation) {
         if (driverLocation == null || targetLocation == null) {
-            System.err.println("Upozorenje: Jedna od lokacija je null prilikom izračunavanja distance.");
             return Double.MAX_VALUE;
         }
         double dx = driverLocation.getLatitude() - targetLocation.getLatitude();

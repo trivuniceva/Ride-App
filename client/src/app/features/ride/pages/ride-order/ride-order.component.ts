@@ -1,15 +1,17 @@
-import {Component, OnInit, SimpleChanges} from '@angular/core';
+import { Component, OnInit, SimpleChanges, NgZone } from '@angular/core'; // Dodaj NgZone
 import { MapTestComponent } from '../../components/map-test/map-test.component';
 import { RouteFormComponent } from '../../components/route-form/route-form.component';
 import axios from 'axios';
 import * as L from 'leaflet';
 import { DriversAvailabilityComponent } from '../../../drivers/drivers-availability/drivers-availability.component';
-import * as polyline from '@mapbox/polyline';
+import *as polyline from '@mapbox/polyline';
 import { RouteInfoComponent } from '../../route-info/route-info.component';
 import { AuthService } from '../../../../core/services/auth/auth.service';
 import { NgIf } from '@angular/common';
 import { environment } from '../../../../../environments/environment';
 import { AdvancedFormPageComponent } from '../advanced-form-page/advanced-form-page.component';
+import { DriverService } from '../../../../core/services/drivers/driver.service';
+import { Driver } from '../../../../core/models/driver.model';
 
 @Component({
   selector: 'app-ride-order',
@@ -41,8 +43,9 @@ export class RideOrderComponent implements OnInit {
   userRole: string = '';
   waypointsCoords: [number, number][] = [];
   vehicleType: string | null = null;
+  allDrivers: Driver[] = [];
 
-  constructor(private authService: AuthService) {}
+  constructor(private authService: AuthService, private driverService: DriverService, private ngZone: NgZone) {} // Ubaci NgZone
 
   ngOnInit(): void {
     this.authService.userRole$.subscribe((role) => {
@@ -50,6 +53,13 @@ export class RideOrderComponent implements OnInit {
     });
 
     this.apiKey = environment.openrouteserviceApiKey;
+
+    this.driverService.getDrivers().subscribe((data) => {
+      this.ngZone.run(() => {
+        this.allDrivers = data;
+        console.log('Dohvaćeni vozači:', this.allDrivers);
+      });
+    });
   }
 
   async handleRouteData(routeData: {
