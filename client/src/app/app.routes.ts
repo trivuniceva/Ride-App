@@ -11,6 +11,7 @@ import {DriverNotificationsComponent} from './features/drivers/driver-notificati
 import {
   DriverRideTrackingMapComponent
 } from './features/drivers/driver-ride-tracking-map/driver-ride-tracking-map.component';
+import {UserManagementComponent} from './features/admin/user-management/user-management.component';
 
 export const routes: Routes = [
   {path: '', component: HomeComponent},
@@ -24,5 +25,6 @@ export const routes: Routes = [
   { path: 'create-driver', component: CreateDriverComponent },
   { path: 'notifications', component: DriverNotificationsComponent },
   { path: 'track-ride', component: DriverRideTrackingMapComponent },
+  { path: 'block-users', component: UserManagementComponent },
 
 ];

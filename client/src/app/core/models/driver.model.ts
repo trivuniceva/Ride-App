@@ -1,15 +1,12 @@
-import {Vehicle} from './vehicle.model';
-import {Point} from './point.model';
+import { Vehicle } from './vehicle.model';
+import { Point } from './point.model';
+import { User } from './user.model';
 
-export interface Driver {
-  id: number;
-  email: string;
-  firstname: string;
-  lastname: string;
-  isBlocked: boolean;
+export interface Driver extends User {
   available: boolean;
-  // vehicle: Vehicle;
+  vehicle: Vehicle;
   location: Point;
   timeOfLogin: string;
   hasFutureDrive: boolean;
+  isAvailable: boolean;
 }

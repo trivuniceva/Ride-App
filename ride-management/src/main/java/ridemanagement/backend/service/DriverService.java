@@ -1,5 +1,7 @@
 package ridemanagement.backend.service;
 
+import com.rideapp.usermanagement.dto.BlockUserRequestDTO;
+import com.rideapp.usermanagement.model.UserRole;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ridemanagement.backend.dto.DriverDTO;
@@ -9,9 +11,12 @@ import ridemanagement.backend.model.Driver;
 import ridemanagement.backend.model.Point;
 import ridemanagement.backend.repository.DriverRepository;
 
+import jakarta.transaction.Transactional;
+
 import java.util.Comparator;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -22,7 +27,7 @@ public class DriverService {
     private DriverRepository driverRepository;
 
     @Autowired
-    private PointService pointService; // Pretpostavljam da imate PointService za dohvatanje Point objekata po ID-u
+    private PointService pointService;
 
     public Driver findEligibleDriver(RideRequestDTO rideRequestDTO) {
         return findNextEligibleDriver(rideRequestDTO, null);
@@ -37,7 +42,6 @@ public class DriverService {
 
         PointDTO rideStartLocationDTO = rideRequestDTO.getStartLocation();
         if (rideStartLocationDTO == null) {
-            // Ako RideRequestDTO nema PointDTO, dohvati ga iz baze ako imate ID
             if (rideRequestDTO.getStartLocation() != null && rideRequestDTO.getStartLocation().getId() != null) {
                 Point startPoint = pointService.findById(rideRequestDTO.getStartLocation().getId())
                         .orElseThrow(() -> new NoSuchElementException("Start location point not found for ID: " + rideRequestDTO.getStartLocation().getId()));
@@ -46,7 +50,6 @@ public class DriverService {
                 throw new IllegalArgumentException("Koordinate početne lokacije (startLocation) nedostaju u zahtevu za vožnju.");
             }
         }
-
 
         List<Driver> availableDriversConsidered = allDrivers.stream()
                 .filter(driver -> refusedDriverIds == null || !refusedDriverIds.contains(driver.getId()))
@@ -115,6 +118,31 @@ public class DriverService {
                 .collect(Collectors.toList());
     }
 
+    @Transactional
+    public DriverDTO blockDriver(BlockUserRequestDTO request) {
+        Optional<Driver> driverOptional = driverRepository.findById(request.getUserId());
+        if (driverOptional.isEmpty()) {
+            throw new NoSuchElementException("Driver not found with ID: " + request.getUserId());
+        }
+
+        Driver driver = driverOptional.get();
+
+        if (driver.getUserRole().equals(UserRole.ADMINISTRATOR)) {
+            throw new IllegalArgumentException("Administrators cannot be blocked/deactivated.");
+        }
+
+        driver.setActive(!request.getIsBlocked());
+        driver.setBlockNote(request.getBlockNote());
+
+        if (!driver.isActive()) {
+            driver.setAvailable(false);
+            driver.setHasFutureDrive(false);
+        }
+
+        driverRepository.save(driver);
+        return convertToDTO(driver);
+    }
+
     public DriverDTO convertToDTO(Driver driver) {
         PointDTO pointDTO = null;
         Point location = driver.getLocation();
@@ -127,7 +155,8 @@ public class DriverService {
                 driver.getEmail(),
                 driver.getFirstname(),
                 driver.getLastname(),
-                driver.isBlocked(),
+                driver.isActive(),
+                driver.getBlockNote(),
                 driver.isAvailable(),
                 driver.getTimeOfLogin(),
                 driver.getHasFutureDrive(),

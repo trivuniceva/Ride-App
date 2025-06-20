@@ -10,10 +10,10 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "email")
+    @Column(name = "email", unique = true, nullable = false)
     private String email;
 
-    @Column(name = "password")
+    @Column(name = "password", nullable = false)
     private String password;
 
     @Column(name = "firstname")
@@ -23,7 +23,7 @@ public class User {
     private String lastname;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "user_role")
+    @Column(name = "user_role", nullable = false)
     private UserRole userRole;
 
     @Column(name = "reset_token")
@@ -35,11 +35,14 @@ public class User {
     @Column(name = "phone")
     private String phone;
 
-    @Column(name = "is_active")
-    private boolean isActive;
+    @Column(name = "is_active", nullable = false)
+    private boolean isActive = true; //Default su svi aktivni
 
     @Column(name = "profile_pic")
     private String profilePic;
+
+    @Column(name = "block_note", length = 500)
+    private String blockNote;
 
     public Long getId() {
         return id;
@@ -129,6 +132,14 @@ public class User {
         this.address = address;
     }
 
+    public String getBlockNote() {
+        return blockNote;
+    }
+
+    public void setBlockNote(String blockNote) {
+        this.blockNote = blockNote;
+    }
+
     @Override
     public String toString() {
         return "User{" +
@@ -143,6 +154,7 @@ public class User {
                 ", phone='" + phone + '\'' +
                 ", isActive=" + isActive +
                 ", profilePic='" + profilePic + '\'' +
+                ", blockNote='" + blockNote + '\'' +
                 '}';
     }
 }

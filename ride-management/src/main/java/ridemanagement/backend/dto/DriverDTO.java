@@ -9,26 +9,43 @@ public class DriverDTO {
     private String email;
     private String firstname;
     private String lastname;
-    private boolean isBlocked;
+    private boolean isActive;
+    private String blockNote;
     private boolean isAvailable;
     private Timestamp timeOfLogin;
     private Boolean hasFutureDrive;
     private PointDTO location;
 
-    public DriverDTO(Long id, String email, String firstname, String lastname, boolean isBlocked, boolean isAvailable, Timestamp timeOfLogin, Boolean hasFutureDrive, PointDTO location) {
+    public DriverDTO() {
+    }
+
+    // Constructor without blockNote
+    public DriverDTO(Long id, String email, String firstname, String lastname, boolean isActive, boolean isAvailable, Timestamp timeOfLogin, Boolean hasFutureDrive, PointDTO location) {
         this.id = id;
         this.email = email;
         this.firstname = firstname;
         this.lastname = lastname;
-        this.isBlocked = isBlocked;
+        this.isActive = isActive; // From User
         this.isAvailable = isAvailable;
         this.timeOfLogin = timeOfLogin;
         this.hasFutureDrive = hasFutureDrive;
         this.location = location;
     }
 
-    public DriverDTO(Long id, String email, String firstname, String lastname, boolean blocked, boolean available, Timestamp timeOfLogin, Boolean hasFutureDrive, Point location) {
+    // Constructor with blockNote
+    public DriverDTO(Long id, String email, String firstname, String lastname, boolean isActive, String blockNote, boolean isAvailable, Timestamp timeOfLogin, Boolean hasFutureDrive, PointDTO location) {
+        this.id = id;
+        this.email = email;
+        this.firstname = firstname;
+        this.lastname = lastname;
+        this.isActive = isActive;
+        this.blockNote = blockNote;
+        this.isAvailable = isAvailable;
+        this.timeOfLogin = timeOfLogin;
+        this.hasFutureDrive = hasFutureDrive;
+        this.location = location;
     }
+
 
     public Long getId() {
         return id;
@@ -60,14 +77,6 @@ public class DriverDTO {
 
     public void setLastname(String lastname) {
         this.lastname = lastname;
-    }
-
-    public boolean isBlocked() {
-        return isBlocked;
-    }
-
-    public void setBlocked(boolean blocked) {
-        isBlocked = blocked;
     }
 
     public boolean isAvailable() {
@@ -109,7 +118,6 @@ public class DriverDTO {
                 ", email='" + email + '\'' +
                 ", firstname='" + firstname + '\'' +
                 ", lastname='" + lastname + '\'' +
-                ", isBlocked=" + isBlocked +
                 ", isAvailable=" + isAvailable +
                 ", timeOfLogin=" + timeOfLogin +
                 ", hasFutureDrive=" + hasFutureDrive +

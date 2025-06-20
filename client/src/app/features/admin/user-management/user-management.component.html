@@ -1,0 +1,106 @@
+<div class="user-management-container">
+  <h2>Upravljanje Korisnicima (Administrator)</h2>
+
+  <div *ngIf="isLoading" class="loading-spinner">Učitavanje...</div>
+  <div *ngIf="errorMessage" class="error-message">{{ errorMessage }}</div>
+
+  <mat-tab-group>
+    <mat-tab label="Registrovani Korisnici (Putnici)">
+      <div class="user-list">
+        <h3>Lista Registrovanih Korisnika</h3>
+        <table mat-table [dataSource]="registeredUsers" class="mat-elevation-z8">
+          <ng-container matColumnDef="id">
+            <th mat-header-cell *matHeaderCellDef> ID </th>
+            <td mat-cell *matCellDef="let user"> {{user.id}} </td>
+          </ng-container>
+          <ng-container matColumnDef="email">
+            <th mat-header-cell *matHeaderCellDef> Email </th>
+            <td mat-cell *matCellDef="let user"> {{user.email}} </td>
+          </ng-container>
+          <ng-container matColumnDef="name">
+            <th mat-header-cell *matHeaderCellDef> Ime i Prezime </th>
+            <td mat-cell *matCellDef="let user"> {{user.firstname}} {{user.lastname}} </td>
+          </ng-container>
+          <ng-container matColumnDef="isActive"> <th mat-header-cell *matHeaderCellDef> Status </th>
+            <td mat-cell *matCellDef="let user">
+              <mat-icon color="{{ user.isActive ? 'primary' : 'warn' }}">
+                {{ user.isActive ? 'check_circle' : 'block' }}
+              </mat-icon>
+              {{ user.isActive ? 'Aktivan' : 'Blokiran' }}
+            </td>
+          </ng-container>
+          <ng-container matColumnDef="blockNote">
+            <th mat-header-cell *matHeaderCellDef> Napomena </th>
+            <td mat-cell *matCellDef="let user"> {{user.blockNote || '-'}} </td>
+          </ng-container>
+          <ng-container matColumnDef="actions">
+            <th mat-header-cell *matHeaderCellDef> Akcije </th>
+            <td mat-cell *matCellDef="let user">
+              <button mat-raised-button color="{{ user.isActive ? 'warn' : 'primary' }}"
+                      (click)="openBlockUserDialog(user, false)">
+                {{ user.isActive ? 'Blokiraj' : 'Odblokiraj' }}
+              </button>
+            </td>
+          </ng-container>
+
+          <tr mat-header-row *matHeaderRowDef="['id', 'email', 'name', 'isActive', 'blockNote', 'actions']"></tr>
+          <tr mat-row *matRowDef="let row; columns: ['id', 'email', 'name', 'isActive', 'blockNote', 'actions'];"></tr>
+        </table>
+        <div *ngIf="!registeredUsers.length && !isLoading" class="no-data">Nema registrovanih korisnika.</div>
+      </div>
+    </mat-tab>
+
+    <mat-tab label="Vozači">
+      <div class="user-list">
+        <h3>Lista Vozača</h3>
+        <table mat-table [dataSource]="drivers" class="mat-elevation-z8">
+          <ng-container matColumnDef="id">
+            <th mat-header-cell *matHeaderCellDef> ID </th>
+            <td mat-cell *matCellDef="let driver"> {{driver.id}} </td>
+          </ng-container>
+          <ng-container matColumnDef="email">
+            <th mat-header-cell *matHeaderCellDef> Email </th>
+            <td mat-cell *matCellDef="let driver"> {{driver.email}} </td>
+          </ng-container>
+          <ng-container matColumnDef="name">
+            <th mat-header-cell *matHeaderCellDef> Ime i Prezime </th>
+            <td mat-cell *matCellDef="let driver"> {{driver.firstname}} {{driver.lastname}} </td>
+          </ng-container>
+          <ng-container matColumnDef="isActive"> <th mat-header-cell *matHeaderCellDef> Status </th>
+            <td mat-cell *matCellDef="let driver">
+              <mat-icon color="{{ driver.isActive ? 'primary' : 'warn' }}">
+                {{ driver.isActive ? 'check_circle' : 'block' }}
+              </mat-icon>
+              {{ driver.isActive ? 'Aktivan' : 'Blokiran' }}
+            </td>
+          </ng-container>
+          <ng-container matColumnDef="blockNote">
+            <th mat-header-cell *matHeaderCellDef> Napomena </th>
+            <td mat-cell *matCellDef="let driver"> {{driver.blockNote || '-'}} </td>
+          </ng-container>
+          <ng-container matColumnDef="isAvailable">
+            <th mat-header-cell *matHeaderCellDef> Dostupan </th>
+            <td mat-cell *matCellDef="let driver">
+              <mat-icon color="{{ driver.isAvailable ? 'primary' : 'warn' }}">
+                {{ driver.isAvailable ? 'check_circle' : 'cancel' }}
+              </mat-icon>
+            </td>
+          </ng-container>
+          <ng-container matColumnDef="actions">
+            <th mat-header-cell *matHeaderCellDef> Akcije </th>
+            <td mat-cell *matCellDef="let driver">
+              <button mat-raised-button color="{{ driver.isActive ? 'warn' : 'primary' }}"
+                      (click)="openBlockUserDialog(driver, true)">
+                {{ driver.isActive ? 'Blokiraj' : 'Odblokiraj' }}
+              </button>
+            </td>
+          </ng-container>
+
+          <tr mat-header-row *matHeaderRowDef="['id', 'email', 'name', 'isActive', 'blockNote', 'isAvailable', 'actions']"></tr>
+          <tr mat-row *matRowDef="let row; columns: ['id', 'email', 'name', 'isActive', 'blockNote', 'isAvailable', 'actions'];"></tr>
+        </table>
+        <div *ngIf="!drivers.length && !isLoading" class="no-data">Nema vozača.</div>
+      </div>
+    </mat-tab>
+  </mat-tab-group>
+</div>

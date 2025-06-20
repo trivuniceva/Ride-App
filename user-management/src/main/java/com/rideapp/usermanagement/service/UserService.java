@@ -1,15 +1,19 @@
 package com.rideapp.usermanagement.service;
 
+import com.rideapp.usermanagement.dto.BlockUserRequestDTO;
 import com.rideapp.usermanagement.dto.ResetPasswordRequestDTO;
-import com.rideapp.usermanagement.model.EmailService;
-import com.rideapp.usermanagement.model.ErrorResponse;
-import com.rideapp.usermanagement.model.SuccessResponse;
+import com.rideapp.usermanagement.dto.UserDTO;
+import com.rideapp.usermanagement.model.*;
+import com.rideapp.usermanagement.repository.UserRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import com.rideapp.usermanagement.repository.UserRepository;
-import com.rideapp.usermanagement.model.User;
+
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class UserService {
@@ -54,7 +58,6 @@ public class UserService {
         }
     }
 
-
     public ResponseEntity<?> resetPassword(ResetPasswordRequestDTO request) {
         User user = userRepository.findByResetToken(request.getToken());
         if (user == null) {
@@ -67,4 +70,43 @@ public class UserService {
         return ResponseEntity.ok(new SuccessResponse("Password reset successfully."));
     }
 
+    public List<UserDTO> getAllRegisteredUsers() {
+        return userRepository.findByUserRole(UserRole.REGISTERED_USER).stream()
+                .map(this::convertToUserDTO)
+                .collect(Collectors.toList());
+    }
+
+    @Transactional
+    public ResponseEntity<?> blockUser(BlockUserRequestDTO request) {
+        Optional<User> userOptional = userRepository.findById(request.getUserId());
+        if (userOptional.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ErrorResponse("User not found with ID: " + request.getUserId()));
+        }
+
+        User user = userOptional.get();
+
+        if (user.getUserRole().equals(UserRole.ADMINISTRATOR)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(new ErrorResponse("Administrators cannot be blocked/deactivated."));
+        }
+
+        user.setActive(!request.getIsBlocked());
+        user.setBlockNote(request.getBlockNote());
+        userRepository.save(user);
+
+        return ResponseEntity.ok(convertToUserDTO(user));
+    }
+
+    public UserDTO convertToUserDTO(User user) {
+        return new UserDTO(
+                user.getId(),
+                user.getEmail(),
+                user.getFirstname(),
+                user.getLastname(),
+                user.getUserRole(),
+                user.getAddress(),
+                user.getPhone(),
+                user.isActive(),
+                user.getBlockNote()
+        );
+    }
 }
