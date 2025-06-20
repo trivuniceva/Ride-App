@@ -40,13 +40,4 @@ public class DriverController {
         return ResponseEntity.ok(updatedDriver);
     }
 
-    // Dodaj ostale metode vezane za vozače ako su potrebne, npr. findEligibleDriver, itd.
-    // Primer ako želiš da izbaciš neke od metoda iz DriverService direktno u Controller:
-    /*
-    @PostMapping("/find-eligible")
-    public ResponseEntity<DriverDTO> findEligibleDriver(@RequestBody RideRequestDTO rideRequestDTO) {
-        Driver driver = driverService.findEligibleDriver(rideRequestDTO);
-        return ResponseEntity.ok(driverService.convertToDTO(driver));
-    }
-    */
 }

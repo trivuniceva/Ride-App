@@ -3,6 +3,7 @@ package ridemanagement.backend.service;
 import com.rideapp.usermanagement.dto.BlockUserRequestDTO;
 import com.rideapp.usermanagement.model.UserRole;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import ridemanagement.backend.dto.DriverDTO;
 import ridemanagement.backend.dto.PointDTO;
@@ -131,15 +132,14 @@ public class DriverService {
             throw new IllegalArgumentException("Administrators cannot be blocked/deactivated.");
         }
 
-        driver.setActive(!request.getIsBlocked());
+        System.out.println(driver.toString());
+
+        driver.setActive(request.getIsBlocked());
         driver.setBlockNote(request.getBlockNote());
 
-        if (!driver.isActive()) {
-            driver.setAvailable(false);
-            driver.setHasFutureDrive(false);
-        }
-
         driverRepository.save(driver);
+        System.out.println(driver.toString());
+
         return convertToDTO(driver);
     }
 

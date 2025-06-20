@@ -70,4 +70,15 @@ public class Driver extends User {
     public void setHasFutureDrive(Boolean hasFutureDrive) {
         this.hasFutureDrive = hasFutureDrive;
     }
+
+    @Override
+    public String toString() {
+        return "Driver{" +
+                "isAvailable=" + isAvailable +
+                ", vehicle=" + vehicle +
+                ", location=" + location +
+                ", timeOfLogin=" + timeOfLogin +
+                ", hasFutureDrive=" + hasFutureDrive +
+                '}';
+    }
 }

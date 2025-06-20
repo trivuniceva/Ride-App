@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import {ChangeDetectorRef, Component, OnInit} from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { tap, catchError } from 'rxjs/operators';
 import { of } from 'rxjs';
@@ -10,7 +10,7 @@ import { BlockUserDialogComponent } from '../block-user-dialog/block-user-dialog
 import { MatTab, MatTabGroup } from '@angular/material/tabs';
 import { MatIconModule } from '@angular/material/icon';
 import { NgIf, CommonModule } from '@angular/common';
-import { MatTableModule } from '@angular/material/table';
+import {MatTableDataSource, MatTableModule} from '@angular/material/table';
 import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 
@@ -36,47 +36,60 @@ export class UserManagementComponent implements OnInit {
   isLoading = false;
   errorMessage: string | null = null;
 
+  registeredUsersDataSource = new MatTableDataSource<User>();
+  driversDataSource = new MatTableDataSource<Driver>();
+
   constructor(
     private userService: UserService,
     private driverService: DriverService,
-    public dialog: MatDialog
+    public dialog: MatDialog,
+    private cdr: ChangeDetectorRef
   ) { }
 
   ngOnInit(): void {
-    this.loadUsersAndDrivers();
+    this.loadRegisteredUsers();
+    this.loadDrivers();
   }
 
-  loadUsersAndDrivers(): void {
+  loadRegisteredUsers(): void {
     this.isLoading = true;
-    this.errorMessage = null;
-
-    this.userService.getAllRegisteredUsers().pipe(
-      tap((users: User[]) => this.registeredUsers = users),
-      catchError(error => {
-        this.errorMessage = 'Failed to load registered users: ' + (error.error?.message || error.message);
-        console.error('Error loading registered users:', error);
-        return of([]);
-      })
-    ).subscribe(() => {
-      this.driverService.getDrivers().pipe(
-        tap((drivers: Driver[]) => this.drivers = drivers),
-        catchError(error => {
-          this.errorMessage = (this.errorMessage ? this.errorMessage + '\n' : '') + 'Failed to load drivers: ' + (error.error?.message || error.message);
-          console.error('Error loading drivers:', error);
-          return of([]);
-        })
-      ).subscribe(() => {
+    this.userService.getAllRegisteredUsers().subscribe({
+      next: (users) => {
+        this.registeredUsers = users;
+        this.registeredUsersDataSource.data = users;
         this.isLoading = false;
-      });
+      },
+
+      error: (err) => {
+        this.errorMessage = 'Greška pri učitavanju registrovanih korisnika.';
+        this.isLoading = false;
+        console.error(err);
+      }
+    });
+  }
+
+  loadDrivers(): void {
+    this.isLoading = true;
+    this.driverService.getDrivers().subscribe({
+      next: (drivers) => {
+        this.drivers = drivers;
+        this.driversDataSource.data = drivers;
+        this.isLoading = false;
+      },
+      error: (err) => {
+        this.errorMessage = 'Greška pri učitavanju vozača.';
+        this.isLoading = false;
+        console.error(err);
+      }
     });
   }
 
   openBlockUserDialog(user: User | Driver, isDriver: boolean): void {
     const dialogRef = this.dialog.open(BlockUserDialogComponent, {
-      width: '400px',
+      width: '500px',
       data: {
         userId: user.id,
-        isBlocked: !user.isActive,
+        isCurrentlyActive: user.active,
         blockNote: user.blockNote || null,
         userName: `${user.firstname} ${user.lastname}`,
         userRole: user.userRole,
@@ -88,21 +101,23 @@ export class UserManagementComponent implements OnInit {
       if (result) {
         const request = {
           userId: user.id,
-          isBlocked: result.isBlocked,
+          isBlocked: !result.isCurrentlyActive,
           blockNote: result.blockNote
         };
 
         if (isDriver) {
           this.driverService.blockDriver(request).pipe(
             tap((updatedDriver: Driver) => {
-              const index = this.drivers.findIndex(d => d.id === updatedDriver.id);
-              if (index > -1) {
-                this.drivers[index] = updatedDriver;
-              }
-              alert(`Vozač ${updatedDriver.firstname} ${updatedDriver.lastname} je ${!updatedDriver.isActive ? 'blokiran' : 'odblokiran'}.`);
+              console.log('Driver BEFORE update:', this.drivers.find(d => d.id === updatedDriver.id));
+              console.log('Driver AFTER update (from backend response):', updatedDriver);
+
+              this.drivers = this.drivers.map(d => d.id === updatedDriver.id ? updatedDriver : d);
+              this.driversDataSource.data = this.drivers;
+              this.cdr.detectChanges();
+              alert(`Vozač ${updatedDriver.firstname} ${updatedDriver.lastname} je ${!updatedDriver.active ? 'blokiran' : 'odblokiran'}.`);
             }),
             catchError(error => {
-              this.errorMessage = `Greška prilikom blokiranja vozača: ${error.error?.message || error.message}`;
+              this.errorMessage = `Greška prilikom ${request.isBlocked ? 'blokiranja' : 'odblokiranja'} vozača: ${error.error?.message || error.message}`;
               console.error('Error blocking driver:', error);
               return of(null);
             })
@@ -110,14 +125,16 @@ export class UserManagementComponent implements OnInit {
         } else {
           this.userService.blockUser(request).pipe(
             tap((updatedUser: User) => {
-              const index = this.registeredUsers.findIndex(u => u.id === updatedUser.id);
-              if (index > -1) {
-                this.registeredUsers[index] = updatedUser;
-              }
-              alert(`Korisnik ${updatedUser.firstname} ${updatedUser.lastname} je ${!updatedUser.isActive ? 'blokiran' : 'odblokiran'}.`);
+              console.log('User BEFORE update:', this.registeredUsers.find(u => u.id === updatedUser.id));
+              console.log('User AFTER update (from backend response):', updatedUser);
+
+              this.registeredUsers = this.registeredUsers.map(u => u.id === updatedUser.id ? updatedUser : u);
+              this.registeredUsersDataSource.data = this.registeredUsers;
+              this.cdr.detectChanges();
+              alert(`Korisnik ${updatedUser.firstname} ${updatedUser.lastname} je ${!updatedUser.active ? 'blokiran' : 'odblokiran'}.`);
             }),
             catchError(error => {
-              this.errorMessage = `Greška prilikom blokiranja korisnika: ${error.error?.message || error.message}`;
+              this.errorMessage = `Greška prilikom ${request.isBlocked ? 'blokiranja' : 'odblokiranja'} korisnika: ${error.error?.message || error.message}`;
               console.error('Error blocking user:', error);
               return of(null);
             })

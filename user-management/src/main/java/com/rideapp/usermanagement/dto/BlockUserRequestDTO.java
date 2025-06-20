@@ -9,10 +9,10 @@ public class BlockUserRequestDTO {
     private Long userId;
 
     @NotNull(message = "Blocked status cannot be null")
-    private Boolean isBlocked; // true means block (isActive = false), false means unblock (isActive = true)
+    private Boolean isBlocked;
 
     @Size(max = 500, message = "Block note cannot exceed 500 characters")
-    private String blockNote; // Optional note
+    private String blockNote;
 
     public BlockUserRequestDTO() {
     }
@@ -46,5 +46,14 @@ public class BlockUserRequestDTO {
 
     public void setBlockNote(String blockNote) {
         this.blockNote = blockNote;
+    }
+
+    @Override
+    public String toString() {
+        return "BlockUserRequestDTO{" +
+                "userId=" + userId +
+                ", isBlocked=" + isBlocked +
+                ", blockNote='" + blockNote + '\'' +
+                '}';
     }
 }

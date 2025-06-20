@@ -1,5 +1,6 @@
 package com.rideapp.usermanagement.model;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 
 @Entity
@@ -36,6 +37,7 @@ public class User {
     private String phone;
 
     @Column(name = "is_active", nullable = false)
+    @JsonProperty("isActive")
     private boolean isActive = true; //Default su svi aktivni
 
     @Column(name = "profile_pic")

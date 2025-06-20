@@ -111,6 +111,22 @@ public class DriverDTO {
         this.location = location;
     }
 
+    public boolean isActive() {
+        return isActive;
+    }
+
+    public void setActive(boolean active) {
+        isActive = active;
+    }
+
+    public String getBlockNote() {
+        return blockNote;
+    }
+
+    public void setBlockNote(String blockNote) {
+        this.blockNote = blockNote;
+    }
+
     @Override
     public String toString() {
         return "DriverDTO{" +

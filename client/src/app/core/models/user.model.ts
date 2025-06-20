@@ -6,6 +6,6 @@ export interface User {
   userRole: 'ADMINISTRATOR' | 'REGISTERED_USER' | 'DRIVER';
   address?: string;
   phone?: string;
-  isActive: boolean;
+  active: boolean;
   blockNote?: string | null;
 }

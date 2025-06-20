@@ -1,3 +1,5 @@
+// src/app/features/admin/block-user-dialog/block-user-dialog.component.ts
+
 import { Component, Inject } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogActions, MatDialogContent, MatDialogRef } from '@angular/material/dialog';
 import { FormControl, Validators, ReactiveFormsModule } from '@angular/forms';
@@ -32,7 +34,7 @@ export class BlockUserDialogComponent {
     public dialogRef: MatDialogRef<BlockUserDialogComponent>,
     @Inject(MAT_DIALOG_DATA) public data: any
   ) {
-    this.isCurrentlyBlocked = data.isBlocked;
+    this.isCurrentlyBlocked = !data.isCurrentlyActive; // Crucial change here!
     this.userName = data.userName;
     this.userRole = data.userRole;
     this.isDriver = data.isDriver;
@@ -50,7 +52,7 @@ export class BlockUserDialogComponent {
       return;
     }
     this.dialogRef.close({
-      isBlocked: !this.isCurrentlyBlocked,
+      isCurrentlyActive: !this.isCurrentlyBlocked, // This flips based on the dialog's current context
       blockNote: this.blockNoteControl.value
     });
   }

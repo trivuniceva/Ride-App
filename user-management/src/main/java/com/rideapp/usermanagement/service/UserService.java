@@ -89,7 +89,7 @@ public class UserService {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(new ErrorResponse("Administrators cannot be blocked/deactivated."));
         }
 
-        user.setActive(!request.getIsBlocked());
+        user.setActive(request.getIsBlocked());
         user.setBlockNote(request.getBlockNote());
         userRepository.save(user);
 
