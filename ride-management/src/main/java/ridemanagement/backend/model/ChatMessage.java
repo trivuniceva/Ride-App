@@ -1,34 +1,33 @@
-// ridemanagement.backend.model.ChatMessage
 package ridemanagement.backend.model;
 
-import com.rideapp.usermanagement.model.User; // Assuming your User model is here
+import com.rideapp.usermanagement.model.User;
 import jakarta.persistence.*;
 import java.util.Date;
 
 @Entity
-@Table(name = "chat_messages") // Explicitly define table name
+@Table(name = "chat_messages")
 public class ChatMessage {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY) // Or UUID, depending on your ID strategy
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY) // Lazy fetch to avoid loading User always
-    @JoinColumn(name = "sender_id", nullable = false) // Foreign key to User table
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "sender_id", nullable = false)
     private User sender;
 
-    @Column(name = "message_content", nullable = false, length = 1000) // Adjust length as needed
+    @Column(name = "message_content", nullable = false, length = 1000)
     private String messageContent;
 
     @Column(name = "chat_session_id", nullable = false)
     private String chatSessionId;
 
     @Column(name = "timestamp", nullable = false)
-    @Temporal(TemporalType.TIMESTAMP) // Maps to SQL TIMESTAMP
+    @Temporal(TemporalType.TIMESTAMP)
     private Date timestamp;
 
-    @Column(name = "is_read") // Assuming you have an isRead field
-    private boolean isRead = false; // Default to false
+    @Column(name = "is_read")
+    private boolean isRead = false;
 
     public ChatMessage() {
     }

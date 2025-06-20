@@ -1,4 +1,3 @@
-// ridemanagement.backend.controller.ChatMessageController
 package ridemanagement.backend.controller;
 
 import org.springframework.messaging.handler.annotation.MessageMapping;
@@ -30,8 +29,7 @@ public class ChatMessageController {
     }
 
     @MessageMapping("/chat.sendMessage")
-    public void sendMessage(@Payload ChatMessageDTO chatMessageDTO, Principal principal) { // Dodaj Principal
-        // Loguj principal, da vidiš šta Spring Security koristi kao username/ID
+    public void sendMessage(@Payload ChatMessageDTO chatMessageDTO, Principal principal) {
         if (principal != null) {
             System.out.println("DEBUG: Principal Name (Authenticated User Sending Message): " + principal.getName());
         } else {
@@ -58,20 +56,16 @@ public class ChatMessageController {
                 " in session " + chatMessageDTO.getChatSessionId() +
                 ": " + chatMessageDTO.getMessageContent());
 
-        // Loguj recipientId i senderId za svaki slučaj
         System.out.println("DEBUG: Message Sender ID: " + chatMessageDTO.getSenderId());
         System.out.println("DEBUG: Message Recipient ID: " + chatMessageDTO.getRecipientId());
 
-
-        // 1. Ako postoji recipientId, šalji poruku direktno tom korisniku
         if (chatMessageDTO.getRecipientId() != null) {
             Optional<User> recipientOptional = userRepository.findById(chatMessageDTO.getRecipientId());
             if (recipientOptional.isPresent()) {
-                String recipientPrincipalName = String.valueOf(recipientOptional.get().getId()); // Predpostavljamo da je ID principal name
-                // ILI: recipientPrincipalName = recipientOptional.get().getEmail(); // Ako je email principal name
+                String recipientPrincipalName = String.valueOf(recipientOptional.get().getId());
                 System.out.println("DEBUG: Sending private message to user with Principal Name: " + recipientPrincipalName + " (Recipient ID: " + chatMessageDTO.getRecipientId() + ")");
                 messagingTemplate.convertAndSendToUser(
-                        recipientPrincipalName, // Koristi Principal ime primaoca
+                        recipientPrincipalName,
                         "/queue/messages",
                         chatMessageDTO
                 );
@@ -80,7 +74,6 @@ public class ChatMessageController {
             }
         }
 
-        // 2. Uvek šalji poruku na admin topic (ovo već radi)
         messagingTemplate.convertAndSend("/topic/admin/chat", chatMessageDTO);
     }
 }
