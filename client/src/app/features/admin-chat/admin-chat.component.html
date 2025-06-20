@@ -1,15 +1,37 @@
-<div class="admin-chat-container">
-  <h2>Administratorski Chat</h2>
-  <div class="messages-list">
-    <div *ngFor="let message of adminMessages"
-         [ngClass]="{'message-item': true, 'admin-message': message.senderEmail === 'admin@rideapp.com', 'user-message': message.senderEmail !== 'admin@rideapp.com'}">
-      <strong>{{ message.senderEmail }}</strong> ({{ message.timestamp | date:'shortTime' }}):
-      {{ message.messageContent }}
-      <small> (Sesija: {{ message.chatSessionId | slice:0:8 }}...)</small>
+<div class="admin-chat-layout">
+  <div class="chat-sessions-list">
+    <h3>Aktivne Sesije</h3>
+    <div *ngIf="chatSessions.length === 0" class="no-sessions-message">Nema aktivnih chat sesija.</div>
+    <div *ngFor="let session of chatSessions"
+         class="session-item"
+         [class.active]="session.sessionId === selectedChatSessionId"
+         (click)="selectChatSession(session.sessionId)">
+      <div class="session-info">
+        <strong>{{ session.lastSenderEmail }}</strong>
+        <span class="session-id-preview"> ({{ session.sessionId | slice:0:8 }}...)</span>
+        <div class="last-message-preview">{{ session.lastMessageContent }}</div>
+      </div>
+      <span class="unread-badge" *ngIf="session.unreadCount > 0">{{ session.unreadCount }}</span>
     </div>
   </div>
-  <div class="input-area">
-    <input type="text" [(ngModel)]="newMessage" placeholder="Odgovori..." (keyup.enter)="sendMessage()">
-    <button (click)="sendMessage()">Pošalji Odgovor</button>
+
+  <div class="chat-window">
+    <ng-container *ngIf="selectedChatSessionId">
+      <h3 class="chat-header">Chat sa: {{ selectedRecipientEmail || selectedChatSessionId }}</h3>
+      <div class="messages-list">
+        <div *ngFor="let message of adminMessages"
+             [ngClass]="{'message-item': true, 'admin-message': message.senderId === currentAdminId, 'user-message': message.senderId !== currentAdminId}">
+          <strong>{{ message.senderEmail }}</strong> ({{ message.timestamp | date:'shortTime' }}):
+          {{ message.messageContent }}
+        </div>
+      </div>
+      <div class="input-area">
+        <input type="text" [(ngModel)]="newMessage" placeholder="Odgovori..." (keyup.enter)="sendMessage()">
+        <button (click)="sendMessage()">Pošalji</button>
+      </div>
+    </ng-container>
+    <div *ngIf="!selectedChatSessionId" class="select-session-message">
+      Odaberite sesiju sa leve strane da biste započeli chat.
+    </div>
   </div>
 </div>

@@ -1,48 +1,63 @@
 .chat-container {
   display: flex;
   flex-direction: column;
-  height: 100%; /* Podesi visinu da popuni roditeljski div */
+  height: 400px; /* Prilagodi visinu chata */
+  border: 1px solid #ccc;
   border-radius: 8px;
-  overflow: hidden; /* Osigurava da se sadržaj ne prelije */
+  overflow: hidden;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  background-color: #fff;
 }
 
-.messages {
-  flex-grow: 1; /* Omogućava da zauzme sav dostupan prostor */
-  overflow-y: auto; /* Omogućava skrolovanje poruka */
-  padding: 10px;
-  background-color: #f0f0f0; /* Svetla pozadina za poruke */
+.messages-list {
+  flex-grow: 1;
+  padding: 15px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 }
 
-.message {
-  margin-bottom: 8px;
-  padding: 8px 12px;
-  border-radius: 15px;
-  max-width: 80%; /* Ograniči širinu poruke */
-  word-wrap: break-word; /* Omogućava prelom reči */
+.message-item {
+  max-width: 80%;
+  padding: 10px 15px;
+  border-radius: 20px;
+  word-wrap: break-word;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
 }
 
 .my-message {
-  align-self: flex-end; /* Poruke korisnika idu desno */
-  background-color: #dcf8c6; /* Zelena za moje poruke */
-  margin-left: auto; /* Pomera poruku desno */
+  align-self: flex-end;
+  background-color: #dcf8c6; /* Light green for current user's messages */
+  color: #333;
+  border-bottom-right-radius: 5px;
 }
 
 .other-message {
-  align-self: flex-start; /* Poruke drugih idu levo */
-  background-color: #ffffff; /* Bela za poruke drugih */
-  margin-right: auto; /* Pomera poruku levo */
+  align-self: flex-start;
+  background-color: #e0e0e0; /* Grey for other user's/admin's messages */
+  color: #333;
+  border-bottom-left-radius: 5px;
+}
+
+.message-item strong {
+  display: block;
+  font-size: 0.8em;
+  color: #555;
+  margin-bottom: 4px;
 }
 
 .input-area {
   display: flex;
-  padding: 20px;
-  border-top: 1px solid #ccc;
-  background-color: #fff;
+  padding: 10px 15px;
+  border-top: 1px solid #eee;
+  background-color: #f9f9f9;
+  flex-shrink: 0;
 }
 
 .input-area input {
   flex-grow: 1;
-  padding: 8px;
+  padding: 10px 15px;
   border: 1px solid #ddd;
   border-radius: 20px;
   margin-right: 10px;
@@ -50,13 +65,13 @@
 }
 
 .input-area button {
-  padding: 8px 15px;
+  padding: 10px 20px;
   background-color: #007bff;
   color: white;
   border: none;
   border-radius: 20px;
   cursor: pointer;
-  font-size: 1em;
+  transition: background-color 0.2s ease;
 }
 
 .input-area button:hover {

@@ -4,14 +4,14 @@ import { FormsModule } from '@angular/forms';
 import { AuthService } from '../../core/services/auth/auth.service';
 import { User } from '../../core/models/user.model';
 import { Subscription } from 'rxjs';
-import {WebSocketService} from '../../core/services/web-socket.service';
+import { WebSocketService } from '../../core/services/web-socket.service';
 
 interface ChatMessage {
   senderId: number;
   senderEmail: string;
   messageContent: string;
   chatSessionId: string;
-  recipientId?: number;
+  recipientId?: number | null;
   timestamp: Date;
 }
 
@@ -35,7 +35,7 @@ export class ChatComponent implements OnInit, OnDestroy {
   constructor(
     private webSocketService: WebSocketService,
     private authService: AuthService
-  ) { }
+  ) {}
 
   ngOnInit(): void {
     this.authSubscription = this.authService.loggedUser$.subscribe((user: User | null) => {
@@ -53,7 +53,9 @@ export class ChatComponent implements OnInit, OnDestroy {
         }
       }
 
-      this.setupWebSocketListener();
+      if (this.currentUserId !== null) {
+        this.setupWebSocketListener();
+      }
     });
   }
 
@@ -67,14 +69,9 @@ export class ChatComponent implements OnInit, OnDestroy {
   }
 
   private setupWebSocketListener(): void {
-    this.wsSubscription = this.webSocketService.getMessages().subscribe(
+    this.wsSubscription = this.webSocketService.allReceivedMessages$.subscribe(
       (message: any) => {
-        console.log('User received message:', message);
-        console.log('User component chatSessionId:', this.chatSessionId);
-        console.log('User message chatSessionId:', message.chatSessionId);
-
         if (message.chatSessionId === this.chatSessionId) {
-          console.log('User: Message matched chatSessionId, adding to display.');
           const receivedMessage: ChatMessage = {
             senderId: message.senderId,
             senderEmail: message.senderEmail,
@@ -83,28 +80,32 @@ export class ChatComponent implements OnInit, OnDestroy {
             recipientId: message.recipientId,
             timestamp: new Date(message.timestamp)
           };
-          this.messages.push(receivedMessage);
-          this.messages.sort((a, b) => a.timestamp.getTime() - b.timestamp.getTime());
-        } else {
-          console.log('User: Message did NOT match chatSessionId. Skipping display.');
+
+          if (!this.messages.some(m =>
+            m.timestamp.getTime() === receivedMessage.timestamp.getTime() &&
+            m.senderId === receivedMessage.senderId &&
+            m.messageContent === receivedMessage.messageContent
+          )) {
+            this.messages.push(receivedMessage);
+            this.messages.sort((a, b) => a.timestamp.getTime() - b.timestamp.getTime());
+          }
         }
-      },
-      (error: any) => {
-        console.error('User WebSocket message error:', error);
       }
     );
   }
 
   sendMessage(): void {
-    if (this.newMessage.trim() && this.currentUserId !== null && this.chatSessionId) {
-      const messageToSend = {
+    if (this.newMessage.trim() && this.currentUserId !== null && this.currentUserEmail && this.chatSessionId) {
+      const messageToSend: ChatMessage = {
         senderId: this.currentUserId,
+        senderEmail: this.currentUserEmail,
         messageContent: this.newMessage.trim(),
         chatSessionId: this.chatSessionId,
+        recipientId: null,
+        timestamp: new Date()
       };
 
       this.webSocketService.sendMessage('/app/chat.sendMessage', messageToSend);
-
       this.newMessage = '';
     }
   }

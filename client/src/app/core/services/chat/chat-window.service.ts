@@ -1,4 +1,3 @@
-// src/app/core/services/chat-window.service.ts
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
 
@@ -21,6 +20,6 @@ export class ChatWindowService {
 
   closeChat(): void {
     this.showChatSubject.next(false);
-    this.chatSessionIdSubject.next(null); // Resetuj sesiju pri zatvaranju
+    this.chatSessionIdSubject.next(null);
   }
 }

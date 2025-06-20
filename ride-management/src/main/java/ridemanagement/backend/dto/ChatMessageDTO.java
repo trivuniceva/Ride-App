@@ -1,32 +1,25 @@
 package ridemanagement.backend.dto;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 public class ChatMessageDTO {
-    private String chatSessionId;
     private Long senderId;
-    private String messageContent;
-    private Long recipientId;
     private String senderEmail;
-    private Date timestamp;
+    private Long recipientId;
+    private String messageContent;
+    private String chatSessionId;
+    private LocalDateTime timestamp;
 
-    public ChatMessageDTO() {}
+    public ChatMessageDTO() {
+    }
 
-    public ChatMessageDTO(String chatSessionId, Long senderId, String messageContent, Long recipientId, String senderEmail, Date timestamp) {
-        this.chatSessionId = chatSessionId;
+    public ChatMessageDTO(Long senderId, String senderEmail, Long recipientId, String messageContent, String chatSessionId, LocalDateTime timestamp) {
         this.senderId = senderId;
-        this.messageContent = messageContent;
-        this.recipientId = recipientId;
         this.senderEmail = senderEmail;
-        this.timestamp = timestamp;
-    }
-
-    public String getChatSessionId() {
-        return chatSessionId;
-    }
-
-    public void setChatSessionId(String chatSessionId) {
+        this.recipientId = recipientId;
+        this.messageContent = messageContent;
         this.chatSessionId = chatSessionId;
+        this.timestamp = timestamp;
     }
 
     public Long getSenderId() {
@@ -37,12 +30,12 @@ public class ChatMessageDTO {
         this.senderId = senderId;
     }
 
-    public String getMessageContent() {
-        return messageContent;
+    public String getSenderEmail() {
+        return senderEmail;
     }
 
-    public void setMessageContent(String messageContent) {
-        this.messageContent = messageContent;
+    public void setSenderEmail(String senderEmail) {
+        this.senderEmail = senderEmail;
     }
 
     public Long getRecipientId() {
@@ -53,19 +46,27 @@ public class ChatMessageDTO {
         this.recipientId = recipientId;
     }
 
-    public String getSenderEmail() {
-        return senderEmail;
+    public String getMessageContent() {
+        return messageContent;
     }
 
-    public void setSenderEmail(String senderEmail) {
-        this.senderEmail = senderEmail;
+    public void setMessageContent(String messageContent) {
+        this.messageContent = messageContent;
     }
 
-    public Date getTimestamp() {
+    public String getChatSessionId() {
+        return chatSessionId;
+    }
+
+    public void setChatSessionId(String chatSessionId) {
+        this.chatSessionId = chatSessionId;
+    }
+
+    public LocalDateTime getTimestamp() {
         return timestamp;
     }
 
-    public void setTimestamp(Date timestamp) {
+    public void setTimestamp(LocalDateTime timestamp) {
         this.timestamp = timestamp;
     }
 }
