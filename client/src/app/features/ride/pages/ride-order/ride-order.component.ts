@@ -12,6 +12,8 @@ import { environment } from '../../../../../environments/environment';
 import { AdvancedFormPageComponent } from '../advanced-form-page/advanced-form-page.component';
 import { DriverService } from '../../../../core/services/drivers/driver.service';
 import { Driver } from '../../../../core/models/driver.model';
+import {User} from '../../../../core/models/user.model';
+import {Subscription} from 'rxjs';
 
 @Component({
   selector: 'app-ride-order',
@@ -45,11 +47,17 @@ export class RideOrderComponent implements OnInit {
   vehicleType: string | null = null;
   allDrivers: Driver[] = [];
 
+  private authSubscription: Subscription | undefined;
+
   constructor(private authService: AuthService, private driverService: DriverService, private ngZone: NgZone) {} // Ubaci NgZone
 
   ngOnInit(): void {
-    this.authService.userRole$.subscribe((role) => {
-      this.userRole = role;
+    this.authSubscription = this.authService.loggedUser$.subscribe((user: User | null) => {
+      if (user && user.userRole) {
+        this.userRole = user.userRole;
+      } else {
+        this.userRole = '';
+      }
     });
 
     this.apiKey = environment.openrouteserviceApiKey;
