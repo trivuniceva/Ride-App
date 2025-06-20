@@ -37,20 +37,16 @@ export class AdminChatComponent implements OnInit, OnDestroy {
       if (user && user.id && user.email && user.userRole === 'ADMINISTRATOR') {
         this.currentAdminId = user.id;
         this.currentAdminEmail = user.email;
-        console.log('AdminChatComponent initialized for Admin:', this.currentAdminEmail, 'ID:', this.currentAdminId);
       } else {
         this.currentAdminId = null;
         this.currentAdminEmail = 'Nije Ulogovan Admin';
-        console.warn('Admin not logged in or role is not ADMINISTRATOR.');
       }
     });
 
-    this.wsSubscription = this.webSocketService.getMessages().subscribe(
+    this.wsSubscription = this.webSocketService.receivedMessages$.subscribe(
       (message: any) => {
-        console.log('Admin received message:', message);
+        console.log('AdminChatComponent received message (from service):', message);
 
-        // Dodajte poruku u niz samo ako još ne postoji (npr. na osnovu ID-a poruke ako ga imate)
-        // Ali za sada, samo primajte sa backenda i dodajte
         if (message.chatSessionId && message.messageContent) {
           const receivedMessage: ChatMessage = {
             senderId: message.senderId,
@@ -60,14 +56,8 @@ export class AdminChatComponent implements OnInit, OnDestroy {
             recipientId: message.recipientId,
             timestamp: new Date(message.timestamp)
           };
-
-          // Opciono: Dodaj proveru da li poruka već postoji da bi se izbegle duplikacije
-          // Ovo je sigurnija opcija, ali zahteva da backend šalje jedinstveni ID poruke
-          // const exists = this.adminMessages.some(msg => msg.id === receivedMessage.id); // Ako ChatMessage ima 'id'
-          // if (!exists) {
           this.adminMessages.push(receivedMessage);
           this.adminMessages.sort((a, b) => a.timestamp.getTime() - b.timestamp.getTime());
-          // }
         }
       },
       (error: any) => {
@@ -103,10 +93,6 @@ export class AdminChatComponent implements OnInit, OnDestroy {
 
         this.webSocketService.sendMessage('/app/chat.sendMessage', adminReply);
         this.newMessage = '';
-
-        // *** UKLONI ILI ZAKOMENTARIŠI OVU LINIJU ***
-        // this.adminMessages.push(adminReply);
-        // this.adminMessages.sort((a, b) => a.timestamp.getTime() - b.timestamp.getTime());
       } else {
         console.warn('Admin cannot send reply: No user message found to reply to, or recipientId/chatSessionId is missing.');
         alert('Ne možete poslati poruku dok ne primite poruku od korisnika kojoj ćete odgovoriti.');

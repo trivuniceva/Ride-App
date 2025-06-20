@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Client, IMessage, StompSubscription } from '@stomp/stompjs';
-import { Subject, Observable } from 'rxjs';
+import { Subject, Observable, ReplaySubject, BehaviorSubject } from 'rxjs';
 import SockJS from 'sockjs-client/dist/sockjs';
 import {environment} from '../../../environments/environment';
 
@@ -12,6 +12,12 @@ export class WebSocketService {
   private messageSubject: Subject<any>;
   private subscription: StompSubscription | null = null;
   private isConnected: boolean = false;
+
+  private _receivedMessages: ReplaySubject<any> = new ReplaySubject<any>();
+  public receivedMessages$: Observable<any> = this._receivedMessages.asObservable();
+
+  private _unreadAdminMessagesCount: BehaviorSubject<number> = new BehaviorSubject<number>(0);
+  public unreadAdminMessagesCount$: Observable<number> = this._unreadAdminMessagesCount.asObservable();
 
   constructor() {
     this.stompClient = new Client({
@@ -36,7 +42,8 @@ export class WebSocketService {
         try {
           const parsedMessage = JSON.parse(message.body);
           this.messageSubject.next(parsedMessage);
-        } catch (e: any) { // Added ': any' for error type
+          this._receivedMessages.next(parsedMessage);
+        } catch (e: any) {
           console.error('Greška pri parsiranju poruke na /user/queue/messages:', e, message.body);
         }
       });
@@ -45,7 +52,12 @@ export class WebSocketService {
         try {
           const parsedMessage = JSON.parse(message.body);
           this.messageSubject.next(parsedMessage);
-        } catch (e: any) { // Added ': any' for error type
+          this._receivedMessages.next(parsedMessage);
+
+          if (parsedMessage.senderEmail !== 'admin@rideapp.com') {
+            this._unreadAdminMessagesCount.next(this._unreadAdminMessagesCount.getValue() + 1);
+          }
+        } catch (e: any) {
           console.error('Greška pri parsiranju poruke na /topic/admin/chat:', e, message.body);
         }
       });
@@ -80,6 +92,10 @@ export class WebSocketService {
     return this.messageSubject.asObservable();
   }
 
+  public emitMessageToComponents(message: any): void {
+    this._receivedMessages.next(message);
+  }
+
   closeConnection(): void {
     if (this.stompClient.connected) {
       this.stompClient.deactivate();
@@ -89,5 +105,9 @@ export class WebSocketService {
 
   isWebSocketConnected(): boolean {
     return this.isConnected;
+  }
+
+  public resetAdminUnreadMessagesCount(): void {
+    this._unreadAdminMessagesCount.next(0);
   }
 }

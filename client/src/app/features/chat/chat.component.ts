@@ -17,7 +17,7 @@ interface ChatMessage {
 
 @Component({
   selector: 'app-chat',
-  standalone: true, // ENSURE THIS IS TRUE
+  standalone: true,
   imports: [CommonModule, FormsModule],
   templateUrl: './chat.component.html',
   styleUrls: ['./chat.component.css']
