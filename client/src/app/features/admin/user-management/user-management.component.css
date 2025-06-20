@@ -1,0 +1,109 @@
+.user-management-container {
+  padding: 20px;
+}
+
+h2 {
+  margin-bottom: 20px;
+}
+
+.loading-spinner,
+.error-message {
+  margin-bottom: 15px;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.error-message {
+  color: red;
+  background-color: #ffe0e0;
+}
+
+mat-tab-group {
+  width: 100%;
+}
+
+.user-list {
+  margin-top: 20px;
+  max-height: 550px;
+  overflow-y: auto;
+  padding-bottom: 10px;
+}
+
+.mat-elevation-z8 {
+  width: 100%;
+  box-shadow: 0 3px 1px -2px rgba(0, 0, 0, 0.2), 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 1px 5px 0 rgba(0, 0, 0, 0.12); /* Standardna Material Design senka */
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th.mat-header-cell,
+td.mat-cell {
+  padding: 12px 8px;
+  border-bottom: 1px solid #ddd;
+  text-align: left;
+  white-space: nowrap;
+}
+
+th.mat-header-cell {
+  font-weight: bold;
+  background-color: #f5f5f5;
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+
+.status-active {
+  color: green;
+  display: flex;
+  align-items: center;
+}
+
+.status-blocked {
+  color: red;
+  display: flex;
+  align-items: center;
+}
+
+.status-active mat-icon,
+.status-blocked mat-icon {
+  margin-right: 5px;
+}
+
+.mat-raised-button.mat-warn {
+  background-color: #f44336;
+  color: white;
+}
+
+.mat-raised-button.mat-primary {
+  background-color: #4caf50;
+  color: white;
+}
+
+.no-data {
+  font-style: italic;
+  color: #777;
+  padding: 10px;
+  text-align: center;
+}
+
+tr.mat-header-row {
+  height: auto;
+}
+
+tr.mat-row {
+  height: auto;
+}
+
+.mat-tab-body-wrapper {
+  overflow: hidden;
+}
+
+.mat-tab-body.mat-tab-body-active {
+  display: block;
+  height: 100%;
+  overflow: hidden;
+}

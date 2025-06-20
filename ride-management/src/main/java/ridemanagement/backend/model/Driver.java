@@ -10,8 +10,6 @@ import java.sql.Timestamp;
 @Table(name = "drivers")
 public class Driver extends User {
 
-    @Column(name = "is_blocked", nullable = false)
-    private boolean isBlocked;
 
     @Column(name = "is_available", nullable = false)
     private boolean isAvailable;
@@ -32,14 +30,6 @@ public class Driver extends User {
     @Column(name = "has_future_drive", columnDefinition = "boolean default false")
     private Boolean hasFutureDrive;
 
-
-    public boolean isBlocked() {
-        return isBlocked;
-    }
-
-    public void setBlocked(boolean blocked) {
-        isBlocked = blocked;
-    }
 
     public boolean isAvailable() {
         return isAvailable;
@@ -79,5 +69,16 @@ public class Driver extends User {
 
     public void setHasFutureDrive(Boolean hasFutureDrive) {
         this.hasFutureDrive = hasFutureDrive;
+    }
+
+    @Override
+    public String toString() {
+        return "Driver{" +
+                "isAvailable=" + isAvailable +
+                ", vehicle=" + vehicle +
+                ", location=" + location +
+                ", timeOfLogin=" + timeOfLogin +
+                ", hasFutureDrive=" + hasFutureDrive +
+                '}';
     }
 }

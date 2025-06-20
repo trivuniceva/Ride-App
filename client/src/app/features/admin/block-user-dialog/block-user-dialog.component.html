@@ -1,0 +1,24 @@
+<h2 mat-dialog-title>{{ isCurrentlyBlocked ? 'Odblokiraj' : 'Blokiraj' }} Korisnika</h2>
+
+<mat-dialog-content>
+  <p>Da li ste sigurni da želite da {{ isCurrentlyBlocked ? 'odblokirate' : 'blokirate' }} korisnika: <strong>{{ userName }} ({{ userRole | lowercase }})</strong>?</p>
+
+  <p *ngIf="isCurrentlyBlocked">Korisnik je trenutno blokiran (neaktivan). Kada ga odblokirate, moći će ponovo da koristi sistem.</p>
+  <p *ngIf="!isCurrentlyBlocked">Kada korisnik bude blokiran (neaktivan), {{ isDriver ? 'neće moći da prihvata vožnje i biće automatski nedostupan.' : 'neće moći da poručuje nove vožnje.' }}</p>
+
+  <mat-form-field appearance="fill" class="full-width">
+    <mat-label>Napomena (opciono, max 500 karaktera)</mat-label>
+    <textarea matInput [formControl]="blockNoteControl" rows="3" placeholder="Unesite napomenu za blokiranje/odblokiranje..."></textarea>
+    <mat-hint align="end">{{blockNoteControl.value?.length || 0}}/500</mat-hint>
+    <mat-error *ngIf="blockNoteControl.hasError('maxlength')">
+      Napomena ne može biti duža od 500 karaktera.
+    </mat-error>
+  </mat-form-field>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button (click)="onCancel()">Odustani</button>
+  <button mat-raised-button color="{{ isCurrentlyBlocked ? 'primary' : 'warn' }}" (click)="onConfirm()" [disabled]="blockNoteControl.invalid">
+    {{ isCurrentlyBlocked ? 'Odblokiraj' : 'Blokiraj' }}
+  </button>
+</mat-dialog-actions>
