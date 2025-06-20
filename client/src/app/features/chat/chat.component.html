@@ -1,0 +1,14 @@
+<div class="chat-container">
+  <div class="messages">
+    <div *ngFor="let message of messages"
+         [ngClass]="{'message': true,
+                     'my-message': message.senderId === currentUserId,
+                     'other-message': message.senderId !== currentUserId}">
+      <strong>{{ message.senderId === currentUserId ? 'Ja' : message.senderEmail }}:</strong> {{ message.messageContent }}
+    </div>
+  </div>
+  <div class="input-area">
+    <input type="text" [(ngModel)]="newMessage" placeholder="Upišite poruku..." (keyup.enter)="sendMessage()">
+    <button (click)="sendMessage()">Pošalji</button>
+  </div>
+</div>

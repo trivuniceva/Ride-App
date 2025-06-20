@@ -13,3 +13,8 @@
   </div>
 </div>
 
+<div *ngIf="showChatWindow" class="floating-chat-container">
+  <app-chat [chatSessionId]="currentChatSessionId"></app-chat>
+  <button class="close-chat-button" (click)="closeChat()">X</button>
+</div>
+

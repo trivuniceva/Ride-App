@@ -12,13 +12,14 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
-        registry.addEndpoint("/ws").setAllowedOriginPatterns("*").withSockJS(); // koristi se sa SockJS ako frontend ne koristi čist WebSocket
+        registry.addEndpoint("/websocket-chat") // <-- THIS MUST MATCH
+                .setAllowedOrigins("http://localhost:4200") // <-- CRUCIAL FOR CORS (use your Angular port)
+                .withSockJS(); // Usually needed for browser compatibility
     }
 
     @Override
-    public void configureMessageBroker(MessageBrokerRegistry registry) {
-        registry.enableSimpleBroker("/topic"); // npr. obaveštenja šalješ na /topic/driver
-        registry.setApplicationDestinationPrefixes("/app");
+    public void configureMessageBroker(MessageBrokerRegistry config) {
+        config.enableSimpleBroker("/topic", "/queue", "/user"); // Enable /topic for public, /queue for private, /user for user-specific
+        config.setApplicationDestinationPrefixes("/app"); // Prefix for messages from client to server (e.g., /app/chat.sendMessage)
     }
 }
-

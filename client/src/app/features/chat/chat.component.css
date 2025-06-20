@@ -1,0 +1,64 @@
+.chat-container {
+  display: flex;
+  flex-direction: column;
+  height: 100%; /* Podesi visinu da popuni roditeljski div */
+  border-radius: 8px;
+  overflow: hidden; /* Osigurava da se sadržaj ne prelije */
+}
+
+.messages {
+  flex-grow: 1; /* Omogućava da zauzme sav dostupan prostor */
+  overflow-y: auto; /* Omogućava skrolovanje poruka */
+  padding: 10px;
+  background-color: #f0f0f0; /* Svetla pozadina za poruke */
+}
+
+.message {
+  margin-bottom: 8px;
+  padding: 8px 12px;
+  border-radius: 15px;
+  max-width: 80%; /* Ograniči širinu poruke */
+  word-wrap: break-word; /* Omogućava prelom reči */
+}
+
+.my-message {
+  align-self: flex-end; /* Poruke korisnika idu desno */
+  background-color: #dcf8c6; /* Zelena za moje poruke */
+  margin-left: auto; /* Pomera poruku desno */
+}
+
+.other-message {
+  align-self: flex-start; /* Poruke drugih idu levo */
+  background-color: #ffffff; /* Bela za poruke drugih */
+  margin-right: auto; /* Pomera poruku levo */
+}
+
+.input-area {
+  display: flex;
+  padding: 20px;
+  border-top: 1px solid #ccc;
+  background-color: #fff;
+}
+
+.input-area input {
+  flex-grow: 1;
+  padding: 8px;
+  border: 1px solid #ddd;
+  border-radius: 20px;
+  margin-right: 10px;
+  font-size: 1em;
+}
+
+.input-area button {
+  padding: 8px 15px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 20px;
+  cursor: pointer;
+  font-size: 1em;
+}
+
+.input-area button:hover {
+  background-color: #0056b3;
+}

@@ -1,4 +1,4 @@
-import {Component, EventEmitter, Output, ViewChild, AfterViewInit, Input} from '@angular/core';
+import {Component, EventEmitter, Output, ViewChild, AfterViewInit, Input, OnInit, OnDestroy} from '@angular/core';
 import { NgIf } from '@angular/common';
 import { RouteFormComponent } from '../../components/route-form/route-form.component';
 import { VehicleTypeComponent } from '../../components/vehicle-type/vehicle-type.component';
@@ -9,6 +9,8 @@ import { RideService } from '../../../../core/services/ride/ride.service';
 import {PointDTO} from '../../../../core/models/PointDTO.model';
 import {PaymentTrackingComponent} from '../../components/payment-tracking/payment-tracking.component';
 import {AuthService} from '../../../../core/services/auth/auth.service';
+import {Subscription} from 'rxjs';
+import {User} from '../../../../core/models/user.model';
 
 
 @Component({
@@ -26,7 +28,8 @@ import {AuthService} from '../../../../core/services/auth/auth.service';
   templateUrl: './advanced-form-page.component.html',
   styleUrl: './advanced-form-page.component.css',
 })
-export class AdvancedFormPageComponent implements AfterViewInit {
+
+export class AdvancedFormPageComponent implements OnInit, AfterViewInit, OnDestroy {
   @Input() fullPrice: number | undefined;
 
   currentStep: number = 1;
@@ -70,13 +73,30 @@ export class AdvancedFormPageComponent implements AfterViewInit {
     vehicleType: null,
   };
 
+  private authSubscription: Subscription | undefined;
+
   constructor(private rideService: RideService, private authService: AuthService) {}
+
+  ngOnInit(): void {
+    this.authSubscription = this.authService.getLoggedUser().subscribe((user: User | null) => {
+      if (user && user.email) {
+        this.requestorEmail = user.email;
+      } else {
+        this.requestorEmail = '';
+      }
+    });
+  }
 
   ngAfterViewInit(): void {
     if (this.vehicleType) {
       this.showRoute();
     }
-    this.requestorEmail = this.authService.getLoggedUser()?.email || '';
+  }
+
+  ngOnDestroy(): void {
+    if (this.authSubscription) {
+      this.authSubscription.unsubscribe();
+    }
   }
 
   goToStep(step: number): void {
