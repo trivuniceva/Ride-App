@@ -53,4 +53,34 @@ export class UserService {
       })
     );
   }
+
+  updateUserProfile(userId: number, userData: Partial<User>): Observable<any> {
+    return this.http.put(`${this.userApiUrl}/${userId}`, userData).pipe(
+      catchError(error => {
+        console.error('Error updating user profile:', error);
+        return throwError(() => new Error('Failed to update user profile.'));
+      })
+    );
+  }
+
+  changePassword(userId: number, oldPassword: string, newPassword: string): Observable<any> {
+    return this.http.post(`${this.userApiUrl}/${userId}/change-password`, { oldPassword, newPassword }).pipe(
+      catchError(error => {
+        console.error('Error changing password:', error);
+        return throwError(() => new Error('Failed to change password.'));
+      })
+    );
+  }
+
+  uploadProfilePicture(userId: number, file: File): Observable<any> {
+    const formData = new FormData();
+    formData.append('file', file);
+    return this.http.post(`${this.userApiUrl}/${userId}/profile-picture`, formData).pipe(
+      catchError(error => {
+        console.error('Error uploading profile picture:', error);
+        return throwError(() => new Error('Failed to upload profile picture.'));
+      })
+    );
+  }
+
 }

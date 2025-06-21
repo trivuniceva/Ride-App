@@ -10,13 +10,14 @@ public class UserDTO {
     private UserRole userRole;
     private String address;
     private String phone;
-    private boolean isActive; // Now used for active/blocked status
-    private String blockNote; // Note related to the active/blocked status
+    private boolean isActive;
+    private String blockNote;
+    private String profilePic;
 
     public UserDTO() {
     }
 
-    public UserDTO(Long id, String email, String firstname, String lastname, UserRole userRole, String address, String phone, boolean isActive, String blockNote) {
+    public UserDTO(Long id, String email, String firstname, String lastname, UserRole userRole, String address, String phone, boolean isActive, String blockNote, String profilePic) {
         this.id = id;
         this.email = email;
         this.firstname = firstname;
@@ -26,9 +27,9 @@ public class UserDTO {
         this.phone = phone;
         this.isActive = isActive;
         this.blockNote = blockNote;
+        this.profilePic = profilePic;
     }
 
-    // Getters and Setters
     public Long getId() {
         return id;
     }
@@ -99,5 +100,13 @@ public class UserDTO {
 
     public void setBlockNote(String blockNote) {
         this.blockNote = blockNote;
+    }
+
+    public String getProfilePic() {
+        return profilePic;
+    }
+
+    public void setProfilePic(String profilePic) {
+        this.profilePic = profilePic;
     }
 }
