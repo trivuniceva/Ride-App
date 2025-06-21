@@ -31,8 +31,7 @@ public class UserService {
     @Autowired
     private EmailService emailService;
 
-    private final String UPLOAD_DIR = "src/main/resources/static/profile_pictures/";
-
+    private final String UPLOAD_DIR = "/Users/nikolina/Desktop/bs/";
 
     public User getUserByEmail(String email) {
         System.out.println("userRepository.findByEmail(email);  " + userRepository.findByEmail(email));
@@ -51,13 +50,10 @@ public class UserService {
         User user = userRepository.findByEmail(email);
         if (user != null) {
             String token = tokenService.generateToken();
-
             user.setResetToken(token);
             userRepository.save(user);
             System.out.println("Token saved: " + token);
-
             emailService.sendPasswordResetEmail(email, token);
-
             return ResponseEntity.ok("Password reset email sent.");
         } else {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found.");
@@ -87,21 +83,15 @@ public class UserService {
         if (userOptional.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ErrorResponse("User not found with ID: " + request.getUserId()));
         }
-
         User user = userOptional.get();
-
         if (user.getUserRole().equals(UserRole.ADMINISTRATOR)) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(new ErrorResponse("Administrators cannot be blocked/deactivated."));
         }
-
         user.setActive(request.getIsBlocked());
         user.setBlockNote(request.getBlockNote());
         userRepository.save(user);
-
         return ResponseEntity.ok(convertToUserDTO(user));
     }
-
-    // --- NOVE METODE ---
 
     @Transactional
     public ResponseEntity<?> updateProfile(Long userId, UserUpdateRequestDTO updateRequest) {
@@ -109,29 +99,14 @@ public class UserService {
         if (userOptional.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ErrorResponse("User not found with ID: " + userId));
         }
-
         User user = userOptional.get();
-
-        // Ažuriraj samo polja koja su dozvoljena
         user.setFirstname(updateRequest.getFirstname());
         user.setLastname(updateRequest.getLastname());
         user.setAddress(updateRequest.getAddress());
         user.setPhone(updateRequest.getPhone());
-
-        // Logika za odobravanje promena vozača
         if (user.getUserRole() == UserRole.DRIVER) {
-            // OVDE bi trebalo da se implementira mehanizam za "pending" promene
-            // Na primer, umesto direktnog snimanja, sačuvati promene u nekoj privremenoj tabeli
-            // i poslati notifikaciju administratoru.
-            // Za sada, radi demonstracije, direktno ćemo snimiti, ali ovo je mesto za tu logiku.
-            // Za pravu implementaciju:
-            // 1. Kreirati PendingDriverUpdate model/tabelu.
-            // 2. Sačuvati UserUpdateRequestDTO i userId u toj tabeli.
-            // 3. Status postaviti na PENDING.
-            // 4. Administrator preko svog panela odobrava te promene, i tek onda se upisuju u User tabelu.
             System.out.println("Promene za vozača moraju biti odobrene od strane administratora! (Simulacija - direktno se snima)");
         }
-
         userRepository.save(user);
         return ResponseEntity.ok(convertToUserDTO(user));
     }
@@ -142,16 +117,12 @@ public class UserService {
         if (userOptional.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ErrorResponse("User not found with ID: " + userId));
         }
-
         User user = userOptional.get();
-
         if (!validPassword(user, request.getOldPassword())) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ErrorResponse("Incorrect old password."));
         }
-
         user.setPassword(request.getNewPassword());
         userRepository.save(user);
-
         return ResponseEntity.ok(new SuccessResponse("Password changed successfully."));
     }
 
@@ -160,28 +131,30 @@ public class UserService {
         if (userOptional.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ErrorResponse("User not found with ID: " + userId));
         }
-
         User user = userOptional.get();
-
         if (file.isEmpty()) {
             return ResponseEntity.badRequest().body(new ErrorResponse("Please select a file to upload."));
         }
-
         try {
             String fileName = UUID.randomUUID().toString() + "_" + file.getOriginalFilename();
             Path uploadPath = Paths.get(UPLOAD_DIR);
+            System.out.println("Upload path (absolute): " + uploadPath.toAbsolutePath());
             if (!Files.exists(uploadPath)) {
                 Files.createDirectories(uploadPath);
+                System.out.println("Created directories: " + uploadPath.toAbsolutePath());
             }
             Path filePath = uploadPath.resolve(fileName);
+            System.out.println("Saving file to (absolute): " + filePath.toAbsolutePath());
             Files.copy(file.getInputStream(), filePath);
+            System.out.println("File saved successfully!");
 
-            user.setProfilePic("/profile_pictures/" + fileName);
+            String relativePath = "/profile_pictures/" + fileName;
+            user.setProfilePic(relativePath);
             userRepository.save(user);
 
-            return ResponseEntity.ok(new SuccessResponse("Profile picture uploaded successfully!"));
-
+            return ResponseEntity.ok(new SuccessResponse("Profile picture uploaded successfully!", relativePath));
         } catch (IOException e) {
+            System.err.println("Error during file upload: " + e.getMessage());
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ErrorResponse("Failed to upload profile picture: " + e.getMessage()));
         }

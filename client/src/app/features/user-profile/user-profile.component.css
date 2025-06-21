@@ -1,85 +1,77 @@
 .profile-container {
-    max-width: 550px;
-    margin: 2% auto;
-    padding: 20px;
-    /*border: 1px solid #ddd;*/
-    border-radius: 5px;
-    box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
-    /*box-shadow: 3px 6px 10px rgba(0, 0, 0, 0.1);*/
-
+  max-width: 550px;
+  margin: 2% auto;
+  padding: 20px;
+  border-radius: 5px;
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
 }
 
 .profile-container h1 {
-    text-align: center;
-    margin-bottom: 20px;
+  text-align: center;
+  margin-bottom: 20px;
 }
 
 .profile-container .form-group {
-    margin-bottom: 15px;
-    width: 97%;
+  margin-bottom: 15px;
+  width: 97%;
 }
 
 .profile-container label {
-    display: block;
-    margin-bottom: 5px;
-    font-weight: bold;
+  display: block;
+  margin-bottom: 5px;
+  font-weight: bold;
 }
 
 .profile-container input[type="text"],
 .profile-container input[type="email"],
 .profile-container input[type="file"] {
-    width: 100%;
-    padding: 8px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    margin-bottom: 10px;
-}
-
-.profile-container img {
-    max-width: 100%;
-    height: auto;
-    border-radius: 5px;
-    margin-top: 10px;
-    margin-bottom: 15px;
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  margin-bottom: 10px;
 }
 
 .profile-container button {
-    display: block;
-    width: 25%;
-    padding: 10px;
-    border: none;
-    border-radius: 4px;
-    background-color: #3b5998;
-    color: white;
-    font-size: 1em;
-    cursor: pointer;
-    margin-bottom: 10px;
+  display: block;
+  width: 25%;
+  padding: 10px;
+  border: none;
+  border-radius: 4px;
+  background-color: #3b5998;
+  color: white;
+  font-size: 1em;
+  cursor: pointer;
+  margin-bottom: 10px;
 }
 
 .profile-container button:disabled {
-    background-color: #ccc;
+  background-color: #ccc;
 }
 
 .profile-container p {
-    text-align: center;
-    font-size: 1em;
-    color: #555;
+  text-align: center;
+  font-size: 1em;
+  color: #555;
 }
 
 .image-container {
-    display: flex;
-    justify-content: center;
+  display: flex;
+  justify-content: center;
+  margin-bottom: 20px;
 }
 
 .button-container {
-    display: flex;
-    justify-content: center;
-    gap: 10px;
+  display: flex;
+  justify-content: center;
+  gap: 10px;
 }
 
 .profile-image {
-    width: 150px;
-    height: 150px;
-    border-radius: 50% !important;
-    object-fit: cover;
+  width: 150px;
+  height: 150px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #ddd;
+  box-shadow: 0 0 8px rgba(0, 0, 0, 0.2);
 }
