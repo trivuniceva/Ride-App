@@ -1,0 +1,56 @@
+<div class="driver-list-container">
+  <h2>Zahtevi za Izmenu Profila Vozača</h2>
+
+  <table class="driver-table">
+    <thead>
+    <tr>
+      <th>ID Zahteva</th>
+      <th>ID Vozača</th>
+      <th>Ime Vozača</th>
+      <th>Prezime Vozača</th>
+      <th>Datum Zahteva</th>
+      <th>Akcije</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr *ngFor="let request of pendingDriverUpdates" (click)="openDriverDetailsPopup(request)">
+      <td>{{ request.requestId }}</td>
+      <td>{{ request.driverId }}</td>
+      <td>{{ request.oldFirstname }} {{ request.oldLastname }}</td>
+      <td>{{ request.newFirstname }} {{ request.newLastname }}</td>
+      <td>{{ request.requestDate | date:'short' }}</td>
+      <td class="actions">
+        <button (click)="confirmChange(request.requestId, $event)">Potvrdi</button>
+        <button (click)="rejectChange(request.requestId, $event)">Odbij</button>
+      </td>
+    </tr>
+    <tr *ngIf="pendingDriverUpdates.length === 0">
+      <td colspan="6" class="no-drivers-message">Nema pending zahteva za izmenu profila vozača.</td>
+    </tr>
+    </tbody>
+  </table>
+
+  <div *ngIf="showPopup" class="popup-overlay">
+    <div class="popup-content">
+      <h3>Detalji Zahteva za Izmenu (ID: {{ selectedUpdateRequest?.requestId }})</h3>
+      <div class="driver-details">
+        <p><strong>Vozač ID:</strong> {{ selectedUpdateRequest?.driverId }}</p>
+        <p><strong>Email:</strong> {{ selectedUpdateRequest?.driverEmail }}</p>
+        <p><strong>Datum zahteva:</strong> {{ selectedUpdateRequest?.requestDate | date:'medium' }}</p>
+
+        <h4>Stare informacije:</h4>
+        <p><strong>Ime:</strong> {{ selectedUpdateRequest?.oldFirstname }}</p>
+        <p><strong>Prezime:</strong> {{ selectedUpdateRequest?.oldLastname }}</p>
+        <p><strong>Adresa:</strong> {{ selectedUpdateRequest?.oldAddress || 'Nije uneto' }}</p>
+        <p><strong>Telefon:</strong> {{ selectedUpdateRequest?.oldPhone || 'Nije uneto' }}</p>
+
+        <h4>Nove informacije (predložene):</h4>
+        <p><strong>Ime:</strong> {{ selectedUpdateRequest?.newFirstname }}</p>
+        <p><strong>Prezime:</strong> {{ selectedUpdateRequest?.newLastname }}</p>
+        <p><strong>Adresa:</strong> {{ selectedUpdateRequest?.newAddress || 'Nije uneto' }}</p>
+        <p><strong>Telefon:</strong> {{ selectedUpdateRequest?.newPhone || 'Nije uneto' }}</p>
+      </div>
+      <button class="close-button" (click)="closeDriverDetailsPopup()">Zatvori</button>
+    </div>
+  </div>
+</div>

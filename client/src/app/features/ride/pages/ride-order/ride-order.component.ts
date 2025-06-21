@@ -21,7 +21,6 @@ import {Subscription} from 'rxjs';
   imports: [
     MapTestComponent,
     RouteFormComponent,
-    DriversAvailabilityComponent,
     MapTestComponent,
     RouteInfoComponent,
     NgIf,

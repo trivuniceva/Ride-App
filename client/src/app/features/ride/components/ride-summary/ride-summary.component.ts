@@ -8,7 +8,6 @@ import {PaymentTrackingComponent} from '../payment-tracking/payment-tracking.com
   imports: [
     NgIf,
     NgForOf,
-    PaymentTrackingComponent
   ],
   templateUrl: './ride-summary.component.html',
   styleUrl: './ride-summary.component.css',

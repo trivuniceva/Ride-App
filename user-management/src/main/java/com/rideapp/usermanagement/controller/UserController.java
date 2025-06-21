@@ -1,14 +1,13 @@
 package com.rideapp.usermanagement.controller;
 
-import com.rideapp.usermanagement.dto.BlockUserRequestDTO;
-import com.rideapp.usermanagement.dto.ForgotPasswordRequestDTO;
-import com.rideapp.usermanagement.dto.ResetPasswordRequestDTO;
-import com.rideapp.usermanagement.dto.UserDTO;
+import com.rideapp.usermanagement.dto.*;
 import com.rideapp.usermanagement.model.SuccessResponse;
+import com.rideapp.usermanagement.model.UserRole;
 import com.rideapp.usermanagement.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -42,4 +41,37 @@ public class UserController {
     public ResponseEntity<?> blockUser(@RequestBody BlockUserRequestDTO request) {
         return userService.blockUser(request);
     }
+
+    @PutMapping("/{userId}")
+    public ResponseEntity<?> updateProfile(@PathVariable Long userId, @RequestBody UserUpdateRequestDTO updateRequest) {
+        return userService.updateProfile(userId, updateRequest);
+    }
+
+    @PostMapping("/{userId}/change-password")
+    public ResponseEntity<?> changePassword(@PathVariable Long userId, @RequestBody ChangePasswordRequestDTO request) {
+        return userService.changePassword(userId, request);
+    }
+
+    @PostMapping("/{userId}/profile-picture")
+    public ResponseEntity<?> uploadProfilePicture(@PathVariable Long userId, @RequestParam("file") MultipartFile file) {
+        return userService.uploadProfilePicture(userId, file);
+    }
+
+    @GetMapping("/driver-update-requests/pending")
+    public ResponseEntity<List<DriverUpdateRequestDTO>> getPendingDriverUpdateRequests() {
+        List<DriverUpdateRequestDTO> requests = userService.getPendingDriverUpdateRequests();
+        return ResponseEntity.ok(requests);
+    }
+
+    @PostMapping("/driver-update-requests/{requestId}/approve")
+    public ResponseEntity<?> approveDriverProfileUpdate(@PathVariable Long requestId) {
+        return userService.approveDriverProfileUpdate(requestId);
+    }
+
+    @PostMapping("/driver-update-requests/{requestId}/reject")
+    public ResponseEntity<?> rejectDriverProfileUpdate(@PathVariable Long requestId) {
+        return userService.rejectDriverProfileUpdate(requestId);
+    }
+
+
 }
