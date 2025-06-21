@@ -25,13 +25,22 @@ public class Ride {
     @Column(name = "destination_address")
     private String destinationAddress;
 
-    @ManyToOne(fetch = FetchType.EAGER) // FetchType.EAGER je postavljen za jednostavnost, razmislite o LAZY za performanse
+    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @JoinColumn(name = "start_location_id")
     private Point startLocation;
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @JoinColumn(name = "destination_location_id")
     private Point destinationLocation;
+
+    @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @JoinTable(
+            name = "ride_stop_locations",
+            joinColumns = @JoinColumn(name = "ride_id"),
+            inverseJoinColumns = @JoinColumn(name = "point_id")
+    )
+    private List<Point> stopLocations;
+
 
     @Column(name = "vehicle_type")
     private String vehicleType;
@@ -82,15 +91,10 @@ public class Ride {
     }
 
     public Ride(ridemanagement.backend.dto.RideRequestDTO rideRequestDTO) {
+        this(); // Calls the default constructor to set createdAt
         this.startAddress = rideRequestDTO.getStartAddress();
         this.stops = rideRequestDTO.getStops();
         this.destinationAddress = rideRequestDTO.getDestinationAddress();
-        // Point objekte moramo da setujemo iz PointDTO, ako oni postoje.
-        // Konkretno, Point objekte bi trebalo da dohvatite iz baze putem PointService-a
-        // pre nego što kreirate Ride entitet, ili da ih sačuvate ako su novi.
-        // Ostavljeno je za servisnu logiku da popuni ove reference.
-        // Za sada, ova polja će biti null ako se ne setuju eksplicitno u servisu.
-
         this.vehicleType = rideRequestDTO.getVehicleType();
         this.carriesBabies = rideRequestDTO.isCarriesBabies();
         this.carriesPets = rideRequestDTO.isCarriesPets();
@@ -98,7 +102,6 @@ public class Ride {
         this.paymentStatus = rideRequestDTO.getPaymentStatus();
         this.fullPrice = rideRequestDTO.getFullPrice();
         this.requestorEmail = rideRequestDTO.getRequestorEmail();
-        this.createdAt = LocalDateTime.now();
         this.rideStatus = "PENDING";
     }
 
@@ -119,6 +122,10 @@ public class Ride {
 
     public Point getDestinationLocation() { return destinationLocation; }
     public void setDestinationLocation(Point destinationLocation) { this.destinationLocation = destinationLocation; }
+
+    public List<Point> getStopLocations() { return stopLocations; }
+    public void setStopLocations(List<Point> stopLocations) { this.stopLocations = stopLocations; }
+
 
     public String getVehicleType() { return vehicleType; }
     public void setVehicleType(String vehicleType) { this.vehicleType = vehicleType; }

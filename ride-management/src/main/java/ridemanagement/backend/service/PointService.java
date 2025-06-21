@@ -20,4 +20,8 @@ public class PointService {
     public Point save(Point point) {
         return pointRepository.save(point);
     }
+
+    public Optional<Point> findByLatitudeAndLongitude(double latitude, double longitude) {
+        return pointRepository.findByLatitudeAndLongitude(latitude, longitude);
+    }
 }
