@@ -41,7 +41,6 @@ public class RouteService {
 
     public List<RouteA> findShortestPaths(String start, String end) {
         List<RouteA> paths = new ArrayList<>();
-        // Pozivanje algoritma za tri različita puta koristeći novu klasu RouteA
         paths.add(routeAlgorithm.findShortestPath(start, end));
         paths.add(routeAlgorithm.findAlternativePath(start, end));
         paths.add(routeAlgorithm.findAnotherAlternativePath(start, end));

@@ -33,9 +33,10 @@
     </div>
 
     <div class="action-buttons">
+      <button (click)="toggleFavorite()" class="btn btn-favorite">
+        <span *ngIf="!isFavorite">&#9734; Add to Favorites</span> <span *ngIf="isFavorite">&#9733; Remove from Favorites</span> </button>
       <button (click)="confirmPayment()" class="btn btn-confirm">Confirm Payment</button>
       <button (click)="closePopup()" class="btn btn-close">X</button>
     </div>
   </div>
 </div>
-

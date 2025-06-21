@@ -7,11 +7,10 @@ import { SplitFareComponent } from '../../components/split-fare/split-fare.compo
 import { RideSummaryComponent } from '../../components/ride-summary/ride-summary.component';
 import { RideService } from '../../../../core/services/ride/ride.service';
 import {PointDTO} from '../../../../core/models/PointDTO.model';
-import {PaymentTrackingComponent} from '../../components/payment-tracking/payment-tracking.component';
 import {AuthService} from '../../../../core/services/auth/auth.service';
 import {Subscription} from 'rxjs';
 import {User} from '../../../../core/models/user.model';
-
+import {FavoriteRouteService} from '../../../../core/services/favorite-route/favorite-route.service';
 
 @Component({
   selector: 'app-advanced-form-page',
@@ -23,7 +22,6 @@ import {User} from '../../../../core/models/user.model';
     AdditionalOptionsComponent,
     SplitFareComponent,
     RideSummaryComponent,
-    PaymentTrackingComponent,
   ],
   templateUrl: './advanced-form-page.component.html',
   styleUrl: './advanced-form-page.component.css',
@@ -75,7 +73,11 @@ export class AdvancedFormPageComponent implements OnInit, AfterViewInit, OnDestr
 
   private authSubscription: Subscription | undefined;
 
-  constructor(private rideService: RideService, private authService: AuthService) {}
+  constructor(
+    private rideService: RideService,
+    private authService: AuthService,
+    private favoriteRouteService: FavoriteRouteService
+  ) {}
 
   ngOnInit(): void {
     this.authSubscription = this.authService.getLoggedUser().subscribe((user: User | null) => {
@@ -113,7 +115,7 @@ export class AdvancedFormPageComponent implements OnInit, AfterViewInit, OnDestr
 
   handlePassengersAdded(passengers: string[]) {
     this.passengers = passengers;
-    this.splitFareEmails = passengers.filter(email => email !== this.requestorEmail); // Primer: svi osim trenutnog korisnika plaćaju split fare
+    this.splitFareEmails = passengers.filter(email => email !== this.requestorEmail);
     console.log('Passengers added:', this.passengers);
     console.log('Split Fare Emails:', this.splitFareEmails);
   }
@@ -198,5 +200,16 @@ export class AdvancedFormPageComponent implements OnInit, AfterViewInit, OnDestr
 
   onTrackingPopupClosed() {
     this.showTrackingPopup = false;
+  }
+
+  handleFavoriteToggle(event: { routeData: any, additionalOptions: any, isFavorite: boolean }): void {
+    if (event.isFavorite) {
+      this.favoriteRouteService.addFavoriteRoute(event.routeData, event.additionalOptions, this.requestorEmail).subscribe({
+        next: (response) => console.log('Ruta dodata u omiljene:', response),
+        error: (error) => console.error('Greška pri dodavanju omiljene rute:', error)
+      });
+    } else {
+      console.log('Ruta uklonjena iz omiljenih. Implementacija brisanja na backendu je potrebna.');
+    }
   }
 }

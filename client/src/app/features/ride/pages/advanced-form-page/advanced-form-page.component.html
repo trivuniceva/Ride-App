@@ -15,7 +15,6 @@
     <button type="button" (click)="goToStep(3)" class="btn btn-next">Next</button>
   </div>
 
-
   <div *ngIf="currentStep === 3">
     <app-split-fare
       (passengersAdded)="handlePassengersAdded($event)"
@@ -34,17 +33,8 @@
         [showPopup]="showPopup"
         [fullPrice]="fullPrice"
         (popupClosed)="handlePopupClosed()"
-      (paymentConfirmed)="handlePaymentConfirmation()">
-      </app-ride-summary>
+        (paymentConfirmed)="handlePaymentConfirmation()"
+        (favoriteToggled)="handleFavoriteToggle($event)"> </app-ride-summary>
     </div>
   </div>
 </div>
-
-
-<app-payment-tracking
-  [splitFareEmails]="splitFareEmails"
-  [passengers]="passengers"
-  [message]="trackingMessage"
-  [showTrackingPopup]="showTrackingPopup"
-  (trackingClosed)="onTrackingPopupClosed()">
-</app-payment-tracking>
