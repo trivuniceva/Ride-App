@@ -18,9 +18,18 @@ public class NotificationService {
 
     public void notifyDriver(Long driverId, String message, RideRequestDTO rideRequestDTO, Long rideId) {
         NotificationDTO notification = new NotificationDTO("RIDE_REQUEST", message, rideRequestDTO, rideId);
+        notification.setDriverId(driverId);
+
         try {
             String jsonMessage = objectMapper.writeValueAsString(notification);
-            messagingTemplate.convertAndSend("/topic/driver/" + driverId, jsonMessage);
+
+            messagingTemplate.convertAndSendToUser(
+                    String.valueOf(driverId),
+                    "/queue/messages",
+                    jsonMessage
+            );
+            System.out.println("Poslato obaveštenje vozaču " + driverId + " na /user/" + driverId + "/queue/messages");
+
         } catch (JsonProcessingException e) {
             System.err.println("Greška prilikom serijalizacije obaveštenja u JSON: " + e.getMessage());
         }

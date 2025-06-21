@@ -16,6 +16,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -171,25 +172,36 @@ public class SplitFareService {
     }
 
     private void tryAssignNextDriver(Ride ride, RideRequestDTO dto) {
+        Set<Long> refusedDriverIds = ride.getRefusedDriverIds();
+
         try {
-            Driver nextDriver = driverService.findNextEligibleDriver(dto, ride.getRefusedDriverIds());
+            Driver nextDriver = driverService.findNextEligibleDriver(dto, refusedDriverIds);
 
-            System.out.println(nextDriver);
-            System.out.println("nextDriver -------------------------");
-            ride.setDriverId(nextDriver.getId());
-            ride.setRideStatus("PENDING_DRIVER_RESPONSE");
-            rideRepository.save(ride);
+            if (nextDriver != null && driverService.isDriverCurrentlyLoggedIn(nextDriver.getId())) {
+                System.out.println("nextDriver: " + nextDriver.getId() + " is logged in.");
+                ride.setDriverId(nextDriver.getId());
+                ride.setRideStatus("PENDING_DRIVER_RESPONSE");
+                rideRepository.save(ride);
 
-            String msg = "Imate novu vožnju od korisnika " + ride.getRequestorEmail() +
-                    ". Detalji: od " + ride.getStartAddress() +
-                    " do " + ride.getDestinationAddress();
+                String msg = "Imate novu vožnju od korisnika " + ride.getRequestorEmail() +
+                        ". Detalji: od " + ride.getStartAddress() +
+                        " do " + ride.getDestinationAddress();
 
-            notificationService.notifyDriver(nextDriver.getId(), msg, dto, ride.getId());
+                notificationService.notifyDriver(nextDriver.getId(), msg, dto, ride.getId());
+            } else {
+                System.out.println("Next eligible driver is not logged in or not found. Trying to find another driver.");
+                if (nextDriver != null) {
+                    ride.addRefusedDriver(nextDriver.getId());
+                    rideRepository.save(ride);
+                }
+                tryAssignNextDriver(ride, dto);
+            }
 
         } catch (NoSuchElementException e) {
             ride.setRideStatus("ALL_DRIVERS_REFUSED");
             ride.setDriverId(null);
             rideRepository.save(ride);
+            System.out.println("Nema više odgovarajućih vozača za vožnju " + ride.getId());
         }
     }
 

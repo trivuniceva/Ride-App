@@ -87,6 +87,15 @@ public class DriverService {
         return driverRepository.findAll();
     }
 
+    public boolean isDriverCurrentlyLoggedIn(Long driverId) {
+        Optional<Driver> driverOptional = driverRepository.findById(driverId);
+        if (driverOptional.isEmpty()) {
+            return false;
+        }
+        Driver driver = driverOptional.get();
+        return workSessionRepository.findTopByDriverAndLogoutTimeIsNullOrderByLoginTimeDesc(driver).isPresent();
+    }
+
     private List<Driver> getTrulyAvailableDrivers(List<Driver> drivers) {
         return drivers.stream()
                 .filter(Driver::isAvailable)
