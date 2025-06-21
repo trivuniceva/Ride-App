@@ -13,6 +13,9 @@ import {
 } from './features/drivers/driver-ride-tracking-map/driver-ride-tracking-map.component';
 import {UserManagementComponent} from './features/admin/user-management/user-management.component';
 import {AdminChatComponent} from './features/admin-chat/admin-chat.component';
+import {
+  DriverChangesApprovalComponent
+} from './features/admin/driver-changes-approval/driver-changes-approval.component';
 
 export const routes: Routes = [
   {path: '', component: HomeComponent},
@@ -28,4 +31,5 @@ export const routes: Routes = [
   { path: 'track-ride', component: DriverRideTrackingMapComponent },
   { path: 'block-users', component: UserManagementComponent },
   { path: 'admin-chat', component: AdminChatComponent },
+  { path: 'driver-changes', component: DriverChangesApprovalComponent },
 ];

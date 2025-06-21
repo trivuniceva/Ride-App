@@ -2,6 +2,7 @@ package com.rideapp.usermanagement.service;
 
 import com.rideapp.usermanagement.dto.*;
 import com.rideapp.usermanagement.model.*;
+import com.rideapp.usermanagement.repository.DriverProfileUpdateRequestRepository;
 import com.rideapp.usermanagement.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +15,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -26,6 +28,9 @@ public class UserService {
     private UserRepository userRepository;
 
     @Autowired
+    private DriverProfileUpdateRequestRepository driverProfileUpdateRequestRepository;
+
+    @Autowired
     private TokenService tokenService;
 
     @Autowired
@@ -34,7 +39,6 @@ public class UserService {
     private final String UPLOAD_DIR = "/Users/nikolina/Desktop/bs/";
 
     public User getUserByEmail(String email) {
-        System.out.println("userRepository.findByEmail(email);  " + userRepository.findByEmail(email));
         return userRepository.findByEmail(email);
     }
 
@@ -52,7 +56,6 @@ public class UserService {
             String token = tokenService.generateToken();
             user.setResetToken(token);
             userRepository.save(user);
-            System.out.println("Token saved: " + token);
             emailService.sendPasswordResetEmail(email, token);
             return ResponseEntity.ok("Password reset email sent.");
         } else {
@@ -100,15 +103,33 @@ public class UserService {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ErrorResponse("User not found with ID: " + userId));
         }
         User user = userOptional.get();
-        user.setFirstname(updateRequest.getFirstname());
-        user.setLastname(updateRequest.getLastname());
-        user.setAddress(updateRequest.getAddress());
-        user.setPhone(updateRequest.getPhone());
+
         if (user.getUserRole() == UserRole.DRIVER) {
-            System.out.println("Promene za vozača moraju biti odobrene od strane administratora! (Simulacija - direktno se snima)");
+            DriverProfileUpdateRequest updateRequestEntity = new DriverProfileUpdateRequest();
+            updateRequestEntity.setDriver(user);
+            updateRequestEntity.setOldFirstname(user.getFirstname());
+            updateRequestEntity.setNewFirstname(updateRequest.getFirstname());
+            updateRequestEntity.setOldLastname(user.getLastname());
+            updateRequestEntity.setNewLastname(updateRequest.getLastname());
+            updateRequestEntity.setOldAddress(user.getAddress());
+            updateRequestEntity.setNewAddress(updateRequest.getAddress());
+            updateRequestEntity.setOldPhone(user.getPhone());
+            updateRequestEntity.setNewPhone(updateRequest.getPhone());
+            updateRequestEntity.setStatus(DriverProfileUpdateRequest.UpdateRequestStatus.PENDING);
+            updateRequestEntity.setRequestDate(LocalDateTime.now());
+
+            driverProfileUpdateRequestRepository.save(updateRequestEntity);
+
+            return ResponseEntity.ok(new SuccessResponse("Zahtev za ažuriranje profila vozača poslat na odobrenje administratoru."));
+
+        } else {
+            user.setFirstname(updateRequest.getFirstname());
+            user.setLastname(updateRequest.getLastname());
+            user.setAddress(updateRequest.getAddress());
+            user.setPhone(updateRequest.getPhone());
+            userRepository.save(user);
+            return ResponseEntity.ok(convertToUserDTO(user));
         }
-        userRepository.save(user);
-        return ResponseEntity.ok(convertToUserDTO(user));
     }
 
     @Transactional
@@ -138,15 +159,11 @@ public class UserService {
         try {
             String fileName = UUID.randomUUID().toString() + "_" + file.getOriginalFilename();
             Path uploadPath = Paths.get(UPLOAD_DIR);
-            System.out.println("Upload path (absolute): " + uploadPath.toAbsolutePath());
             if (!Files.exists(uploadPath)) {
                 Files.createDirectories(uploadPath);
-                System.out.println("Created directories: " + uploadPath.toAbsolutePath());
             }
             Path filePath = uploadPath.resolve(fileName);
-            System.out.println("Saving file to (absolute): " + filePath.toAbsolutePath());
             Files.copy(file.getInputStream(), filePath);
-            System.out.println("File saved successfully!");
 
             String relativePath = "/profile_pictures/" + fileName;
             user.setProfilePic(relativePath);
@@ -154,10 +171,72 @@ public class UserService {
 
             return ResponseEntity.ok(new SuccessResponse("Profile picture uploaded successfully!", relativePath));
         } catch (IOException e) {
-            System.err.println("Error during file upload: " + e.getMessage());
-            e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ErrorResponse("Failed to upload profile picture: " + e.getMessage()));
         }
+    }
+
+    public List<DriverUpdateRequestDTO> getPendingDriverUpdateRequests() {
+        return driverProfileUpdateRequestRepository.findByStatus(DriverProfileUpdateRequest.UpdateRequestStatus.PENDING).stream()
+                .map(request -> new DriverUpdateRequestDTO(
+                        request.getId(),
+                        request.getDriver().getId(),
+                        request.getDriver().getEmail(),
+                        request.getOldFirstname(),
+                        request.getNewFirstname(),
+                        request.getOldLastname(),
+                        request.getNewLastname(),
+                        request.getOldAddress(),
+                        request.getNewAddress(),
+                        request.getOldPhone(),
+                        request.getNewPhone(),
+                        request.getRequestDate()
+                ))
+                .collect(Collectors.toList());
+    }
+
+    @Transactional
+    public ResponseEntity<?> approveDriverProfileUpdate(Long requestId) {
+        Optional<DriverProfileUpdateRequest> requestOptional = driverProfileUpdateRequestRepository.findById(requestId);
+        if (requestOptional.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ErrorResponse("Zahtev za ažuriranje nije pronađen."));
+        }
+        DriverProfileUpdateRequest request = requestOptional.get();
+
+        if (request.getStatus() != DriverProfileUpdateRequest.UpdateRequestStatus.PENDING) {
+            return ResponseEntity.badRequest().body(new ErrorResponse("Zahtev je već obrađen."));
+        }
+
+        User driver = request.getDriver();
+        driver.setFirstname(request.getNewFirstname());
+        driver.setLastname(request.getNewLastname());
+        driver.setAddress(request.getNewAddress());
+        driver.setPhone(request.getNewPhone());
+        userRepository.save(driver);
+
+        request.setStatus(DriverProfileUpdateRequest.UpdateRequestStatus.APPROVED);
+        request.setProcessedDate(LocalDateTime.now());
+        driverProfileUpdateRequestRepository.save(request);
+
+        return ResponseEntity.ok(new SuccessResponse("Profil vozača uspešno ažuriran i zahtev odobren."));
+    }
+
+    @Transactional
+    public ResponseEntity<?> rejectDriverProfileUpdate(Long requestId) {
+        Optional<DriverProfileUpdateRequest> requestOptional = driverProfileUpdateRequestRepository.findById(requestId);
+        if (requestOptional.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ErrorResponse("Zahtev za ažuriranje nije pronađen."));
+        }
+        DriverProfileUpdateRequest request = requestOptional.get();
+
+        if (request.getStatus() != DriverProfileUpdateRequest.UpdateRequestStatus.PENDING) {
+            return ResponseEntity.badRequest().body(new ErrorResponse("Zahtev je već obrađen."));
+        }
+
+        request.setStatus(DriverProfileUpdateRequest.UpdateRequestStatus.REJECTED);
+        request.setProcessedDate(LocalDateTime.now());
+        driverProfileUpdateRequestRepository.save(request);
+
+        return ResponseEntity.ok(new SuccessResponse("Zahtev za ažuriranje profila vozača je odbijen."));
     }
 
     public UserDTO convertToUserDTO(User user) {
@@ -174,4 +253,5 @@ public class UserService {
                 user.getProfilePic()
         );
     }
+
 }

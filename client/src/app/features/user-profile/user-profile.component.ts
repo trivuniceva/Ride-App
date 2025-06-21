@@ -114,30 +114,32 @@ export class UserProfileComponent implements OnInit, OnDestroy {
       address: this.user.address,
       phone: this.user.phone
     }).subscribe({
-      next: (updatedUser: User) => {
-        console.log('Profile updated successfully:', updatedUser);
-        this.user = updatedUser;
-        this.authService.storageHandle({ user: updatedUser });
-        alert('Profil je uspešno ažuriran!');
+      next: (response: any) => {
+        if (response.message && response.message.includes('Zahtev za ažuriranje profila vozača poslat')) {
+          alert(response.message);
+          this.isEditing = false;
+        } else {
+          console.log('Profile updated successfully:', response);
+          this.user = response;
+          this.authService.storageHandle({ user: response });
+          alert('Profil je uspešno ažuriran!');
+          this.isEditing = false;
+        }
 
         if (this.selectedFile) {
-          this.userService.uploadProfilePicture(this.user.id, this.selectedFile).subscribe({
-            next: (response: any) => {
-              alert(response.message);
-              this.user!.profilePic = response.profilePicPath;
-              this.profilePicPreview = `http://localhost:8080${response.profilePicPath}`;
+          this.userService.uploadProfilePicture(this.user!.id, this.selectedFile).subscribe({
+            next: (uploadResponse: any) => {
+              alert(uploadResponse.message);
+              this.user!.profilePic = uploadResponse.profilePicPath;
+              this.profilePicPreview = `http://localhost:8080${uploadResponse.profilePicPath}`;
               this.authService.storageHandle({ user: this.user! });
               this.selectedFile = null;
-              this.isEditing = false;
             },
             error: (err) => {
               console.error('Error uploading profile picture:', err);
               alert('Greška pri uploadu slike: ' + (err.error?.error || 'Nepoznata greška.'));
-              this.isEditing = false;
             }
           });
-        } else {
-          this.isEditing = false;
         }
       },
       error: (err) => {
@@ -146,6 +148,7 @@ export class UserProfileComponent implements OnInit, OnDestroy {
       }
     });
   }
+
 
   onFileSelected(event: Event) {
     const input = event.target as HTMLInputElement;

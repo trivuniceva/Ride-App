@@ -2,6 +2,7 @@ package com.rideapp.usermanagement.controller;
 
 import com.rideapp.usermanagement.dto.*;
 import com.rideapp.usermanagement.model.SuccessResponse;
+import com.rideapp.usermanagement.model.UserRole;
 import com.rideapp.usermanagement.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -54,6 +55,22 @@ public class UserController {
     @PostMapping("/{userId}/profile-picture")
     public ResponseEntity<?> uploadProfilePicture(@PathVariable Long userId, @RequestParam("file") MultipartFile file) {
         return userService.uploadProfilePicture(userId, file);
+    }
+
+    @GetMapping("/driver-update-requests/pending")
+    public ResponseEntity<List<DriverUpdateRequestDTO>> getPendingDriverUpdateRequests() {
+        List<DriverUpdateRequestDTO> requests = userService.getPendingDriverUpdateRequests();
+        return ResponseEntity.ok(requests);
+    }
+
+    @PostMapping("/driver-update-requests/{requestId}/approve")
+    public ResponseEntity<?> approveDriverProfileUpdate(@PathVariable Long requestId) {
+        return userService.approveDriverProfileUpdate(requestId);
+    }
+
+    @PostMapping("/driver-update-requests/{requestId}/reject")
+    public ResponseEntity<?> rejectDriverProfileUpdate(@PathVariable Long requestId) {
+        return userService.rejectDriverProfileUpdate(requestId);
     }
 
 

@@ -1,0 +1,124 @@
+.driver-list-container {
+  padding: 20px;
+  font-family: Arial, sans-serif;
+}
+
+.driver-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.driver-table th,
+.driver-table td {
+  border: 1px solid #ddd;
+  padding: 12px 15px;
+  text-align: left;
+}
+
+.driver-table th {
+  background-color: #f2f2f2;
+  font-weight: bold;
+  color: #333;
+}
+
+.driver-table tbody tr:nth-child(even) {
+  background-color: #f9f9f9;
+}
+
+.driver-table tbody tr:hover {
+  background-color: #e9e9e9;
+  cursor: pointer;
+}
+
+.driver-table .actions button {
+  padding: 8px 12px;
+  margin-right: 8px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background-color 0.2s ease;
+}
+
+.driver-table .actions button:first-of-type {
+  background-color: #4CAF50;
+  color: white;
+}
+
+.driver-table .actions button:first-of-type:hover {
+  background-color: #45a049;
+}
+
+.driver-table .actions button:last-of-type {
+  background-color: #f44336;
+  color: white;
+}
+
+.driver-table .actions button:last-of-type:hover {
+  background-color: #da190b;
+}
+
+.no-drivers-message {
+  text-align: center;
+  font-style: italic;
+  color: #666;
+  padding: 20px;
+}
+
+.popup-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.popup-content {
+  background: #fff;
+  padding: 30px;
+  border-radius: 8px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+  width: 90%;
+  max-width: 500px;
+  position: relative;
+}
+
+.popup-content h3 {
+  margin-top: 0;
+  color: #333;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 10px;
+  margin-bottom: 20px;
+}
+
+.driver-details p {
+  margin-bottom: 8px;
+  line-height: 1.5;
+}
+
+.driver-details strong {
+  color: #555;
+}
+
+.close-button {
+  background-color: #007bff;
+  color: white;
+  padding: 10px 15px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-top: 20px;
+  float: right;
+  transition: background-color 0.2s ease;
+}
+
+.close-button:hover {
+  background-color: #0056b3;
+}
