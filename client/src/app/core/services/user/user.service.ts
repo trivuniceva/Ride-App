@@ -26,6 +26,7 @@ export interface DriverUpdateRequest {
 export class UserService {
   private userApiUrl = 'http://localhost:8080/user';
   private rideApiUrl = 'http://localhost:8080/rides';
+  private driverApiUrl = 'http://localhost:8080/driver';
 
   constructor(private http: HttpClient) { }
 
@@ -135,4 +136,30 @@ export class UserService {
     );
   }
 
+  loggedDriver(driverId: number): Observable<any> {
+    return this.http.post(
+      `${this.driverApiUrl}/logged/${driverId}`,
+      {},
+      { responseType: 'text' }
+    ).pipe(
+      catchError(error => {
+        console.error('Error logging driver on backend:', error);
+        return throwError(() => new Error('Failed to log driver on backend. ' + (error.error || error.message)));
+      })
+    );
+  }
+
+  loggedOutDriver(driverId: number): Observable<any> {
+    console.log(`Sending logout request for driver ID: ${driverId}`);
+    return this.http.post(
+      `${this.driverApiUrl}/logged-out/${driverId}`,
+      {},
+      { responseType: 'text' }
+    ).pipe(
+      catchError(error => {
+        console.error('Error logging out driver on backend:', error);
+        return throwError(() => new Error('Failed to log out driver on backend. ' + (error.error || error.message)));
+      })
+    );
+  }
 }
