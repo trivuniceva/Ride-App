@@ -156,16 +156,36 @@ public class UserService {
         if (file.isEmpty()) {
             return ResponseEntity.badRequest().body(new ErrorResponse("Please select a file to upload."));
         }
+
+        String originalFileName = file.getOriginalFilename();
+        if (originalFileName == null || originalFileName.trim().isEmpty()) {
+            return ResponseEntity.badRequest().body(new ErrorResponse("Invalid file name."));
+        }
+
+        String sanitizedFileName = originalFileName.replaceAll("[/\\\\?%*:|\"<>]", "");
+        sanitizedFileName = sanitizedFileName.replaceAll("\\.{2,}", ""); // Remove multiple dots like ".."
+
+        if (sanitizedFileName.trim().isEmpty()) {
+            return ResponseEntity.badRequest().body(new ErrorResponse("Invalid file name after sanitization."));
+        }
+
         try {
-            String fileName = UUID.randomUUID().toString() + "_" + file.getOriginalFilename();
+            String finalFileName = UUID.randomUUID().toString() + "_" + sanitizedFileName;
             Path uploadPath = Paths.get(UPLOAD_DIR);
+
             if (!Files.exists(uploadPath)) {
                 Files.createDirectories(uploadPath);
             }
-            Path filePath = uploadPath.resolve(fileName);
+
+            Path filePath = uploadPath.resolve(finalFileName).normalize();
+
+            if (!filePath.startsWith(uploadPath)) {
+                return ResponseEntity.badRequest().body(new ErrorResponse("Attempted path traversal detected."));
+            }
+
             Files.copy(file.getInputStream(), filePath);
 
-            String relativePath = "/profile_pictures/" + fileName;
+            String relativePath = "/profile_pictures/" + finalFileName;
             user.setProfilePic(relativePath);
             userRepository.save(user);
 
