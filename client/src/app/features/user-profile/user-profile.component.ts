@@ -62,6 +62,8 @@ export class UserProfileComponent implements OnInit, OnDestroy {
       }
 
       if (this.user && this.user.userRole === 'DRIVER') {
+        console.log(" ide sranjeeeee")
+        console.log(" ---------------------------------------------------------------")
         this.wsSubscription = this.webSocketService.getMessages().subscribe((notification: any) => {
           // --- DODAJ OVE CONSOLE.LOG LINIJE OVDE ---
           console.log('--- WebSocket Notification Received ---');
@@ -73,6 +75,9 @@ export class UserProfileComponent implements OnInit, OnDestroy {
           console.log('Is notification type RIDE_REQUEST?', notification.type === 'RIDE_REQUEST');
           // --- KRAJ DODATIH LINIJA ---
 
+
+          console.log(notification.type)
+          console.log("notification.type")
           if (notification.type === 'RIDE_REQUEST' && notification.driverId === this.user?.id) {
             console.log('Conditions met! Showing popup...');
             this.popupMessage = notification.message;

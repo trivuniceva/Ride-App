@@ -37,11 +37,19 @@ export class WebSocketService {
       this.isConnected = true;
       this.processedMessageIds.clear();
 
+
+      // web-socket.service.ts, unutar onConnect
       this.stompClient.subscribe('/user/queue/messages', (message: IMessage) => {
         this.processIncomingMessage(message);
       });
 
       this.stompClient.subscribe('/topic/admin/chat', (message: IMessage) => {
+        this.processIncomingMessage(message);
+      });
+
+// DODAJ OVU LINIIJU ZA TESTIRANJE
+      this.stompClient.subscribe('/topic/ride-requests', (message: IMessage) => {
+        console.log('Received message on /topic/ride-requests');
         this.processIncomingMessage(message);
       });
     };
@@ -61,11 +69,14 @@ export class WebSocketService {
 
   private processIncomingMessage(message: IMessage): void {
     try {
+      console.log('Raw WebSocket message body:', message.body);
       const parsedMessage = JSON.parse(message.body);
-      const messageIdentifier = `${parsedMessage.chatSessionId}-${parsedMessage.timestamp}-${parsedMessage.senderId}-${parsedMessage.messageContent}`;
+      console.log('Received WebSocket message (parsed):', parsedMessage);
+
+      const messageIdentifier = `<span class="math-inline">\{parsedMessage\.chatSessionId \|\| ''\}\-</span>{parsedMessage.timestamp || ''}-<span class="math-inline">\{parsedMessage\.senderId \|\| ''\}\-</span>{parsedMessage.messageContent || ''}`;
 
       if (this.processedMessageIds.has(messageIdentifier)) {
-        console.log('Ignorisanja duplikat poruke:', parsedMessage);
+        console.log('Ignoring duplicate message:', parsedMessage);
         return;
       }
 
@@ -73,7 +84,7 @@ export class WebSocketService {
       this._allReceivedMessages.next(parsedMessage);
 
     } catch (e: any) {
-      console.error('Greška pri parsiranju poruke:', e, message.body);
+      console.error('Error parsing message:', e, message.body);
     }
   }
 
@@ -89,6 +100,9 @@ export class WebSocketService {
   }
 
   public getMessages(): Observable<any> {
+    console.log("---------   *** --------- (( ---------")
+    console.log(this.allReceivedMessages$)
+
     return this.allReceivedMessages$;
   }
 

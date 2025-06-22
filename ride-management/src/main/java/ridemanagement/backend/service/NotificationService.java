@@ -16,19 +16,24 @@ public class NotificationService {
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 
+    // NotificationService.java
     public void notifyDriver(Long driverId, String message, RideRequestDTO rideRequestDTO, Long rideId) {
-        NotificationDTO notification = new NotificationDTO("RIDE_REQUEST", message, rideRequestDTO, rideId);
-        notification.setDriverId(driverId);
+        NotificationDTO notification = new NotificationDTO("RIDE_REQUEST", message, rideRequestDTO, rideId, driverId);
 
         try {
             String jsonMessage = objectMapper.writeValueAsString(notification);
 
-            messagingTemplate.convertAndSendToUser(
-                    String.valueOf(driverId),
-                    "/queue/messages",
+            // PRIVREMENA PROMENA SAMO ZA TESTIRANJE:
+            // messagingTemplate.convertAndSendToUser(
+            //         String.valueOf(driverId),
+            //         "/queue/messages",
+            //         jsonMessage
+            // );
+            messagingTemplate.convertAndSend(
+                    "/topic/ride-requests", // NOVA GENERICKA DESTINACIJA
                     jsonMessage
             );
-            System.out.println("Poslato obaveštenje vozaču " + driverId + " na /user/" + driverId + "/queue/messages");
+            System.out.println("Poslato obaveštenje vozaču " + driverId + " na /topic/ride-requests (TEST)");
 
         } catch (JsonProcessingException e) {
             System.err.println("Greška prilikom serijalizacije obaveštenja u JSON: " + e.getMessage());
