@@ -1,6 +1,7 @@
 package ridemanagement.backend.service;
 
 import com.rideapp.usermanagement.model.EmailService;
+import com.rideapp.usermanagement.repository.UserRepository;
 import com.rideapp.usermanagement.service.TokenService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -11,6 +12,7 @@ import ridemanagement.backend.model.Driver;
 import ridemanagement.backend.model.Point;
 import ridemanagement.backend.model.Ride;
 import ridemanagement.backend.repository.RideRepository;
+import com.rideapp.usermanagement.model.User;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -36,6 +38,16 @@ public class SplitFareService {
     private PointService pointService;
     @Autowired
     private FavoriteRouteService favoriteRouteService;
+    @Autowired
+    private UserRepository userRepository;
+
+    private Long getUserIdByEmail(String email) {
+        User user = userRepository.findByEmail(email);
+        if (user != null) {
+            return user.getId();
+        }
+        return null;
+    }
 
     public Ride initiateRideRequest(RideRequestDTO rideRequestDTO) {
         Ride ride = new Ride(rideRequestDTO);
@@ -74,6 +86,13 @@ public class SplitFareService {
         ride.setPaymentStatus("PENDING_DRIVER_CONFIRMATION");
         ride = rideRepository.save(ride);
 
+        Long requestorUserId = getUserIdByEmail(ride.getRequestorEmail());
+
+        if (requestorUserId != null) {
+            // Note: driverFirstname, driverLastname, and driverPictureUrl are null here for RIDE_REQUEST_SENT
+            notificationService.notifyUser(requestorUserId, "RIDE_REQUEST_SENT", "Vaš zahtev za vožnju je poslat.", ride.getId(), null, null, null);
+        }
+
         tryAssignNextDriver(ride, rideRequestDTO);
 
         return ride;
@@ -87,11 +106,28 @@ public class SplitFareService {
             throw new IllegalStateException("Vožnju " + rideId + " nije moguće prihvatiti u trenutnom statusu: " + ride.getRideStatus());
         }
 
+        if (ride.getDriverId() == null) {
+            throw new IllegalStateException("Vožnja nema dodeljenog vozača. Nije moguće prihvatiti.");
+        }
+
         confirmAndProcessPayment(ride.getFullPrice(), ride.getPassengers());
 
         ride.setRideStatus("ACCEPTED");
         ride.setPaymentStatus("PAID");
         rideRepository.save(ride);
+
+        Long requestorUserId = getUserIdByEmail(ride.getRequestorEmail());
+        if (requestorUserId != null && ride.getDriverId() != null) {
+            try {
+                Driver acceptedDriver = driverService.findById(ride.getDriverId());
+                // Pass acceptedDriver.getProfilePictureUrl() here
+                notificationService.notifyUser(requestorUserId, "DRIVER_ACCEPTED_RIDE",
+                        "Vozač " + acceptedDriver.getFirstname() + " " + acceptedDriver.getLastname() + " je prihvatio vašu vožnju!",
+                        ride.getId(), acceptedDriver.getFirstname(), acceptedDriver.getLastname(), acceptedDriver.getProfilePic());
+            } catch (NoSuchElementException e) {
+                System.err.println("Greska: Prihvaćeni vozač sa ID " + ride.getDriverId() + " nije pronađen: " + e.getMessage());
+            }
+        }
 
         FavoriteRouteDTO favoriteRouteDTO = new FavoriteRouteDTO();
         favoriteRouteDTO.setUserEmail(ride.getRequestorEmail());
@@ -135,6 +171,12 @@ public class SplitFareService {
         ride.setRideStatus("DRIVER_REFUSED");
         rideRepository.save(ride);
 
+        Long requestorUserId = getUserIdByEmail(ride.getRequestorEmail());
+        if (requestorUserId != null) {
+            // Note: driverFirstname, driverLastname, and driverPictureUrl are null here for DRIVER_SEARCHING
+            notificationService.notifyUser(requestorUserId, "DRIVER_SEARCHING", "Prethodni vozač je odbio. Traži se novi vozač za vašu vožnju...", ride.getId(), null, null, null);
+        }
+
         PointDTO startLocationDTO = null;
         if(ride.getStartLocation() != null) {
             startLocationDTO = new PointDTO(ride.getStartLocation().getId(), ride.getStartLocation().getLatitude(), ride.getStartLocation().getLongitude());
@@ -150,7 +192,6 @@ public class SplitFareService {
                     .map(p -> new PointDTO(p.getId(), p.getLatitude(), p.getLongitude()))
                     .collect(Collectors.toList());
         }
-
 
         RideRequestDTO reconstructedRideRequestDTO = new RideRequestDTO(
                 ride.getStartAddress(),
@@ -187,6 +228,7 @@ public class SplitFareService {
                         ". Detalji: od " + ride.getStartAddress() +
                         " do " + ride.getDestinationAddress();
 
+                // notificationService.notifyDriver does not send driver picture
                 notificationService.notifyDriver(nextDriver.getId(), msg, dto, ride.getId());
             } else {
                 System.out.println("Next eligible driver is not logged in or not found. Trying to find another driver.");

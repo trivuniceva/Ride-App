@@ -38,6 +38,11 @@ public class DriverService {
     @Autowired
     private PointService pointService;
 
+    public Driver findById(Long driverId) {
+        return driverRepository.findById(driverId)
+                .orElseThrow(() -> new NoSuchElementException("Driver not found with ID: " + driverId));
+    }
+
     public Driver findEligibleDriver(RideRequestDTO rideRequestDTO) {
         return findNextEligibleDriver(rideRequestDTO, null);
     }
