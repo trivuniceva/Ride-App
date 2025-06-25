@@ -36,7 +36,7 @@ public class UserService {
     @Autowired
     private EmailService emailService;
 
-    private final String UPLOAD_DIR = "/Users/nikolina/Desktop/bs/";
+    private final String UPLOAD_DIR = "/Users/nikolina/Desktop/Projekti/bs/";
 
     public User getUserByEmail(String email) {
         return userRepository.findByEmail(email);

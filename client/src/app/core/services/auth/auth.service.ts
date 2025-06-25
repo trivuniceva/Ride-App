@@ -1,8 +1,9 @@
-// src/app/core/services/auth/auth.service.ts
 import { Injectable } from '@angular/core';
 import { HttpClient } from "@angular/common/http";
 import { BehaviorSubject, catchError, Observable, throwError, of, tap } from "rxjs";
-import {User} from '../../models/user.model'; // Dodaj 'tap' operator
+import { User } from '../../models/user.model';
+import { Router } from '@angular/router';
+import { UserService } from '../user/user.service';
 
 @Injectable({
   providedIn: 'root'
@@ -10,20 +11,36 @@ import {User} from '../../models/user.model'; // Dodaj 'tap' operator
 export class AuthService {
   private apiUrl = 'http://localhost:8080/auth';
 
-  // BehaviorSubject za praćenje prijavljenog korisnika
-  // Inicijalna vrednost se čita iz localStorage prilikom pokretanja servisa
   private loggedUserSubject = new BehaviorSubject<User | null>(
     JSON.parse(localStorage.getItem('loggedUser') || 'null')
   );
-  // Observable koji komponente mogu da prate
   loggedUser$: Observable<User | null> = this.loggedUserSubject.asObservable();
 
-  constructor(private http: HttpClient) { }
+  constructor(
+    private http: HttpClient,
+    private router: Router,
+    private userService: UserService
+  ) { }
 
   login(email: string, password: string): Observable<any> {
     return this.http.post(this.apiUrl + '/login', { email, password }).pipe(
-      tap((response: any) => { // Koristi tap da bi se izvršila akcija sa odgovorom bez menjanja Observabla
-        this.storageHandle({ user: response }); // Poziva se storageHandle sa celim odgovorom
+      tap((response: any) => {
+        const user: User = response; // Pretpostavljamo da backend vraća User objekat
+        this.storageHandle({ user: user });
+
+        if (user && user.userRole === 'DRIVER') {
+          console.log('User is a DRIVER. Calling loggedDriver backend method.');
+          this.userService.loggedDriver(user.id).subscribe({
+            next: (driverResponse) => {
+              console.log('Driver logged in successfully on backend:', driverResponse);
+            },
+            error: (err) => {
+              console.error('Error calling loggedDriver backend method:', err);
+            }
+          });
+        }
+
+        this.router.navigate(['/user-profile']);
       }),
       catchError(error => {
         console.error('Login error:', error);
@@ -32,20 +49,33 @@ export class AuthService {
     );
   }
 
-  // Preimenuj i modifikuj ovu metodu
-  // Sada samo vraća Observable iz BehaviorSubject-a
   getLoggedUser(): Observable<User | null> {
     return this.loggedUser$;
   }
 
-  storageHandle({ user }: { user: User }) { // Očekuje User objekat
+  storageHandle({ user }: { user: User }) {
     localStorage.setItem('loggedUser', JSON.stringify(user));
-    this.loggedUserSubject.next(user); // Ažuriraj BehaviorSubject
+    this.loggedUserSubject.next(user);
   }
 
   logout() {
+    const loggedUser = this.loggedUserSubject.getValue();
+
+    if (loggedUser && loggedUser.userRole === 'DRIVER') {
+      console.log('User is a DRIVER. Notifying backend about logout.');
+      this.userService.loggedOutDriver(loggedUser.id).subscribe({
+        next: (response) => {
+          console.log('Driver logout successfully recorded on backend:', response);
+        },
+        error: (err) => {
+          console.error('Error notifying backend about driver logout:', err);
+        }
+      });
+    }
+
     localStorage.removeItem('loggedUser');
-    this.loggedUserSubject.next(null); // Postavi na null kada se korisnik odjavi
+    this.loggedUserSubject.next(null);
+    this.router.navigate(['/login']);
   }
 
   register(userData: any): Observable<any> {
