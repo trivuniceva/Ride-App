@@ -3,21 +3,14 @@ package ridemanagement.backend.controller;
 import com.rideapp.usermanagement.dto.BlockUserRequestDTO;
 import org.springframework.http.HttpStatus;
 import ridemanagement.backend.dto.DriverDTO;
-import ridemanagement.backend.dto.PointDTO;
-import ridemanagement.backend.dto.RideRequestDTO;
-import ridemanagement.backend.model.Driver;
-import ridemanagement.backend.model.Point;
 import ridemanagement.backend.service.DriverService;
 import ridemanagement.backend.service.PointService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Comparator;
 import java.util.List;
 import java.util.NoSuchElementException;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/driver")

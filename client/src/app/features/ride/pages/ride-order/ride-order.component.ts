@@ -14,6 +14,8 @@ import { DriverService } from '../../../../core/services/drivers/driver.service'
 import { Driver } from '../../../../core/models/driver.model';
 import {User} from '../../../../core/models/user.model';
 import {Subscription} from 'rxjs';
+import {VehicleType} from '../../../../core/models/VehicleType.model';
+import {VehicleService} from '../../../../core/services/vehicle/vehicle.service';
 
 @Component({
   selector: 'app-ride-order',
@@ -45,10 +47,15 @@ export class RideOrderComponent implements OnInit {
   waypointsCoords: [number, number][] = [];
   vehicleType: string | null = null;
   allDrivers: Driver[] = [];
+  vehicleTypes: VehicleType[] = [];
 
   private authSubscription: Subscription | undefined;
 
-  constructor(private authService: AuthService, private driverService: DriverService, private ngZone: NgZone) {} // Ubaci NgZone
+  constructor(private authService: AuthService,
+              private driverService: DriverService,
+              private ngZone: NgZone,
+              private vehicleService: VehicleService,
+  ) {}
 
   ngOnInit(): void {
     this.authSubscription = this.authService.loggedUser$.subscribe((user: User | null) => {
@@ -67,6 +74,12 @@ export class RideOrderComponent implements OnInit {
         console.log('Dohvaćeni vozači:', this.allDrivers);
       });
     });
+
+    this.vehicleService.getVehicleTypes().subscribe((types) => {
+      this.vehicleTypes = types;
+      console.log('Tipovi vozila:', this.vehicleTypes);
+    });
+
   }
 
   async handleRouteData(routeData: {
@@ -130,16 +143,17 @@ export class RideOrderComponent implements OnInit {
 
   async calculatePrice(distance: number, duration: number, selectedClass: string | null): Promise<number> {
     console.log(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>", distance)
-    let price = distance*120;
-    if (selectedClass === 'Standard') {
-      return price + 22;
-    } else if (selectedClass === 'Van') {
-      return price + 15;
-    } else if (selectedClass === 'Luxury') {
-      return price + 30;
-    } else {
-      return 0;
-    }
+
+    if (!selectedClass) return 0;
+
+    const selectedVehicle = this.vehicleTypes.find(
+      (v) => v.type.toUpperCase() === selectedClass.toUpperCase()
+    );
+
+    if (!selectedVehicle) return 0;
+
+    const totalPrice = selectedVehicle.price + distance * 120;
+    return Math.round(totalPrice);
   }
 
   async geocodeAddress(address: string): Promise<[number, number] | null> {
