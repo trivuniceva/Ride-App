@@ -1,16 +1,21 @@
-import {Component, EventEmitter, Output, ViewChild, AfterViewInit, Input, OnInit, OnDestroy} from '@angular/core';
-import { NgIf } from '@angular/common';
+import {Component, OnInit, AfterViewInit, OnDestroy, ViewChild, EventEmitter, Output, Input} from '@angular/core';
+import { NgIf, CurrencyPipe } from '@angular/common';
+import { Subscription } from 'rxjs';
+import { filter, take } from 'rxjs/operators';
+
 import { RouteFormComponent } from '../../components/route-form/route-form.component';
 import { VehicleTypeComponent } from '../../components/vehicle-type/vehicle-type.component';
 import { AdditionalOptionsComponent } from '../../components/additional-options/additional-options.component';
 import { SplitFareComponent } from '../../components/split-fare/split-fare.component';
 import { RideSummaryComponent } from '../../components/ride-summary/ride-summary.component';
-import { RideService } from '../../../../core/services/ride/ride.service';
+
+import { WebSocketService } from '../../../../core/services/web-socket.service';
 import {PointDTO} from '../../../../core/models/PointDTO.model';
+import {RideService} from '../../../../core/services/ride/ride.service';
 import {AuthService} from '../../../../core/services/auth/auth.service';
-import {Subscription} from 'rxjs';
-import {User} from '../../../../core/models/user.model';
 import {FavoriteRouteService} from '../../../../core/services/favorite-route/favorite-route.service';
+import {User} from '../../../../core/models/user.model';
+import {RideTrackingPopupComponent} from '../../components/ride-tracking-popup/ride-tracking-popup.component';
 
 @Component({
   selector: 'app-advanced-form-page',
@@ -22,14 +27,12 @@ import {FavoriteRouteService} from '../../../../core/services/favorite-route/fav
     AdditionalOptionsComponent,
     SplitFareComponent,
     RideSummaryComponent,
+    RideTrackingPopupComponent
   ],
   templateUrl: './advanced-form-page.component.html',
   styleUrl: './advanced-form-page.component.css',
 })
-
 export class AdvancedFormPageComponent implements OnInit, AfterViewInit, OnDestroy {
-  @Input() fullPrice: number | undefined;
-
   currentStep: number = 1;
   additionalOptions: { carriesBabies: boolean; carriesPets: boolean } = { carriesBabies: false, carriesPets: false };
   passengers: string[] = [];
@@ -37,9 +40,15 @@ export class AdvancedFormPageComponent implements OnInit, AfterViewInit, OnDestr
   showPopup = false;
   splitFareEmails: string[] = [];
   private requestorEmail: string = '';
+  private currentUserId: number | null = null;
 
-  showTrackingPopup: boolean = false;
-  trackingMessage: string = '';
+  showRideTrackingPopup: boolean = false;
+  rideTrackingMessage: string = '';
+  driverName: string | null = null;
+  currentRideId: number | null = null;
+  driverPictureUrl: string | null = null;
+
+  @Input() fullPrice: number | undefined;
 
   @ViewChild('routeForm') routeForm!: RouteFormComponent;
 
@@ -72,19 +81,32 @@ export class AdvancedFormPageComponent implements OnInit, AfterViewInit, OnDestr
   };
 
   private authSubscription: Subscription | undefined;
+  private wsSubscription: Subscription | undefined;
 
   constructor(
     private rideService: RideService,
     private authService: AuthService,
-    private favoriteRouteService: FavoriteRouteService
+    private favoriteRouteService: FavoriteRouteService,
+    private webSocketService: WebSocketService
   ) {}
 
   ngOnInit(): void {
     this.authSubscription = this.authService.getLoggedUser().subscribe((user: User | null) => {
-      if (user && user.email) {
+      if (user && user.id && user.email) {
         this.requestorEmail = user.email;
+        this.currentUserId = user.id;
+        if (user.userRole === 'REGISTERED_USER') {
+          if (this.wsSubscription === undefined || this.wsSubscription.closed || (this.currentUserId && this.webSocketService.isWebSocketConnected() && (!this.wsSubscription || this.wsSubscription.closed))) {
+            this.subscribeToRideNotifications(user.id);
+          }
+        }
       } else {
         this.requestorEmail = '';
+        this.currentUserId = null;
+        if (this.wsSubscription) {
+          this.wsSubscription.unsubscribe();
+          this.wsSubscription = undefined;
+        }
       }
     });
   }
@@ -98,6 +120,9 @@ export class AdvancedFormPageComponent implements OnInit, AfterViewInit, OnDestr
   ngOnDestroy(): void {
     if (this.authSubscription) {
       this.authSubscription.unsubscribe();
+    }
+    if (this.wsSubscription) {
+      this.wsSubscription.unsubscribe();
     }
   }
 
@@ -173,24 +198,28 @@ export class AdvancedFormPageComponent implements OnInit, AfterViewInit, OnDestr
         next: (response: any) => {
           console.log('Ride request sent successfully', response);
           this.handlePopupClosed();
-          this.showTrackingPopup = true;
-          this.trackingMessage = 'Hvala na porudžbini! Vaše vozilo uskoro stiže na adresu.';
-
+          this.currentRideId = Number(response.rideId);
+          this.showRideTrackingPopup = true;
+          this.rideTrackingMessage = 'Zahtev za vožnju poslat. Čeka se odgovor vozača...';
+          this.driverName = null;
+          this.driverPictureUrl = null;
         },
         error: (error: any) => {
           console.error('Error sending ride request', error);
           this.handlePopupClosed();
-          this.showTrackingPopup = true;
-          this.trackingMessage = 'Došlo je do greške prilikom naručivanja vožnje. Molimo pokušajte ponovo.';
-
+          this.showRideTrackingPopup = true;
+          this.rideTrackingMessage = 'Došlo je do greške prilikom naručivanja vožnje. Molimo pokušajte ponovo.';
+          this.driverName = null;
+          this.driverPictureUrl = null;
         }
       });
     } else {
       console.error('Cannot send ride request: Start or destination location coordinates are missing.');
       this.handlePopupClosed();
-      this.showTrackingPopup = true;
-      this.trackingMessage = 'Nije moguće naručiti vožnju: nedostaju početna ili krajnja lokacija.';
-
+      this.showRideTrackingPopup = true;
+      this.rideTrackingMessage = 'Nije moguće naručiti vožnju: nedostaju početna ili krajnja lokacija.';
+      this.driverName = null;
+      this.driverPictureUrl = null;
     }
   }
 
@@ -198,8 +227,12 @@ export class AdvancedFormPageComponent implements OnInit, AfterViewInit, OnDestr
     this.showPopup = false;
   }
 
-  onTrackingPopupClosed() {
-    this.showTrackingPopup = false;
+  onRideTrackingPopupClosed() {
+    this.showRideTrackingPopup = false;
+    this.rideTrackingMessage = '';
+    this.driverName = null;
+    this.currentRideId = null;
+    this.driverPictureUrl = null;
   }
 
   handleFavoriteToggle(event: { routeData: any, additionalOptions: any, isFavorite: boolean }): void {
@@ -211,5 +244,55 @@ export class AdvancedFormPageComponent implements OnInit, AfterViewInit, OnDestr
     } else {
       console.log('Ruta uklonjena iz omiljenih. Implementacija brisanja na backendu je potrebna.');
     }
+  }
+
+  private subscribeToRideNotifications(userId: number): void {
+    if (this.wsSubscription && !this.wsSubscription.closed) {
+      return;
+    }
+
+    this.wsSubscription = this.webSocketService.subscribeToUserTopic(userId).subscribe({
+      next: (notification: any) => {
+        const isRideIdMatching = this.currentRideId !== null && String(notification.rideId) === String(this.currentRideId);
+
+        if (isRideIdMatching) {
+          switch (notification.type) {
+            case 'RIDE_REQUEST_SENT':
+              this.showRideTrackingPopup = true;
+              this.rideTrackingMessage = 'Zahtev za vožnju poslat. Čeka se odgovor vozača...';
+              this.driverName = null;
+              this.driverPictureUrl = null;
+              break;
+            case 'DRIVER_SEARCHING':
+              this.showRideTrackingPopup = true;
+              this.rideTrackingMessage = 'Traži se vozač za vašu vožnju...';
+              this.driverName = null;
+              this.driverPictureUrl = null;
+              break;
+            case 'DRIVER_ACCEPTED_RIDE':
+              this.showRideTrackingPopup = true;
+              this.rideTrackingMessage = `Vozač ${notification.driverFirstname} ${notification.driverLastname} je prihvatio vašu vožnju! Stiže uskoro!`;
+              this.driverName = `${notification.driverFirstname} ${notification.driverLastname}`;
+              this.driverPictureUrl = notification.driverPictureUrl;
+              break;
+            case 'NO_DRIVER_AVAILABLE':
+              this.showRideTrackingPopup = true;
+              this.rideTrackingMessage = `Trenutno nema dostupnih vozača za vašu vožnju. Molimo pokušajte ponovo kasnije.`;
+              this.driverName = null;
+              this.driverPictureUrl = null;
+              break;
+            default:
+              break;
+          }
+        } else if (this.currentRideId === null) {
+        } else {
+        }
+      },
+      error: (err) => {
+        console.error('Greška pri primanju notifikacija o vožnji:', err);
+      },
+      complete: () => {
+      }
+    });
   }
 }
