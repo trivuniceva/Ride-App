@@ -62,18 +62,37 @@ export class UserProfileComponent implements OnInit, OnDestroy {
       }
 
       if (this.user && this.user.userRole === 'DRIVER') {
+        console.log(" ide sranjeeeee")
+        console.log(" ---------------------------------------------------------------")
         this.wsSubscription = this.webSocketService.getMessages().subscribe((notification: any) => {
+          // --- DODAJ OVE CONSOLE.LOG LINIJE OVDE ---
+          console.log('--- WebSocket Notification Received ---');
+          console.log('Raw notification object:', notification);
+          console.log('Notification Type:', notification.type);
+          console.log('Notification Driver ID:', notification.driverId);
+          console.log('Current User ID (from component):', this.user?.id);
+          console.log('Are IDs matching?', notification.driverId === this.user?.id); // Provera podudaranja
+          console.log('Is notification type RIDE_REQUEST?', notification.type === 'RIDE_REQUEST');
+          // --- KRAJ DODATIH LINIJA ---
+
+
+          console.log(notification.type)
+          console.log("notification.type")
           if (notification.type === 'RIDE_REQUEST' && notification.driverId === this.user?.id) {
+            console.log('Conditions met! Showing popup...');
             this.popupMessage = notification.message;
             this.currentRideId = notification.rideId;
             this.showPopup = true;
+          } else {
+            console.log('Conditions NOT met. Popup not shown.');
+            if (notification.type !== 'RIDE_REQUEST') {
+              console.log('Reason: Type is not RIDE_REQUEST. Actual type:', notification.type);
+            }
+            if (notification.driverId !== this.user?.id) {
+              console.log('Reason: Driver ID mismatch. Notification ID:', notification.driverId, 'User ID:', this.user?.id);
+            }
           }
         });
-      } else {
-        if (this.wsSubscription) {
-          this.wsSubscription.unsubscribe();
-          this.wsSubscription = undefined;
-        }
       }
     });
   }

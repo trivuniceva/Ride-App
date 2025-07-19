@@ -1,0 +1,12 @@
+<div class="popup-overlay">
+  <div class="popup-content">
+    <h2>Status vaše vožnje</h2>
+    <div class="message-container">
+      <img *ngIf="driverPictureUrl" [src]="driverPictureUrl" alt="Driver Profile" class="driver-picture">
+
+      <p>{{ message }}</p>
+      <p *ngIf="driverName">Vozač: {{ driverName }}</p>
+    </div>
+    <button (click)="onClose()">OK</button>
+  </div>
+</div>

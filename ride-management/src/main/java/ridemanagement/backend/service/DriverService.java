@@ -10,10 +10,15 @@ import ridemanagement.backend.dto.PointDTO;
 import ridemanagement.backend.dto.RideRequestDTO;
 import ridemanagement.backend.model.Driver;
 import ridemanagement.backend.model.Point;
+import ridemanagement.backend.model.WorkSession;
 import ridemanagement.backend.repository.DriverRepository;
 
 import jakarta.transaction.Transactional;
+import ridemanagement.backend.repository.WorkSessionRepository;
 
+import java.sql.Timestamp;
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.Comparator;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -28,7 +33,15 @@ public class DriverService {
     private DriverRepository driverRepository;
 
     @Autowired
+    private WorkSessionRepository workSessionRepository;
+
+    @Autowired
     private PointService pointService;
+
+    public Driver findById(Long driverId) {
+        return driverRepository.findById(driverId)
+                .orElseThrow(() -> new NoSuchElementException("Driver not found with ID: " + driverId));
+    }
 
     public Driver findEligibleDriver(RideRequestDTO rideRequestDTO) {
         return findNextEligibleDriver(rideRequestDTO, null);
@@ -77,6 +90,15 @@ public class DriverService {
 
     private List<Driver> getAllDriversFromRepository() {
         return driverRepository.findAll();
+    }
+
+    public boolean isDriverCurrentlyLoggedIn(Long driverId) {
+        Optional<Driver> driverOptional = driverRepository.findById(driverId);
+        if (driverOptional.isEmpty()) {
+            return false;
+        }
+        Driver driver = driverOptional.get();
+        return workSessionRepository.findTopByDriverAndLogoutTimeIsNullOrderByLoginTimeDesc(driver).isPresent();
     }
 
     private List<Driver> getTrulyAvailableDrivers(List<Driver> drivers) {
@@ -163,4 +185,79 @@ public class DriverService {
                 pointDTO
         );
     }
+
+    public void recordDriverLoginTime(Long driverId) {
+        Optional<Driver> driverOptional = driverRepository.findById(driverId);
+        if (driverOptional.isPresent()) {
+            Driver driver = driverOptional.get();
+
+            // TODO: zatvori sve prethodne otvorene sesije ako postoje (zlu ne trebalo)
+            Optional<WorkSession> existingOpenSession = workSessionRepository.findTopByDriverAndLogoutTimeIsNullOrderByLoginTimeDesc(driver);
+            if (existingOpenSession.isPresent()) {
+                WorkSession oldSession = existingOpenSession.get();
+                oldSession.setLogoutTime(new Timestamp(System.currentTimeMillis()));
+                workSessionRepository.save(oldSession);
+                System.out.println("Zatvorena prethodna otvorena sesija za drajvera ID " + driverId);
+            }
+
+            WorkSession newSession = new WorkSession(driver, new Timestamp(System.currentTimeMillis()));
+            workSessionRepository.save(newSession);
+            System.out.println("Nova radna sesija započeta za drajvera ID " + driverId + " u: " + newSession.getLoginTime());
+
+            // TODO: update is_available status drajvera
+            // driver.setAvailable(true);
+            // driverRepository.save(driver);
+
+        } else {
+            throw new NoSuchElementException("Drajver sa ID " + driverId + " nije pronađen.");
+        }
+    }
+
+    public void recordDriverLogoutTime(Long driverId) {
+        Optional<Driver> driverOptional = driverRepository.findById(driverId);
+        if (driverOptional.isPresent()) {
+            Driver driver = driverOptional.get();
+
+            Optional<WorkSession> openSession = workSessionRepository.findTopByDriverAndLogoutTimeIsNullOrderByLoginTimeDesc(driver);
+
+            if (openSession.isPresent()) {
+                WorkSession sessionToClose = openSession.get();
+                sessionToClose.setLogoutTime(new Timestamp(System.currentTimeMillis()));
+                workSessionRepository.save(sessionToClose);
+                System.out.println("Radna sesija završena za drajvera ID " + driverId + " u: " + sessionToClose.getLogoutTime());
+            } else {
+                System.out.println("Nema otvorene sesije za drajvera ID " + driverId + " za zatvaranje. Moguće da je već odjavljen ili se aplikacija srušila.");
+            }
+
+            // TODO: update is_available status drajvera
+            // driver.setAvailable(false);
+            // driverRepository.save(driver);
+
+        } else {
+            throw new NoSuchElementException("Drajver sa ID " + driverId + " nije pronađen.");
+        }
+    }
+
+    public Duration calculateTotalWorkTime(Long driverId, Timestamp startDate, Timestamp endDate) {
+        Optional<Driver> driverOptional = driverRepository.findById(driverId);
+        if (driverOptional.isEmpty()) {
+            throw new NoSuchElementException("Drajver sa ID " + driverId + " nije pronađen.");
+        }
+        Driver driver = driverOptional.get();
+
+        List<WorkSession> sessions = workSessionRepository
+                .findByDriverAndLoginTimeBetween(driver, startDate, endDate);
+
+        long totalSeconds = 0;
+        for (WorkSession session : sessions) {
+            if (session.getLogoutTime() != null) {
+                LocalDateTime login = session.getLoginTime().toLocalDateTime();
+                LocalDateTime logout = session.getLogoutTime().toLocalDateTime();
+                totalSeconds += Duration.between(login, logout).getSeconds();
+            }
+        }
+        return Duration.ofSeconds(totalSeconds);
+    }
+
+
 }
