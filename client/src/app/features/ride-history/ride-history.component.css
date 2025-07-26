@@ -1,0 +1,70 @@
+.ride-history-container {
+  padding: 20px;
+  max-width: 1200px;
+  margin: 20px auto;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  background-color: #fff;
+}
+
+h2 {
+  text-align: center;
+  color: #3f51b5;
+  margin-bottom: 25px;
+}
+
+.table-responsive {
+  overflow-x: auto;
+}
+
+.full-width-table {
+  width: 100%;
+}
+
+.mat-table {
+  width: 100%;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+.mat-header-cell, .mat-cell {
+  padding: 8px 16px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.12);
+  white-space: nowrap;
+}
+
+.mat-header-cell {
+  font-weight: bold;
+  color: rgba(0, 0, 0, 0.87);
+  background-color: #f5f5f5;
+}
+
+.mat-cell {
+  color: rgba(0, 0, 0, 0.7);
+}
+
+.mat-row:hover {
+  background-color: #f9f9f9;
+}
+
+.mat-column-details {
+  text-align: right;
+  width: 120px;
+}
+
+.mat-row.mat-no-data {
+  text-align: center;
+  font-style: italic;
+  color: #777;
+}
+
+@media (max-width: 768px) {
+  .mat-header-cell, .mat-cell {
+    padding: 6px 10px;
+  }
+
+  .mat-column-details button {
+    padding: 6px 10px;
+    min-width: unset;
+  }
+}

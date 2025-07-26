@@ -1,1 +1,43 @@
-<p>ride-history works!</p>
+<div class="ride-history-container">
+  <h2>Istorija Vožnji</h2>
+
+  <div class="table-responsive">
+    <table mat-table [dataSource]="dataSource" matSort class="full-width-table">
+      <ng-container matColumnDef="route">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>Ruta</th>
+        <td mat-cell *matCellDef="let ride">{{ getRouteDisplay(ride) }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="fullPrice">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>Cena</th>
+        <td mat-cell *matCellDef="let ride">{{ ride.fullPrice | currency:'RSD ':'symbol':'1.2-2' }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="createdAt">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>Datum Početka</th>
+        <td mat-cell *matCellDef="let ride">{{ ride.createdAt | date:'dd.MM.yyyy. HH:mm' }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="rideStatus">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>Status</th>
+        <td mat-cell *matCellDef="let ride">{{ ride.rideStatus }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="details">
+        <th mat-header-cell *matHeaderCellDef></th>
+        <td mat-cell *matCellDef="let ride">
+          <button mat-raised-button color="primary" (click)="showDetails(ride)">
+            <mat-icon>info</mat-icon> Show details
+          </button>
+        </td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+
+      <tr class="mat-row" *matNoDataRow>
+        <td class="mat-cell" colspan="5">Nema dostupnih vožnji.</td>
+      </tr>
+    </table>
+  </div>
+</div>

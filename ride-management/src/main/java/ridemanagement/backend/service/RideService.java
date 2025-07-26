@@ -4,7 +4,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ridemanagement.backend.dto.DriverDTO;
 import ridemanagement.backend.model.Driver;
+import ridemanagement.backend.model.Ride;
 import ridemanagement.backend.repository.DriverRepository;
+import ridemanagement.backend.repository.RideRepository;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -19,6 +21,9 @@ public class RideService {
     @Autowired
     private DriverService driverService;
 
+    @Autowired
+    private RideRepository rideRepository;
+
     public List<Driver> getAllDrivers() {
         return driverRepository.findAll();
     }
@@ -28,4 +33,7 @@ public class RideService {
     }
 
 
+    public List<Ride> getAllRidesSortedByCreatedAtDesc() {
+        return rideRepository.findAllByOrderByCreatedAtDesc();
+    }
 }
