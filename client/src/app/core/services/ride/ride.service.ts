@@ -76,4 +76,6 @@ export class RideService {
 
     return this.http.post<any>(this.apiUrl, rideRequest);
   }
+
+
 }
