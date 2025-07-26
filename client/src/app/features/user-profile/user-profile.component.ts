@@ -7,7 +7,7 @@ import { NgIf } from "@angular/common";
 import { RideRequestPopupComponent } from '../drivers/ride-request-popup/ride-request-popup.component';
 import { User } from '../../core/models/user.model';
 import { Subscription } from 'rxjs';
-import {WebSocketService} from '../../core/services/web-socket.service';
+import { WebSocketService } from '../../core/services/web-socket.service';
 
 @Component({
   selector: 'app-user-profile',
@@ -27,6 +27,18 @@ export class UserProfileComponent implements OnInit, OnDestroy {
   popupMessage = '';
   currentRideId: number | null = null;
 
+  showPasswordChange = false;
+  oldPassword = '';
+  newPassword = '';
+  confirmNewPassword = '';
+
+  showPaymentInfo = false;
+  paypalEmail = '';
+  bitcoinAddress = '';
+
+  selectedFile: File | null = null;
+  profilePicPreview: string | ArrayBuffer | null = null;
+
   private authSubscription: Subscription | undefined;
   private wsSubscription: Subscription | undefined;
 
@@ -40,19 +52,47 @@ export class UserProfileComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.authSubscription = this.authService.loggedUser$.subscribe((user: User | null) => {
       this.user = user;
+      if (this.user) {
+        this.paypalEmail = this.user.paypalEmail || '';
+        this.bitcoinAddress = this.user.bitcoinAddress || '';
+
+        if (this.user.profilePic) {
+          this.profilePicPreview = `http://localhost:8080${this.user.profilePic}`;
+        }
+      }
+
       if (this.user && this.user.userRole === 'DRIVER') {
+        console.log(" ide sranjeeeee")
+        console.log(" ---------------------------------------------------------------")
         this.wsSubscription = this.webSocketService.getMessages().subscribe((notification: any) => {
+          // --- DODAJ OVE CONSOLE.LOG LINIJE OVDE ---
+          console.log('--- WebSocket Notification Received ---');
+          console.log('Raw notification object:', notification);
+          console.log('Notification Type:', notification.type);
+          console.log('Notification Driver ID:', notification.driverId);
+          console.log('Current User ID (from component):', this.user?.id);
+          console.log('Are IDs matching?', notification.driverId === this.user?.id); // Provera podudaranja
+          console.log('Is notification type RIDE_REQUEST?', notification.type === 'RIDE_REQUEST');
+          // --- KRAJ DODATIH LINIJA ---
+
+
+          console.log(notification.type)
+          console.log("notification.type")
           if (notification.type === 'RIDE_REQUEST' && notification.driverId === this.user?.id) {
+            console.log('Conditions met! Showing popup...');
             this.popupMessage = notification.message;
             this.currentRideId = notification.rideId;
             this.showPopup = true;
+          } else {
+            console.log('Conditions NOT met. Popup not shown.');
+            if (notification.type !== 'RIDE_REQUEST') {
+              console.log('Reason: Type is not RIDE_REQUEST. Actual type:', notification.type);
+            }
+            if (notification.driverId !== this.user?.id) {
+              console.log('Reason: Driver ID mismatch. Notification ID:', notification.driverId, 'User ID:', this.user?.id);
+            }
           }
         });
-      } else {
-        if (this.wsSubscription) {
-          this.wsSubscription.unsubscribe();
-          this.wsSubscription = undefined;
-        }
       }
     });
   }
@@ -72,16 +112,116 @@ export class UserProfileComponent implements OnInit, OnDestroy {
 
   cancelEditing() {
     this.isEditing = false;
+    if (this.user) {
+      this.authService.getLoggedUser().subscribe(user => {
+        this.user = user;
+        if (this.user && this.user.profilePic) {
+          this.profilePicPreview = `http://localhost:8080${this.user.profilePic}`;
+        } else {
+          this.profilePicPreview = null;
+        }
+      });
+    }
   }
 
   saveChanges() {
+    if (!this.user) return;
+
+    this.userService.updateUserProfile(this.user.id, {
+      firstname: this.user.firstname,
+      lastname: this.user.lastname,
+      address: this.user.address,
+      phone: this.user.phone
+    }).subscribe({
+      next: (response: any) => {
+        if (response.message && response.message.includes('Zahtev za ažuriranje profila vozača poslat')) {
+          alert(response.message);
+          this.isEditing = false;
+        } else {
+          console.log('Profile updated successfully:', response);
+          this.user = response;
+          this.authService.storageHandle({ user: response });
+          alert('Profil je uspešno ažuriran!');
+          this.isEditing = false;
+        }
+
+        if (this.selectedFile) {
+          this.userService.uploadProfilePicture(this.user!.id, this.selectedFile).subscribe({
+            next: (uploadResponse: any) => {
+              alert(uploadResponse.message);
+              this.user!.profilePic = uploadResponse.profilePicPath;
+              this.profilePicPreview = `http://localhost:8080${uploadResponse.profilePicPath}`;
+              this.authService.storageHandle({ user: this.user! });
+              this.selectedFile = null;
+            },
+            error: (err) => {
+              console.error('Error uploading profile picture:', err);
+              alert('Greška pri uploadu slike: ' + (err.error?.error || 'Nepoznata greška.'));
+            }
+          });
+        }
+      },
+      error: (err) => {
+        console.error('Error updating profile:', err);
+        alert('Greška pri ažuriranju profila: ' + (err.error?.error || 'Nepoznata greška.'));
+      }
+    });
   }
 
-  onFileSelected($event: Event) {
+
+  onFileSelected(event: Event) {
+    const input = event.target as HTMLInputElement;
+    if (input.files && input.files.length > 0) {
+      this.selectedFile = input.files[0];
+
+      const reader = new FileReader();
+      reader.onload = () => {
+        this.profilePicPreview = reader.result;
+      };
+      reader.readAsDataURL(this.selectedFile);
+    } else {
+      this.selectedFile = null;
+      this.profilePicPreview = this.user?.profilePic ? `http://localhost:8080${this.user.profilePic}` : null;
+    }
   }
 
   deleteAcc() {
   }
+
+  togglePasswordChange() {
+    this.showPasswordChange = !this.showPasswordChange;
+    this.oldPassword = '';
+    this.newPassword = '';
+    this.confirmNewPassword = '';
+  }
+
+  changePassword() {
+    if (!this.user) return;
+
+    if (this.newPassword !== this.confirmNewPassword) {
+      alert('Nove lozinke se ne podudaraju!');
+      return;
+    }
+
+    this.userService.changePassword(this.user.id, this.oldPassword, this.newPassword).subscribe({
+      next: (response) => {
+        alert(response.message);
+        this.togglePasswordChange();
+      },
+      error: (err) => {
+        alert('Greška pri promeni lozinke: ' + (err.error?.error || 'Nepoznata greška.'));
+      }
+    });
+  }
+
+  togglePaymentInfo() {
+    this.showPaymentInfo = !this.showPaymentInfo;
+  }
+
+  savePaymentInfo() {
+
+  }
+
 
   acceptRide() {
     if (!this.currentRideId || !this.user?.id) {

@@ -1,6 +1,5 @@
-import {Component, EventEmitter, Input, Output} from '@angular/core';
+import {Component, EventEmitter, Input, Output, OnInit} from '@angular/core';
 import {NgForOf, NgIf} from '@angular/common';
-import {PaymentTrackingComponent} from '../payment-tracking/payment-tracking.component';
 
 @Component({
   selector: 'app-ride-summary',
@@ -8,12 +7,11 @@ import {PaymentTrackingComponent} from '../payment-tracking/payment-tracking.com
   imports: [
     NgIf,
     NgForOf,
-    PaymentTrackingComponent
   ],
   templateUrl: './ride-summary.component.html',
   styleUrl: './ride-summary.component.css',
 })
-export class RideSummaryComponent {
+export class RideSummaryComponent implements OnInit {
   @Input() routeData: any;
   @Input() additionalOptions: any;
   @Input() passengers: string[] = [];
@@ -23,12 +21,17 @@ export class RideSummaryComponent {
 
   @Output() popupClosed = new EventEmitter<void>();
   @Output() paymentConfirmed = new EventEmitter<void>();
+  @Output() favoriteToggled = new EventEmitter<{ routeData: any, additionalOptions: any, isFavorite: boolean }>();
 
   showTrackingPopup: boolean = false;
   trackingMessage: string = '';
+  isFavorite: boolean = false;
 
-  constructor(
-  ) { }
+  constructor() { }
+
+  ngOnInit(): void {
+    this.isFavorite = false;
+  }
 
   getPaymentStatus(email: string): string {
     return "Paid";
@@ -48,5 +51,15 @@ export class RideSummaryComponent {
 
   onTrackingPopupClosed() {
     this.showTrackingPopup = false;
+  }
+
+  toggleFavorite(): void {
+    this.isFavorite = !this.isFavorite;
+    this.favoriteToggled.emit({
+      routeData: this.routeData,
+      additionalOptions: this.additionalOptions,
+      isFavorite: this.isFavorite
+    });
+    console.log(`Route is now ${this.isFavorite ? 'favorited' : 'unfavorited'}.`);
   }
 }

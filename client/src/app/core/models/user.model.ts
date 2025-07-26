@@ -8,4 +8,7 @@ export interface User {
   phone?: string;
   active: boolean;
   blockNote?: string | null;
+  profilePic?: string;
+  paypalEmail?: string;
+  bitcoinAddress?: string;
 }

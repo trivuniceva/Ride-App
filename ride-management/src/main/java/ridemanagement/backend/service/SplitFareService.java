@@ -1,20 +1,25 @@
 package ridemanagement.backend.service;
 
 import com.rideapp.usermanagement.model.EmailService;
+import com.rideapp.usermanagement.repository.UserRepository;
 import com.rideapp.usermanagement.service.TokenService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import ridemanagement.backend.dto.FavoriteRouteDTO;
 import ridemanagement.backend.dto.PointDTO;
 import ridemanagement.backend.dto.RideRequestDTO;
 import ridemanagement.backend.model.Driver;
 import ridemanagement.backend.model.Point;
 import ridemanagement.backend.model.Ride;
 import ridemanagement.backend.repository.RideRepository;
+import com.rideapp.usermanagement.model.User;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 public class SplitFareService {
@@ -31,47 +36,62 @@ public class SplitFareService {
     private RideRepository rideRepository;
     @Autowired
     private PointService pointService;
+    @Autowired
+    private FavoriteRouteService favoriteRouteService;
+    @Autowired
+    private UserRepository userRepository;
+
+    private Long getUserIdByEmail(String email) {
+        User user = userRepository.findByEmail(email);
+        if (user != null) {
+            return user.getId();
+        }
+        return null;
+    }
 
     public Ride initiateRideRequest(RideRequestDTO rideRequestDTO) {
         Ride ride = new Ride(rideRequestDTO);
 
         if (rideRequestDTO.getStartLocation() != null) {
-            Point startPoint;
-            if (rideRequestDTO.getStartLocation().getId() != null) {
-                startPoint = pointService.findById(rideRequestDTO.getStartLocation().getId())
-                        .orElseGet(() -> pointService.save(
-                                new Point(rideRequestDTO.getStartLocation().getLatitude(),
-                                        rideRequestDTO.getStartLocation().getLongitude())
-                        ));
-            } else {
-                startPoint = pointService.save(
-                        new Point(rideRequestDTO.getStartLocation().getLatitude(),
-                                rideRequestDTO.getStartLocation().getLongitude())
-                );
-            }
+            Point startPoint = pointService.findByLatitudeAndLongitude(
+                    rideRequestDTO.getStartLocation().getLatitude(),
+                    rideRequestDTO.getStartLocation().getLongitude()
+            ).orElseGet(() -> pointService.save(
+                    new Point(rideRequestDTO.getStartLocation().getLatitude(), rideRequestDTO.getStartLocation().getLongitude())
+            ));
             ride.setStartLocation(startPoint);
         }
 
         if (rideRequestDTO.getDestinationLocation() != null) {
-            Point destinationPoint;
-            if (rideRequestDTO.getDestinationLocation().getId() != null) {
-                destinationPoint = pointService.findById(rideRequestDTO.getDestinationLocation().getId())
-                        .orElseGet(() -> pointService.save(
-                                new Point(rideRequestDTO.getDestinationLocation().getLatitude(),
-                                        rideRequestDTO.getDestinationLocation().getLongitude())
-                        ));
-            } else {
-                destinationPoint = pointService.save(
-                        new Point(rideRequestDTO.getDestinationLocation().getLatitude(),
-                                rideRequestDTO.getDestinationLocation().getLongitude())
-                );
-            }
+            Point destinationPoint = pointService.findByLatitudeAndLongitude(
+                    rideRequestDTO.getDestinationLocation().getLatitude(),
+                    rideRequestDTO.getDestinationLocation().getLongitude()
+            ).orElseGet(() -> pointService.save(
+                    new Point(rideRequestDTO.getDestinationLocation().getLatitude(), rideRequestDTO.getDestinationLocation().getLongitude())
+            ));
             ride.setDestinationLocation(destinationPoint);
+        }
+
+        if (rideRequestDTO.getStopLocations() != null && !rideRequestDTO.getStopLocations().isEmpty()) {
+            List<Point> stopPoints = rideRequestDTO.getStopLocations().stream().map(stopDto -> {
+                return pointService.findByLatitudeAndLongitude(
+                        stopDto.getLatitude(),
+                        stopDto.getLongitude()
+                ).orElseGet(() -> pointService.save(new Point(stopDto.getLatitude(), stopDto.getLongitude())));
+            }).collect(Collectors.toList());
+            ride.setStopLocations(stopPoints);
         }
 
         ride.setRideStatus("PENDING_DRIVER_RESPONSE");
         ride.setPaymentStatus("PENDING_DRIVER_CONFIRMATION");
         ride = rideRepository.save(ride);
+
+        Long requestorUserId = getUserIdByEmail(ride.getRequestorEmail());
+
+        if (requestorUserId != null) {
+            // Note: driverFirstname, driverLastname, and driverPictureUrl are null here for RIDE_REQUEST_SENT
+            notificationService.notifyUser(requestorUserId, "RIDE_REQUEST_SENT", "Vaš zahtev za vožnju je poslat.", ride.getId(), null, null, null);
+        }
 
         tryAssignNextDriver(ride, rideRequestDTO);
 
@@ -86,11 +106,56 @@ public class SplitFareService {
             throw new IllegalStateException("Vožnju " + rideId + " nije moguće prihvatiti u trenutnom statusu: " + ride.getRideStatus());
         }
 
+        if (ride.getDriverId() == null) {
+            throw new IllegalStateException("Vožnja nema dodeljenog vozača. Nije moguće prihvatiti.");
+        }
+
         confirmAndProcessPayment(ride.getFullPrice(), ride.getPassengers());
 
         ride.setRideStatus("ACCEPTED");
         ride.setPaymentStatus("PAID");
         rideRepository.save(ride);
+
+        Long requestorUserId = getUserIdByEmail(ride.getRequestorEmail());
+        if (requestorUserId != null && ride.getDriverId() != null) {
+            try {
+                Driver acceptedDriver = driverService.findById(ride.getDriverId());
+                // Pass acceptedDriver.getProfilePictureUrl() here
+                notificationService.notifyUser(requestorUserId, "DRIVER_ACCEPTED_RIDE",
+                        "Vozač " + acceptedDriver.getFirstname() + " " + acceptedDriver.getLastname() + " je prihvatio vašu vožnju!",
+                        ride.getId(), acceptedDriver.getFirstname(), acceptedDriver.getLastname(), acceptedDriver.getProfilePic());
+            } catch (NoSuchElementException e) {
+                System.err.println("Greska: Prihvaćeni vozač sa ID " + ride.getDriverId() + " nije pronađen: " + e.getMessage());
+            }
+        }
+
+        FavoriteRouteDTO favoriteRouteDTO = new FavoriteRouteDTO();
+        favoriteRouteDTO.setUserEmail(ride.getRequestorEmail());
+        favoriteRouteDTO.setStartAddress(ride.getStartAddress());
+        favoriteRouteDTO.setStops(ride.getStops());
+        favoriteRouteDTO.setDestinationAddress(ride.getDestinationAddress());
+        favoriteRouteDTO.setVehicleType(ride.getVehicleType());
+        favoriteRouteDTO.setCarriesBabies(ride.isCarriesBabies());
+        favoriteRouteDTO.setCarriesPets(ride.isCarriesPets());
+
+        if (ride.getStartLocation() != null) {
+            favoriteRouteDTO.setStartLocation(new ridemanagement.backend.dto.PointDTO(ride.getStartLocation().getId(), ride.getStartLocation().getLatitude(), ride.getStartLocation().getLongitude()));
+        }
+        if (ride.getDestinationLocation() != null) {
+            favoriteRouteDTO.setDestinationLocation(new ridemanagement.backend.dto.PointDTO(ride.getDestinationLocation().getId(), ride.getDestinationLocation().getLatitude(), ride.getDestinationLocation().getLongitude()));
+        }
+        if (ride.getStopLocations() != null) {
+            favoriteRouteDTO.setStopLocations(ride.getStopLocations().stream()
+                    .map(p -> new ridemanagement.backend.dto.PointDTO(p.getId(), p.getLatitude(), p.getLongitude()))
+                    .collect(Collectors.toList()));
+        }
+
+        try {
+            favoriteRouteService.saveFavoriteRoute(favoriteRouteDTO);
+            System.out.println("Ruta automatski dodata u omiljene nakon uspešne vožnje.");
+        } catch (Exception e) {
+            System.err.println("Greška prilikom automatskog dodavanja rute u omiljene: " + e.getMessage());
+        }
     }
 
     public void rejectRide(Long rideId, Long driverId) {
@@ -106,15 +171,34 @@ public class SplitFareService {
         ride.setRideStatus("DRIVER_REFUSED");
         rideRepository.save(ride);
 
-        PointDTO startLocationDTO = new PointDTO(ride.getStartLocation().getId(), ride.getStartLocation().getLatitude(), ride.getStartLocation().getLongitude());
-        PointDTO destinationLocationDTO = new PointDTO(ride.getDestinationLocation().getId(), ride.getDestinationLocation().getLatitude(), ride.getDestinationLocation().getLongitude());
+        Long requestorUserId = getUserIdByEmail(ride.getRequestorEmail());
+        if (requestorUserId != null) {
+            // Note: driverFirstname, driverLastname, and driverPictureUrl are null here for DRIVER_SEARCHING
+            notificationService.notifyUser(requestorUserId, "DRIVER_SEARCHING", "Prethodni vozač je odbio. Traži se novi vozač za vašu vožnju...", ride.getId(), null, null, null);
+        }
+
+        PointDTO startLocationDTO = null;
+        if(ride.getStartLocation() != null) {
+            startLocationDTO = new PointDTO(ride.getStartLocation().getId(), ride.getStartLocation().getLatitude(), ride.getStartLocation().getLongitude());
+        }
+        PointDTO destinationLocationDTO = null;
+        if(ride.getDestinationLocation() != null) {
+            destinationLocationDTO = new PointDTO(ride.getDestinationLocation().getId(), ride.getDestinationLocation().getLatitude(), ride.getDestinationLocation().getLongitude());
+        }
+
+        List<PointDTO> stopLocationDTOs = null;
+        if (ride.getStopLocations() != null) {
+            stopLocationDTOs = ride.getStopLocations().stream()
+                    .map(p -> new PointDTO(p.getId(), p.getLatitude(), p.getLongitude()))
+                    .collect(Collectors.toList());
+        }
 
         RideRequestDTO reconstructedRideRequestDTO = new RideRequestDTO(
                 ride.getStartAddress(),
                 ride.getStops(),
                 ride.getDestinationAddress(),
                 startLocationDTO,
-                null,
+                stopLocationDTOs,
                 destinationLocationDTO,
                 ride.getVehicleType(),
                 ride.isCarriesBabies(),
@@ -129,25 +213,37 @@ public class SplitFareService {
     }
 
     private void tryAssignNextDriver(Ride ride, RideRequestDTO dto) {
+        Set<Long> refusedDriverIds = ride.getRefusedDriverIds();
+
         try {
-            Driver nextDriver = driverService.findNextEligibleDriver(dto, ride.getRefusedDriverIds());
+            Driver nextDriver = driverService.findNextEligibleDriver(dto, refusedDriverIds);
 
-            System.out.println(nextDriver);
-            System.out.println("nextDriver -------------------------");
-            ride.setDriverId(nextDriver.getId());
-            ride.setRideStatus("PENDING_DRIVER_RESPONSE");
-            rideRepository.save(ride);
+            if (nextDriver != null && driverService.isDriverCurrentlyLoggedIn(nextDriver.getId())) {
+                System.out.println("nextDriver: " + nextDriver.getId() + " is logged in.");
+                ride.setDriverId(nextDriver.getId());
+                ride.setRideStatus("PENDING_DRIVER_RESPONSE");
+                rideRepository.save(ride);
 
-            String msg = "Imate novu vožnju od korisnika " + ride.getRequestorEmail() +
-                    ". Detalji: od " + ride.getStartAddress() +
-                    " do " + ride.getDestinationAddress();
+                String msg = "Imate novu vožnju od korisnika " + ride.getRequestorEmail() +
+                        ". Detalji: od " + ride.getStartAddress() +
+                        " do " + ride.getDestinationAddress();
 
-            notificationService.notifyDriver(nextDriver.getId(), msg, dto, ride.getId());
+                // notificationService.notifyDriver does not send driver picture
+                notificationService.notifyDriver(nextDriver.getId(), msg, dto, ride.getId());
+            } else {
+                System.out.println("Next eligible driver is not logged in or not found. Trying to find another driver.");
+                if (nextDriver != null) {
+                    ride.addRefusedDriver(nextDriver.getId());
+                    rideRepository.save(ride);
+                }
+                tryAssignNextDriver(ride, dto);
+            }
 
         } catch (NoSuchElementException e) {
             ride.setRideStatus("ALL_DRIVERS_REFUSED");
             ride.setDriverId(null);
             rideRepository.save(ride);
+            System.out.println("Nema više odgovarajućih vozača za vožnju " + ride.getId());
         }
     }
 
