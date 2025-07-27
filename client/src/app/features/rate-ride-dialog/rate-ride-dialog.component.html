@@ -2,16 +2,30 @@
 
 <form [formGroup]="ratingForm" (ngSubmit)="submit()" class="rating-form">
   <mat-form-field appearance="fill" class="full-width">
-    <mat-label>Rating</mat-label>
-    <mat-select formControlName="rating" required>
+    <mat-label>Driver Rating</mat-label>
+    <mat-select formControlName="driverRating" required>
       <mat-option *ngFor="let r of [1, 2, 3, 4, 5]" [value]="r">{{ r }}</mat-option>
     </mat-select>
+    <mat-error *ngIf="ratingForm.get('driverRating')?.hasError('required') && ratingForm.get('driverRating')?.touched">
+      Driver rating is required.
+    </mat-error>
   </mat-form-field>
 
   <mat-form-field appearance="fill" class="full-width">
+    <mat-label>Vehicle Rating</mat-label>
+    <mat-select formControlName="vehicleRating" required>
+      <mat-option *ngFor="let r of [1, 2, 3, 4, 5]" [value]="r">{{ r }}</mat-option>
+    </mat-select>
+    <mat-error *ngIf="ratingForm.get('vehicleRating')?.hasError('required') && ratingForm.get('vehicleRating')?.touched">
+      Vehicle rating is required.
+    </mat-error>
+  </mat-form-field>
+
+  <mat-form-field appearance="fill" class="full-width">
+    <mat-label>Optional comment</mat-label>
     <textarea
       matInput
-      placeholder="Optional comment"
+      placeholder="Enter your comment (optional)"
       rows="3"
       formControlName="comment"
       maxlength="250"

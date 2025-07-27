@@ -8,8 +8,9 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatSelectModule } from '@angular/material/select';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
-
 import { MatSliderModule } from '@angular/material/slider';
+import {RideRatingService} from '../../core/services/ride-rating/ride-rating.service';
+
 
 @Component({
   selector: 'app-rate-ride-dialog',
@@ -35,12 +36,14 @@ export class RateRideDialogComponent {
   constructor(
     public dialogRef: MatDialogRef<RateRideDialogComponent>,
     @Inject(MAT_DIALOG_DATA)
-    public data: { rideId: number; driverId: number; vehicleId: number | null },
+    public data: { rideId: number; driverId: number; vehicleId: number | null; reviewerUserId: number },
     private fb: FormBuilder,
-    private snackBar: MatSnackBar
+    private snackBar: MatSnackBar,
+    private rideRatingService: RideRatingService
   ) {
     this.ratingForm = this.fb.group({
-      rating: [null, [Validators.required]],
+      driverRating: [null, [Validators.required]],
+      vehicleRating: [null, [Validators.required]],
       comment: ['']
     });
   }
@@ -51,11 +54,25 @@ export class RateRideDialogComponent {
         rideId: this.data.rideId,
         driverId: this.data.driverId,
         vehicleId: this.data.vehicleId,
-        rating: this.ratingForm.value.rating,
+        reviewerUserId: this.data.reviewerUserId,
+        driverRating: this.ratingForm.value.driverRating,
+        vehicleRating: this.ratingForm.value.vehicleRating,
         comment: this.ratingForm.value.comment
       };
-      this.snackBar.open('Hvala na oceni!', 'Zatvori', { duration: 3000 });
-      this.dialogRef.close(ratingData);
+
+      this.rideRatingService.submitRideRating(ratingData).subscribe({
+        next: (response) => {
+          this.snackBar.open('Thank you for your rating!', 'Close', { duration: 3000 });
+          console.log('Rating submitted successfully:', response);
+          this.dialogRef.close(ratingData);
+        },
+        error: (error) => {
+          this.snackBar.open('Failed to submit rating. Please try again.', 'Close', { duration: 3000 });
+          console.error('Error submitting rating:', error);
+        }
+      });
+    } else {
+      this.ratingForm.markAllAsTouched();
     }
   }
 

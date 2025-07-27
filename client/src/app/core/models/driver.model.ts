@@ -9,4 +9,5 @@ export interface Driver extends User {
   timeOfLogin: string;
   hasFutureDrive: boolean;
   isAvailable: boolean;
+  averageRating?: number | null;
 }

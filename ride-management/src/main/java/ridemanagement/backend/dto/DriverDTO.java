@@ -15,12 +15,13 @@ public class DriverDTO {
     private Timestamp timeOfLogin;
     private Boolean hasFutureDrive;
     private PointDTO location;
+    private Double averageRating;
 
     public DriverDTO() {
     }
 
     // Constructor without blockNote
-    public DriverDTO(Long id, String email, String firstname, String lastname, boolean isActive, boolean isAvailable, Timestamp timeOfLogin, Boolean hasFutureDrive, PointDTO location) {
+    public DriverDTO(Long id, String email, String firstname, String lastname, boolean isActive, boolean isAvailable, Timestamp timeOfLogin, Boolean hasFutureDrive, PointDTO location, Double averageRating) {
         this.id = id;
         this.email = email;
         this.firstname = firstname;
@@ -30,10 +31,11 @@ public class DriverDTO {
         this.timeOfLogin = timeOfLogin;
         this.hasFutureDrive = hasFutureDrive;
         this.location = location;
+        this.averageRating = averageRating;
     }
 
     // Constructor with blockNote
-    public DriverDTO(Long id, String email, String firstname, String lastname, boolean isActive, String blockNote, boolean isAvailable, Timestamp timeOfLogin, Boolean hasFutureDrive, PointDTO location) {
+    public DriverDTO(Long id, String email, String firstname, String lastname, boolean isActive, String blockNote, boolean isAvailable, Timestamp timeOfLogin, Boolean hasFutureDrive, PointDTO location, Double averageRating) {
         this.id = id;
         this.email = email;
         this.firstname = firstname;
@@ -44,6 +46,7 @@ public class DriverDTO {
         this.timeOfLogin = timeOfLogin;
         this.hasFutureDrive = hasFutureDrive;
         this.location = location;
+        this.averageRating = averageRating;
     }
 
 
@@ -125,6 +128,14 @@ public class DriverDTO {
 
     public void setBlockNote(String blockNote) {
         this.blockNote = blockNote;
+    }
+
+    public Double getAverageRating() {
+        return averageRating;
+    }
+
+    public void setAverageRating(Double averageRating) {
+        this.averageRating = averageRating;
     }
 
     @Override

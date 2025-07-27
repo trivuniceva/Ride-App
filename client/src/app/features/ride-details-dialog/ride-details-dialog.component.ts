@@ -29,9 +29,8 @@ import { RateRideDialogComponent } from '../rate-ride-dialog/rate-ride-dialog.co
 export class RideDetailsDialogComponent implements OnInit {
   ride: Ride;
   driver: Driver | null = null;
-  driverRating: number | null = null;
   isLoadingDriver: boolean = false;
-  loggedUser: User | null = null;
+  loggedUser: User | null = null; // Ovo već imaš
 
   startCoords: [number, number] | null = null;
   destinationCoords: [number, number] | null = null;
@@ -63,8 +62,8 @@ export class RideDetailsDialogComponent implements OnInit {
           timeOfLogin: (loggedUser as Driver).timeOfLogin,
           hasFutureDrive: (loggedUser as Driver).hasFutureDrive,
           isAvailable: (loggedUser as Driver).isAvailable,
+          averageRating: (loggedUser as Driver).averageRating
         };
-        this.driverRating = (this.driver as any).averageRating || null;
       } else {
         this.fetchDriverDetailsFromBackend(this.ride.driverId);
       }
@@ -93,13 +92,11 @@ export class RideDetailsDialogComponent implements OnInit {
     this.driverService.getDriverById(driverId).subscribe({
       next: (driver: Driver) => {
         this.driver = driver;
-        this.driverRating = (driver as any).averageRating || null;
         this.isLoadingDriver = false;
       },
       error: (err) => {
-        console.error('Greška prilikom dohvatanja vozača:', err);
+        console.error('Error fetching driver:', err);
         this.driver = null;
-        this.driverRating = null;
         this.isLoadingDriver = false;
       }
     });
@@ -122,17 +119,21 @@ export class RideDetailsDialogComponent implements OnInit {
     const threeDaysAgo = new Date();
     threeDaysAgo.setDate(threeDaysAgo.getDate() - 3);
 
-    console.log('Logged User:', this.loggedUser);
-    console.log('User Role is REGISTERED_USER:', isRegisteredUser);
-    console.log('Ride Status is FINISHED:', rideFinished);
-    console.log('Ride Created At:', createdAt);
-    console.log('Three Days Ago:', threeDaysAgo);
-    console.log('Ride within 3 days:', createdAt >= threeDaysAgo);
+    // console.log('Logged User:', this.loggedUser);
+    // console.log('User Role is REGISTERED_USER:', isRegisteredUser);
+    // console.log('Ride Status is FINISHED:', rideFinished);
+    // console.log('Ride Created At:', createdAt);
+    // console.log('Three Days Ago:', threeDaysAgo);
+    // console.log('Ride within 3 days:', createdAt >= threeDaysAgo);
 
     return isRegisteredUser && rideFinished && createdAt >= threeDaysAgo;
   }
 
   openRatingDialog(): void {
+    if (!this.loggedUser || this.loggedUser.id === undefined) {
+      console.error('Logged user or user ID is not available. Cannot open rating dialog.');
+      return;
+    }
 
     (document.activeElement as HTMLElement)?.blur();
 
@@ -142,14 +143,14 @@ export class RideDetailsDialogComponent implements OnInit {
       data: {
         rideId: this.ride.id,
         driverId: this.ride.driverId,
-        vehicleId: this.driver?.vehicle?.id || null
+        vehicleId: this.driver?.vehicle?.id || null,
+        reviewerUserId: this.loggedUser.id
       }
     });
 
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
-        console.log('✅ Ocena poslata:', result);
-        // TODO: pozvati servis za backend
+        console.log('✅ Rating submitted:', result);
       }
     });
   }
