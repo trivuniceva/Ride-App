@@ -8,6 +8,8 @@ import {MatButtonModule} from '@angular/material/button';
 import {CommonModule} from '@angular/common';
 import {AuthService} from '../../core/services/auth/auth.service';
 import {User} from '../../core/models/user.model';
+import {MatDialog, MatDialogModule} from '@angular/material/dialog';
+import {RideDetailsDialogComponent} from '../ride-details-dialog/ride-details-dialog.component';
 
 @Component({
   selector: 'app-ride-history',
@@ -19,7 +21,8 @@ import {User} from '../../core/models/user.model';
     MatSortModule,
     MatButtonModule,
     MatIconModule,
-    CommonModule
+    CommonModule,
+    MatDialogModule,
   ],
   styleUrls: ['./ride-history.component.css']
 })
@@ -34,7 +37,8 @@ export class RideHistoryComponent implements OnInit, AfterViewInit {
 
   constructor(
     private rideService: RideService,
-    private authService: AuthService
+    private authService: AuthService,
+    private dialog: MatDialog
   ) { }
 
   ngOnInit(): void {
@@ -73,7 +77,7 @@ export class RideHistoryComponent implements OnInit, AfterViewInit {
           const sortedRides = rides.sort((a, b) => {
             const dateA = new Date(a.createdAt);
             const dateB = new Date(b.createdAt);
-            return dateB.getTime() - dateA.getTime(); // najskorije prve
+            return dateB.getTime() - dateA.getTime();
           });
           this.dataSource.data = sortedRides;
         } else {
@@ -100,7 +104,22 @@ export class RideHistoryComponent implements OnInit, AfterViewInit {
   }
 
   showDetails(ride: Ride): void {
-    console.log('Prikaz detalja za vožnju:', ride);
-    alert(`Detalji vožnje ID: ${ride.id}\nRuta: ${this.getRouteDisplay(ride)}\nCena: ${ride.fullPrice} RSD\nStatus: ${ride.rideStatus}`);
+    const dialogRef = this.dialog.open(RideDetailsDialogComponent, {
+      width: '95vw',
+      maxWidth: '1200px',
+      height: '80vh',
+      maxHeight: '90vh',
+      panelClass: 'custom-ride-details-dialog',
+      data: { ride: ride },
+      autoFocus: true,
+      restoreFocus: true,
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      console.log('The dialog was closed', result);
+      if (result === 'orderNow') {
+      } else if (result === 'orderLater') {
+      }
+    });
   }
 }

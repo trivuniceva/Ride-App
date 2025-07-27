@@ -30,4 +30,13 @@ export class DriverService {
       })
     );
   }
+
+  getDriverById(driverId: number): Observable<Driver> {
+    return this.http.get<Driver>(`${this.driverApiUrl}/${driverId}`).pipe(
+      catchError(error => {
+        console.error(`Error in getDriverById for ID ${driverId}:`, error);
+        return throwError(() => new Error(`Failed to fetch driver with ID ${driverId}.`));
+      })
+    );
+  }
 }

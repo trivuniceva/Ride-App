@@ -1,0 +1,66 @@
+<div class="dialog-container">
+  <div class="dialog-header">
+    <h2>Detalji Vožnje #{{ ride.id }}</h2>
+    <button mat-icon-button (click)="closeDialog()">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+
+  <div class="dialog-content">
+    <div class="ride-details-left">
+      <h3>Informacije o vožnji</h3>
+      <p><strong>Ruta:</strong> {{ getRouteDisplay() }}</p>
+      <p><strong>Cena:</strong> {{ ride.fullPrice | currency:'RSD ':'symbol':'1.2-2' }}</p>
+      <p><strong>Datum početka:</strong> {{ ride.createdAt | date:'dd.MM.yyyy. HH:mm' }}</p>
+      <p><strong>Status:</strong> {{ ride.rideStatus }}</p>
+      <p *ngIf="ride.expectedTime"><strong>Očekivano vreme:</strong> {{ ride.expectedTime }}</p>
+      <p *ngIf="ride.totalLength"><strong>Ukupna dužina:</strong> {{ ride.totalLength | number:'1.1-2' }} km</p>
+      <p><strong>Tip vozila:</strong> {{ ride.vehicleType || 'Nije specificiran' }}</p>
+      <p><strong>Bebe/Kućni ljubimci:</strong>
+        <span *ngIf="ride.carriesBabies">Bebe <mat-icon color="primary">check_circle</mat-icon></span>
+        <span *ngIf="ride.carriesPets">Ljubimci <mat-icon color="primary">check_circle</mat-icon></span>
+        <span *ngIf="!ride.carriesBabies && !ride.carriesPets">N/A</span>
+      </p>
+      <p><strong>Putnici:</strong> {{ ride.passengers.join(', ') || 'Nema' }}</p>
+
+      <div class="driver-info">
+        <h3>Informacije o vozaču</h3>
+        <div *ngIf="isLoadingDriver" style="display: flex; justify-content: center; padding: 20px;">
+          <mat-spinner [diameter]="30"></mat-spinner>
+        </div>
+        <div *ngIf="!isLoadingDriver">
+          <p *ngIf="driver">
+            <strong>Ime:</strong> {{ driver.firstname }} {{ driver.lastname }}<br>
+            <strong>Email:</strong> {{ driver.email }}<br>
+            <span *ngIf="driverRating !== null">
+              <strong>Ocena:</strong> {{ driverRating | number:'1.1-1' }} <mat-icon>star</mat-icon>
+            </span>
+            <span *ngIf="driverRating === null"><strong>Ocena:</strong> Nema dostupnih ocena</span>
+          </p>
+          <p *ngIf="!driver && ride.driverId">
+            Nije moguće dohvatiti informacije o vozaču.
+          </p>
+          <p *ngIf="!ride.driverId">
+            Vožnja nema dodeljenog vozača.
+          </p>
+        </div>
+      </div>
+
+      <div class="actions">
+        <button mat-raised-button color="primary" (click)="orderNow()">Poruči ovu rutu ponovo (odmah)</button>
+        <button mat-button (click)="orderLater()">Sačuvaj ovu rutu za kasnije</button>
+      </div>
+    </div>
+
+    <div class="ride-details-right">
+      <div class="map-container-dialog">
+        <app-ride-details-map
+          [startCoords]="startCoords"
+          [destinationCoords]="destinationCoords"
+          [waypointsCoords]="waypointsCoords"
+          [routePathCoords]="routePathCoords"
+        ></app-ride-details-map>
+      </div>
+    </div>
+  </div>
+</div>
