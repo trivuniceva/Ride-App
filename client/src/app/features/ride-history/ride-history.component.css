@@ -200,3 +200,8 @@ h2 {
     grid-template-columns: 1fr;
   }
 }
+
+button[mat-icon-button] .mat-icon {
+  font-size: 24px;
+}
+

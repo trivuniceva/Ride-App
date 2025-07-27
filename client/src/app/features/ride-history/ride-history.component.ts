@@ -52,12 +52,14 @@ ChartJS.register(
   styleUrls: ['./ride-history.component.css']
 })
 export class RideHistoryComponent implements OnInit, AfterViewInit {
-  displayedColumns: string[] = ['route', 'fullPrice', 'createdAt', 'rideStatus', 'details'];
+  displayedColumns: string[] = [];
   dataSource = new MatTableDataSource<Ride>();
   loggedUser: User | null = null;
   isLoading: boolean = true;
   errorMessage: string | null = null;
   allRides: Ride[] = [];
+  favoriteRideIds: Set<number> = new Set();
+
 
   @ViewChild(MatSort) sort!: MatSort;
 
@@ -139,6 +141,13 @@ export class RideHistoryComponent implements OnInit, AfterViewInit {
     this.authService.getLoggedUser().subscribe(user => {
       this.loggedUser = user;
       if (this.loggedUser) {
+        this.displayedColumns = ['route', 'fullPrice', 'createdAt', 'rideStatus'];
+
+        if (this.loggedUser.userRole === 'REGISTERED_USER') {
+          this.displayedColumns.push('favorite');
+        }
+
+        this.displayedColumns.push('details');
         this.loadRideHistory();
       } else {
         this.isLoading = false;
@@ -316,5 +325,20 @@ export class RideHistoryComponent implements OnInit, AfterViewInit {
 
   toggleCharts(): void {
     this.showCharts = !this.showCharts;
+  }
+
+  toggleFavorite(ride: Ride): void {
+    if (this.isFavorite(ride)) {
+      this.favoriteRideIds.delete(ride.id);
+    } else {
+      this.favoriteRideIds.add(ride.id);
+    }
+
+
+    //TODO: servis za bek
+  }
+
+  isFavorite(ride: Ride): boolean {
+    return this.favoriteRideIds.has(ride.id);
   }
 }
