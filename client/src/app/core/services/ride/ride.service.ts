@@ -24,6 +24,8 @@ interface RideRequestDTO {
   paymentStatus: string | null;
   fullPrice: number;
   requestorEmail: string;
+  totalLength: number | undefined;
+  expectedTime: number | undefined;
 }
 
 @Injectable({
@@ -52,7 +54,9 @@ export class RideService {
     passengers: string[],
     fullPrice: number,
     paymentStatus: string,
-    requestorEmail: string
+    requestorEmail: string,
+    totalLength: number | undefined,
+    expectedTime: number | undefined
   ): Observable<any> {
 
     const rideRequest: RideRequestDTO = {
@@ -68,7 +72,9 @@ export class RideService {
       passengers: passengers,
       paymentStatus: paymentStatus,
       fullPrice: fullPrice,
-      requestorEmail: requestorEmail
+      requestorEmail: requestorEmail,
+      totalLength: totalLength,
+      expectedTime: expectedTime
     };
 
     console.log("RideService: Sending Ride Request DTO to backend:", rideRequest);

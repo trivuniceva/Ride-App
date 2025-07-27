@@ -1,4 +1,4 @@
-import { Component, OnInit, SimpleChanges, NgZone } from '@angular/core'; // Dodaj NgZone
+import { Component, OnInit, SimpleChanges, NgZone } from '@angular/core';
 import { MapTestComponent } from '../../components/map-test/map-test.component';
 import { RouteFormComponent } from '../../components/route-form/route-form.component';
 import axios from 'axios';
@@ -14,6 +14,8 @@ import { DriverService } from '../../../../core/services/drivers/driver.service'
 import { Driver } from '../../../../core/models/driver.model';
 import {User} from '../../../../core/models/user.model';
 import {Subscription} from 'rxjs';
+import {PointDTO} from "../../../../core/models/PointDTO.model";
+
 
 @Component({
   selector: 'app-ride-order',
@@ -45,10 +47,13 @@ export class RideOrderComponent implements OnInit {
   waypointsCoords: [number, number][] = [];
   vehicleType: string | null = null;
   allDrivers: Driver[] = [];
+  totalLength: number | undefined;
+  expectedTime: number | undefined;
+  stops: string[] = []; // Dodajemo stops properti
 
   private authSubscription: Subscription | undefined;
 
-  constructor(private authService: AuthService, private driverService: DriverService, private ngZone: NgZone) {} // Ubaci NgZone
+  constructor(private authService: AuthService, private driverService: DriverService, private ngZone: NgZone) {}
 
   ngOnInit(): void {
     this.authSubscription = this.authService.loggedUser$.subscribe((user: User | null) => {
@@ -96,6 +101,7 @@ export class RideOrderComponent implements OnInit {
         this.destinationAddress = routeData.destinationAddress;
         this.waypointsCoords = waypointsCoords;
         this.vehicleType = routeData.vehicleType || null;
+        this.stops = routeData.stops; // Postavi stops properti
 
         const routes = await this.getRoutes(startCoords, waypointsCoords, destinationCoords);
 
@@ -110,6 +116,9 @@ export class RideOrderComponent implements OnInit {
             this.distance = Math.round(routes[0].summary.distance / 100) / 10;
             this.duration = Math.round(routes[0].summary.duration / 60);
             this.price = await this.calculatePrice(this.distance, this.duration, this.vehicleType);
+
+            this.totalLength = this.distance;
+            this.expectedTime = this.duration;
 
             console.log('Udaljenost:', this.distance, 'km');
             console.log('Trajanje:', this.duration, 'min');
