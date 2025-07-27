@@ -1,10 +1,9 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import {HttpClient, HttpParams} from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { Driver } from '../../models/driver.model'; // Proveri putanju!
+import { Driver } from '../../models/driver.model';
+import {Ride} from '../../models/ride.model';
 
-// Definisi PointDTO.model.ts i RideRequestDTO interfejse
-// Najbolje ih je prebaciti u zajednički fajl, npr. src/app/shared/models/interfaces.ts
 interface PointDTO {
   latitude: number;
   longitude: number;
@@ -76,4 +75,13 @@ export class RideService {
 
     return this.http.post<any>(this.apiUrl, rideRequest);
   }
+
+  getRideHistory(userId: number, userRole: string, userEmail: string | null): Observable<Ride[]> {
+    let params = new HttpParams();
+    if (userEmail) {
+      params = params.set('userEmail', userEmail);
+    }
+    return this.http.get<Ride[]>(`${this.apiUrl}/history/${userId}/${userRole}`, { params });
+  }
+
 }
