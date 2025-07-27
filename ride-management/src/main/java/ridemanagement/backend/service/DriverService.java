@@ -3,7 +3,6 @@ package ridemanagement.backend.service;
 import com.rideapp.usermanagement.dto.BlockUserRequestDTO;
 import com.rideapp.usermanagement.model.UserRole;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import ridemanagement.backend.dto.DriverDTO;
 import ridemanagement.backend.dto.PointDTO;
@@ -12,7 +11,7 @@ import ridemanagement.backend.model.Driver;
 import ridemanagement.backend.model.Point;
 import ridemanagement.backend.model.WorkSession;
 import ridemanagement.backend.repository.DriverRepository;
-
+import ridemanagement.backend.repository.RideRatingRepository;
 import jakarta.transaction.Transactional;
 import ridemanagement.backend.repository.WorkSessionRepository;
 
@@ -23,6 +22,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
+import java.util.OptionalDouble; // DODATO: Import za OptionalDouble
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -37,6 +37,9 @@ public class DriverService {
 
     @Autowired
     private PointService pointService;
+
+    @Autowired
+    private RideRatingRepository rideRatingRepository;
 
     public Driver findById(Long driverId) {
         return driverRepository.findById(driverId)
@@ -64,6 +67,7 @@ public class DriverService {
                 throw new IllegalArgumentException("Koordinate početne lokacije (startLocation) nedostaju u zahtevu za vožnju.");
             }
         }
+
 
         List<Driver> availableDriversConsidered = allDrivers.stream()
                 .filter(driver -> refusedDriverIds == null || !refusedDriverIds.contains(driver.getId()))
@@ -119,10 +123,25 @@ public class DriverService {
         if (drivers.isEmpty()) {
             throw new NoSuchElementException("No drivers in the list to find the closest from.");
         }
-        return drivers.stream()
-                .min(Comparator.comparingDouble(driver ->
-                        calculateDistance(driver.getLocation(), targetLocation)))
-                .orElseThrow(() -> new NoSuchElementException("Failed to find closest driver."));
+
+        Driver closestDriver = null;
+        double minDistance = Double.MAX_VALUE;
+
+        for (Driver driver : drivers) {
+            if (driver.getLocation() != null) {
+                double distance = calculateDistance(driver.getLocation(), targetLocation);
+                if (distance < minDistance) {
+                    minDistance = distance;
+                    closestDriver = driver;
+                }
+            }
+        }
+
+        if (closestDriver == null) {
+            throw new NoSuchElementException("Failed to find closest driver with a valid location among the provided list.");
+        }
+
+        return closestDriver;
     }
 
     private double calculateDistance(Point driverLocation, PointDTO targetLocation) {
@@ -132,6 +151,27 @@ public class DriverService {
         double dx = driverLocation.getLatitude() - targetLocation.getLatitude();
         double dy = driverLocation.getLongitude() - targetLocation.getLongitude();
         return Math.sqrt(dx * dx + dy * dy);
+    }
+
+    private Double calculateAverageDriverRating(Long driverId) {
+        List<Integer> ratings = rideRatingRepository.findByDriverId(driverId)
+                .stream()
+                .map(rating -> rating.getDriverRating())
+                .collect(Collectors.toList());
+
+        if (ratings.isEmpty()) {
+            return null; // Ako nema ocena, vrati null
+        }
+
+        OptionalDouble average = ratings.stream()
+                .mapToDouble(Integer::doubleValue)
+                .average();
+
+        if (average.isPresent()) {
+            return average.getAsDouble();
+        } else {
+            return null;
+        }
     }
 
     public List<DriverDTO> getAllDrivers() {
@@ -172,6 +212,8 @@ public class DriverService {
             pointDTO = new PointDTO(location.getId(), location.getLatitude(), location.getLongitude());
         }
 
+        Double averageRating = calculateAverageDriverRating(driver.getId());
+
         return new DriverDTO(
                 driver.getId(),
                 driver.getEmail(),
@@ -182,7 +224,8 @@ public class DriverService {
                 driver.isAvailable(),
                 driver.getTimeOfLogin(),
                 driver.getHasFutureDrive(),
-                pointDTO
+                pointDTO,
+                averageRating
         );
     }
 
@@ -191,25 +234,20 @@ public class DriverService {
         if (driverOptional.isPresent()) {
             Driver driver = driverOptional.get();
 
-            // TODO: zatvori sve prethodne otvorene sesije ako postoje (zlu ne trebalo)
             Optional<WorkSession> existingOpenSession = workSessionRepository.findTopByDriverAndLogoutTimeIsNullOrderByLoginTimeDesc(driver);
             if (existingOpenSession.isPresent()) {
                 WorkSession oldSession = existingOpenSession.get();
                 oldSession.setLogoutTime(new Timestamp(System.currentTimeMillis()));
                 workSessionRepository.save(oldSession);
-                System.out.println("Zatvorena prethodna otvorena sesija za drajvera ID " + driverId);
+                System.out.println("Closed previous open session for driver ID " + driverId);
             }
 
             WorkSession newSession = new WorkSession(driver, new Timestamp(System.currentTimeMillis()));
             workSessionRepository.save(newSession);
-            System.out.println("Nova radna sesija započeta za drajvera ID " + driverId + " u: " + newSession.getLoginTime());
-
-            // TODO: update is_available status drajvera
-            // driver.setAvailable(true);
-            // driverRepository.save(driver);
+            System.out.println("New work session started for driver ID " + driverId + " at: " + newSession.getLoginTime());
 
         } else {
-            throw new NoSuchElementException("Drajver sa ID " + driverId + " nije pronađen.");
+            throw new NoSuchElementException("Driver with ID " + driverId + " not found.");
         }
     }
 
@@ -224,24 +262,20 @@ public class DriverService {
                 WorkSession sessionToClose = openSession.get();
                 sessionToClose.setLogoutTime(new Timestamp(System.currentTimeMillis()));
                 workSessionRepository.save(sessionToClose);
-                System.out.println("Radna sesija završena za drajvera ID " + driverId + " u: " + sessionToClose.getLogoutTime());
+                System.out.println("Work session ended for driver ID " + driverId + " at: " + sessionToClose.getLogoutTime());
             } else {
-                System.out.println("Nema otvorene sesije za drajvera ID " + driverId + " za zatvaranje. Moguće da je već odjavljen ili se aplikacija srušila.");
+                System.out.println("No open session found for driver ID " + driverId + " to close. Possibly already logged out or application crashed.");
             }
 
-            // TODO: update is_available status drajvera
-            // driver.setAvailable(false);
-            // driverRepository.save(driver);
-
         } else {
-            throw new NoSuchElementException("Drajver sa ID " + driverId + " nije pronađen.");
+            throw new NoSuchElementException("Driver with ID " + driverId + " not found.");
         }
     }
 
     public Duration calculateTotalWorkTime(Long driverId, Timestamp startDate, Timestamp endDate) {
         Optional<Driver> driverOptional = driverRepository.findById(driverId);
         if (driverOptional.isEmpty()) {
-            throw new NoSuchElementException("Drajver sa ID " + driverId + " nije pronađen.");
+            throw new NoSuchElementException("Driver with ID " + driverId + " not found.");
         }
         Driver driver = driverOptional.get();
 
@@ -259,13 +293,12 @@ public class DriverService {
         return Duration.ofSeconds(totalSeconds);
     }
 
-
     public DriverDTO getDriverDTOById(Long id) {
         Optional<Driver> driverOptional = driverRepository.findById(id);
         if (driverOptional.isPresent()) {
             return convertToDTO(driverOptional.get());
         } else {
-            throw new NoSuchElementException("Vozač sa ID-jem " + id + " nije pronađen.");
+            throw new NoSuchElementException("Driver with ID " + id + " not found.");
         }
     }
 }

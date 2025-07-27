@@ -28,10 +28,10 @@
         <p><strong>Ime:</strong> {{ driver.firstname }} {{ driver.lastname }}</p>
         <p><strong>Email:</strong> {{ driver.email }}</p>
         <p><strong>Ocena:</strong>
-          <ng-container *ngIf="driverRating !== null">
-            {{ driverRating | number:'1.1-1' }} <mat-icon>star</mat-icon>
+          <ng-container *ngIf="driver.averageRating !== null">
+            {{ driver.averageRating | number:'1.1-1' }} <mat-icon>star</mat-icon>
           </ng-container>
-          <ng-container *ngIf="driverRating === null">Nema ocena</ng-container>
+          <ng-container *ngIf="driver.averageRating === null">Nema ocena</ng-container>
         </p>
       </div>
 
