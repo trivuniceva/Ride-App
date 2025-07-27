@@ -47,7 +47,7 @@ ChartJS.register(
     MatNativeDateModule,
     MatFormFieldModule,
     MatInputModule,
-    BaseChartDirective
+    BaseChartDirective,
   ],
   styleUrls: ['./ride-history.component.css']
 })

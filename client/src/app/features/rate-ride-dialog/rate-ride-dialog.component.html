@@ -1,0 +1,27 @@
+<h2 mat-dialog-title>Rate Your Ride</h2>
+
+<form [formGroup]="ratingForm" (ngSubmit)="submit()" class="rating-form">
+  <mat-form-field appearance="fill" class="full-width">
+    <mat-label>Rating</mat-label>
+    <mat-select formControlName="rating" required>
+      <mat-option *ngFor="let r of [1, 2, 3, 4, 5]" [value]="r">{{ r }}</mat-option>
+    </mat-select>
+  </mat-form-field>
+
+  <mat-form-field appearance="fill" class="full-width">
+    <textarea
+      matInput
+      placeholder="Optional comment"
+      rows="3"
+      formControlName="comment"
+      maxlength="250"
+    ></textarea>
+  </mat-form-field>
+
+  <div class="actions">
+    <button mat-stroked-button type="button" (click)="cancel()">Cancel</button>
+    <button mat-raised-button color="primary" type="submit" [disabled]="ratingForm.invalid">
+      Submit
+    </button>
+  </div>
+</form>
