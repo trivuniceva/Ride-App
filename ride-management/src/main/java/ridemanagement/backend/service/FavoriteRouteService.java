@@ -8,10 +8,8 @@ import ridemanagement.backend.model.Point;
 import ridemanagement.backend.repository.FavoriteRouteRepository;
 import ridemanagement.backend.repository.PointRepository;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors; // Added for stream processing
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class FavoriteRouteService {
@@ -23,6 +21,21 @@ public class FavoriteRouteService {
     private PointRepository pointRepository;
 
     public FavoriteRoute saveFavoriteRoute(FavoriteRouteDTO dto) {
+
+        List<FavoriteRoute> potentialDuplicates = favoriteRouteRepository.findByUserEmailAndStartAddressAndDestinationAddress(
+                dto.getUserEmail(), dto.getStartAddress(), dto.getDestinationAddress()
+        );
+
+        for (FavoriteRoute existingRoute : potentialDuplicates) {
+            if (areStopsEqual(existingRoute.getStops(), dto.getStops()) &&
+                    Objects.equals(existingRoute.getVehicleType(), dto.getVehicleType()) &&
+                    existingRoute.isCarriesBabies() == dto.isCarriesBabies() &&
+                    existingRoute.isCarriesPets() == dto.isCarriesPets()) {
+                System.out.println("Ruta (sa istim stajalištima i opcijama) već postoji kao omiljena za ovog korisnika. Neće se dodavati ponovo.");
+                return existingRoute;
+            }
+        }
+
         FavoriteRoute favoriteRoute = new FavoriteRoute();
         favoriteRoute.setUserEmail(dto.getUserEmail());
         favoriteRoute.setStartAddress(dto.getStartAddress());
@@ -50,7 +63,7 @@ public class FavoriteRouteService {
             favoriteRoute.setDestinationLocation(destinationPoint);
         }
 
-        // Handle stopLocations - CRITICAL CHANGE: Always ensure a new collection and proper Point management
+        // Handle stopLocations - Ensure new collection and proper Point management
         if (dto.getStopLocations() != null && !dto.getStopLocations().isEmpty()) {
             List<Point> managedStopPoints = new ArrayList<>();
             for (ridemanagement.backend.dto.PointDTO stopDto : dto.getStopLocations()) {
@@ -64,7 +77,6 @@ public class FavoriteRouteService {
                     pointToUse = existingStopPoint.get(); // Use the existing managed Point
                 } else {
                     // If not found, create a new Point and save it.
-                    // This ensures the Point is a managed entity in the current session.
                     pointToUse = pointRepository.save(new Point(stopDto.getLatitude(), stopDto.getLongitude()));
                 }
                 managedStopPoints.add(pointToUse);
@@ -77,11 +89,19 @@ public class FavoriteRouteService {
         return favoriteRouteRepository.save(favoriteRoute);
     }
 
+    private boolean areStopsEqual(List<String> existingStops, List<String> newStops) {
+        return Objects.equals(existingStops, newStops);
+    }
+
     public List<FavoriteRoute> getFavoriteRoutesByUserEmail(String userEmail) {
         return favoriteRouteRepository.findByUserEmail(userEmail);
     }
 
     public void deleteFavoriteRoute(Long id) {
-        favoriteRouteRepository.deleteById(id);
+        if (favoriteRouteRepository.existsById(id)) {
+            favoriteRouteRepository.deleteById(id);
+        } else {
+            throw new NoSuchElementException("Favorite route with ID " + id + " not found for deletion.");
+        }
     }
 }

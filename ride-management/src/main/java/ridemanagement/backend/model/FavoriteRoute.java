@@ -25,11 +25,11 @@ public class FavoriteRoute {
     @Column(nullable = false)
     private String destinationAddress;
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne
     @JoinColumn(name = "start_location_id", referencedColumnName = "id")
     private Point startLocation;
 
-    @ManyToMany(cascade = CascadeType.ALL)
+    @ManyToMany
     @JoinTable(
             name = "favorite_route_stop_locations",
             joinColumns = @JoinColumn(name = "favorite_route_id"),
@@ -37,7 +37,7 @@ public class FavoriteRoute {
     )
     private List<Point> stopLocations;
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne
     @JoinColumn(name = "destination_location_id", referencedColumnName = "id")
     private Point destinationLocation;
 
