@@ -16,6 +16,7 @@ import {AdminChatComponent} from './features/admin-chat/admin-chat.component';
 import {
   DriverChangesApprovalComponent
 } from './features/admin/driver-changes-approval/driver-changes-approval.component';
+import {RideHistoryComponent} from './features/ride-history/ride-history.component';
 
 export const routes: Routes = [
   {path: '', component: HomeComponent},
@@ -32,4 +33,5 @@ export const routes: Routes = [
   { path: 'block-users', component: UserManagementComponent },
   { path: 'admin-chat', component: AdminChatComponent },
   { path: 'driver-changes', component: DriverChangesApprovalComponent },
+  { path: 'ride-history', component: RideHistoryComponent },
 ];

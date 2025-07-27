@@ -65,4 +65,17 @@ public class DriverController {
         }
     }
 
+    @GetMapping("/{id}")
+    public ResponseEntity<DriverDTO> getDriverById(@PathVariable Long id) {
+        try {
+            DriverDTO driverDTO = driverService.getDriverDTOById(id); // Using DriverDTO as per your /all endpoint
+            return ResponseEntity.ok(driverDTO);
+        } catch (NoSuchElementException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build(); // Return 404 if not found
+        } catch (Exception e) {
+            System.err.println("Error fetching driver by ID: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build(); // Generic error
+        }
+    }
+
 }

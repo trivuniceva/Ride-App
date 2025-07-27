@@ -11,6 +11,7 @@ import ridemanagement.backend.model.Ride;
 import ridemanagement.backend.service.RideService;
 import ridemanagement.backend.service.SplitFareService;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
@@ -86,6 +87,24 @@ public class RideController {
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(Map.of("error", "Došlo je do greške prilikom odbijanja vožnje: " + e.getMessage()));
+        }
+    }
+
+    @GetMapping("/history/{userId}/{userRole}")
+    public ResponseEntity<List<Ride>> getRideHistoryForLoggedUser(
+            @PathVariable Long userId,
+            @PathVariable String userRole,
+            @RequestParam(required = false) String userEmail) {
+        try {
+            List<Ride> rides = rideService.getRideHistoryForUser(userId, userRole, userEmail);
+            if (rides.isEmpty()) {
+                return ResponseEntity.status(HttpStatus.NO_CONTENT).body(Collections.emptyList());
+            }
+            return ResponseEntity.ok(rides);
+        } catch (Exception e) {
+            System.err.println("Error fetching ride history: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Collections.emptyList());
         }
     }
 }

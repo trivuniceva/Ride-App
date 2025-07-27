@@ -260,4 +260,12 @@ public class DriverService {
     }
 
 
+    public DriverDTO getDriverDTOById(Long id) {
+        Optional<Driver> driverOptional = driverRepository.findById(id);
+        if (driverOptional.isPresent()) {
+            return convertToDTO(driverOptional.get());
+        } else {
+            throw new NoSuchElementException("Vozač sa ID-jem " + id + " nije pronađen.");
+        }
+    }
 }
