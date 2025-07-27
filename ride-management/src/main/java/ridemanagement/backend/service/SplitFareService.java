@@ -37,7 +37,7 @@ public class SplitFareService {
     @Autowired
     private PointService pointService;
     @Autowired
-    private FavoriteRouteService favoriteRouteService; // Već imaš autowired FavoriteRouteService
+    private FavoriteRouteService favoriteRouteService;
     @Autowired
     private UserRepository userRepository;
 
@@ -84,12 +84,13 @@ public class SplitFareService {
 
         ride.setRideStatus("PENDING_DRIVER_RESPONSE");
         ride.setPaymentStatus("PENDING_DRIVER_CONFIRMATION");
+
+        System.out.println(ride.toString());
         ride = rideRepository.save(ride);
 
         Long requestorUserId = getUserIdByEmail(ride.getRequestorEmail());
 
         if (requestorUserId != null) {
-            // Note: driverFirstname, driverLastname, and driverPictureUrl are null here for RIDE_REQUEST_SENT
             notificationService.notifyUser(requestorUserId, "RIDE_REQUEST_SENT", "Vaš zahtev za vožnju je poslat.", ride.getId(), null, null, null);
         }
 
@@ -120,7 +121,6 @@ public class SplitFareService {
         if (requestorUserId != null && ride.getDriverId() != null) {
             try {
                 Driver acceptedDriver = driverService.findById(ride.getDriverId());
-                // Pass acceptedDriver.getProfilePictureUrl() here
                 notificationService.notifyUser(requestorUserId, "DRIVER_ACCEPTED_RIDE",
                         "Vozač " + acceptedDriver.getFirstname() + " " + acceptedDriver.getLastname() + " je prihvatio vašu vožnju!",
                         ride.getId(), acceptedDriver.getFirstname(), acceptedDriver.getLastname(), acceptedDriver.getProfilePic());
@@ -146,7 +146,6 @@ public class SplitFareService {
 
         Long requestorUserId = getUserIdByEmail(ride.getRequestorEmail());
         if (requestorUserId != null) {
-            // Note: driverFirstname, driverLastname, and driverPictureUrl are null here for DRIVER_SEARCHING
             notificationService.notifyUser(requestorUserId, "DRIVER_SEARCHING", "Prethodni vozač je odbio. Traži se novi vozač za vašu vožnju...", ride.getId(), null, null, null);
         }
 
@@ -179,7 +178,9 @@ public class SplitFareService {
                 ride.getPassengers(),
                 ride.getPaymentStatus(),
                 ride.getFullPrice(),
-                ride.getRequestorEmail()
+                ride.getRequestorEmail(),
+                ride.getTotalLength(),
+                ride.getExpectedTime()
         );
 
         tryAssignNextDriver(ride, reconstructedRideRequestDTO);
@@ -201,7 +202,6 @@ public class SplitFareService {
                         ". Detalji: od " + ride.getStartAddress() +
                         " do " + ride.getDestinationAddress();
 
-                // notificationService.notifyDriver does not send driver picture
                 notificationService.notifyDriver(nextDriver.getId(), msg, dto, ride.getId());
             } else {
                 System.out.println("Next eligible driver is not logged in or not found. Trying to find another driver.");

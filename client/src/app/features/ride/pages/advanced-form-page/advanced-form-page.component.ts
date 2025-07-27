@@ -49,6 +49,17 @@ export class AdvancedFormPageComponent implements OnInit, AfterViewInit, OnDestr
   driverPictureUrl: string | null = null;
 
   @Input() fullPrice: number | undefined;
+  @Input() startAddress: string | undefined;
+  @Input() stops: string[] = [];
+  @Input() destinationAddress: string | undefined;
+  @Input() startLocation: [number, number] | null = null;
+  @Input() stopLocations: [number, number][] = [];
+  @Input() destinationLocation: [number, number] | null = null;
+  @Input() totalLength: number | undefined;
+  @Input() expectedTime: number | undefined;
+  @Input() set vehicleTypeFromParent(value: string | null) {
+    this.vehicleType = value;
+  }
 
   @ViewChild('routeForm') routeForm!: RouteFormComponent;
 
@@ -60,6 +71,8 @@ export class AdvancedFormPageComponent implements OnInit, AfterViewInit, OnDestr
     stopLocations: PointDTO[];
     destinationLocation: PointDTO | null;
     vehicleType: string | null;
+    distance: number | undefined;
+    duration: number | undefined;
   }>();
 
   routeData: {
@@ -171,7 +184,11 @@ export class AdvancedFormPageComponent implements OnInit, AfterViewInit, OnDestr
   }): void {
     this.routeData = routeData;
     console.log('Route Data with Coordinates: ->>>>>', this.routeData);
-    this.routeDataSubmitted.emit(routeData);
+    this.routeDataSubmitted.emit({
+      ...routeData,
+      distance: this.totalLength,
+      duration: this.expectedTime
+    });
   }
 
   handleVehicleTypeSelected(selectedType: string) {
@@ -184,16 +201,33 @@ export class AdvancedFormPageComponent implements OnInit, AfterViewInit, OnDestr
 
   handlePaymentConfirmation() {
     console.log('Payment has been confirmed in AdvancedFormPageComponent');
-    console.log('Final object to be sent to backend:', this.routeData);
 
-    if (this.routeData.startLocation && this.routeData.destinationLocation) {
+    const startLocDTO: PointDTO | null = this.startLocation ? { latitude: this.startLocation[0], longitude: this.startLocation[1] } : null;
+    const destLocDTO: PointDTO | null = this.destinationLocation ? { latitude: this.destinationLocation[0], longitude: this.destinationLocation[1] } : null;
+    const stopLocDTOs: PointDTO[] = this.stopLocations.map(loc => ({ latitude: loc[0], longitude: loc[1] }));
+
+    const rideServiceRouteData = {
+      startAddress: this.startAddress || '',
+      stops: this.stops,
+      destinationAddress: this.destinationAddress || '',
+      startLocation: startLocDTO,
+      stopLocations: stopLocDTOs,
+      destinationLocation: destLocDTO,
+      vehicleType: this.vehicleType,
+    };
+
+    console.log('Final object to be sent to backend:', rideServiceRouteData);
+
+    if (startLocDTO && destLocDTO) {
       this.rideService.createRide(
-        this.routeData,
+        rideServiceRouteData,
         this.additionalOptions,
         this.passengers,
         this.fullPrice || 0,
         this.splitFareEmails.length > 0 ? 'PENDING' : 'PAID',
-        this.requestorEmail
+        this.requestorEmail,
+        this.totalLength,
+        this.expectedTime
       ).subscribe({
         next: (response: any) => {
           console.log('Ride request sent successfully', response);

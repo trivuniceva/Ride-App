@@ -17,7 +17,7 @@ export interface Ride {
   requestorEmail: string;
   createdAt: string;
   rideStatus: string;
-  expectedTime: string;
+  expectedTime: number;
   totalLength: number;
   driverId: number;
   refusedDriverIds: number[];

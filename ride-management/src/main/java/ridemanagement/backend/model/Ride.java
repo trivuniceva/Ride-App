@@ -72,7 +72,7 @@ public class Ride {
     private String rideStatus;
 
     @Column(name = "expected_time")
-    private String expectedTime;
+    private Integer expectedTime;
 
     @Column(name = "total_length")
     private Double totalLength;
@@ -91,7 +91,7 @@ public class Ride {
     }
 
     public Ride(ridemanagement.backend.dto.RideRequestDTO rideRequestDTO) {
-        this(); // Calls the default constructor to set createdAt
+        this();
         this.startAddress = rideRequestDTO.getStartAddress();
         this.stops = rideRequestDTO.getStops();
         this.destinationAddress = rideRequestDTO.getDestinationAddress();
@@ -103,6 +103,8 @@ public class Ride {
         this.fullPrice = rideRequestDTO.getFullPrice();
         this.requestorEmail = rideRequestDTO.getRequestorEmail();
         this.rideStatus = "PENDING";
+        this.totalLength = rideRequestDTO.getTotalLength();
+        this.expectedTime = rideRequestDTO.getExpectedTime();
     }
 
     public Long getId() { return id; }
@@ -154,8 +156,8 @@ public class Ride {
     public String getRideStatus() { return rideStatus; }
     public void setRideStatus(String rideStatus) { this.rideStatus = rideStatus; }
 
-    public String getExpectedTime() { return expectedTime; }
-    public void setExpectedTime(String expectedTime) { this.expectedTime = expectedTime; }
+    public Integer getExpectedTime() { return expectedTime; }
+    public void setExpectedTime(Integer expectedTime) { this.expectedTime = expectedTime; }
 
     public Double getTotalLength() { return totalLength; }
     public void setTotalLength(Double totalLength) { this.totalLength = totalLength; }
@@ -166,4 +168,30 @@ public class Ride {
     public Set<Long> getRefusedDriverIds() { return refusedDriverIds; }
     public void setRefusedDriverIds(Set<Long> refusedDriverIds) { this.refusedDriverIds = refusedDriverIds; }
     public void addRefusedDriver(Long driverId) { this.refusedDriverIds.add(driverId); }
+
+    @Override
+    public String toString() {
+        return "Ride{" +
+                "id=" + id +
+                ", startAddress='" + startAddress + '\'' +
+                ", stops=" + stops +
+                ", destinationAddress='" + destinationAddress + '\'' +
+                ", startLocation=" + startLocation +
+                ", destinationLocation=" + destinationLocation +
+                ", stopLocations=" + stopLocations +
+                ", vehicleType='" + vehicleType + '\'' +
+                ", carriesBabies=" + carriesBabies +
+                ", carriesPets=" + carriesPets +
+                ", passengers=" + passengers +
+                ", paymentStatus='" + paymentStatus + '\'' +
+                ", fullPrice=" + fullPrice +
+                ", requestorEmail='" + requestorEmail + '\'' +
+                ", createdAt=" + createdAt +
+                ", rideStatus='" + rideStatus + '\'' +
+                ", expectedTime=" + expectedTime +
+                ", totalLength=" + totalLength +
+                ", driverId=" + driverId +
+                ", refusedDriverIds=" + refusedDriverIds +
+                '}';
+    }
 }

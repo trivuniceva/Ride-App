@@ -18,10 +18,12 @@ public class RideRequestDTO {
     private String paymentStatus;
     private double fullPrice;
     private String requestorEmail;
+    private Double totalLength;
+    private Integer expectedTime;
 
     public RideRequestDTO() {}
 
-    public RideRequestDTO(String startAddress, List<String> stops, String destinationAddress, PointDTO startLocation, List<PointDTO> stopLocations, PointDTO destinationLocation, String vehicleType, boolean carriesBabies, boolean carriesPets, List<String> passengers, String paymentStatus, double fullPrice, String requestorEmail) {
+    public RideRequestDTO(String startAddress, List<String> stops, String destinationAddress, PointDTO startLocation, List<PointDTO> stopLocations, PointDTO destinationLocation, String vehicleType, boolean carriesBabies, boolean carriesPets, List<String> passengers, String paymentStatus, double fullPrice, String requestorEmail, Double totalLength, Integer expectedTime) {
         this.startAddress = startAddress;
         this.stops = stops;
         this.destinationAddress = destinationAddress;
@@ -35,9 +37,10 @@ public class RideRequestDTO {
         this.paymentStatus = paymentStatus;
         this.fullPrice = fullPrice;
         this.requestorEmail = requestorEmail;
+        this.totalLength = totalLength;
+        this.expectedTime = expectedTime;
     }
 
-    // Dodao sam konstruktor sa manje argumenata za potrebe kreiranja DTO-a iz Ride objekta u SplitFareService
     public RideRequestDTO(String startAddress, List<String> stops, String destinationAddress, PointDTO startLocation, PointDTO destinationLocation, String vehicleType, boolean carriesBabies, boolean carriesPets, List<String> passengers, double fullPrice, String requestorEmail) {
         this.startAddress = startAddress;
         this.stops = stops;
@@ -50,8 +53,9 @@ public class RideRequestDTO {
         this.passengers = passengers;
         this.fullPrice = fullPrice;
         this.requestorEmail = requestorEmail;
-        // paymentStatus se može postaviti defaultno ili izvan konstruktora
         this.paymentStatus = "PENDING_DRIVER_CONFIRMATION";
+        this.totalLength = 0.0;
+        this.expectedTime = 0;
     }
 
     public String getStartAddress() { return startAddress; }
@@ -80,6 +84,10 @@ public class RideRequestDTO {
     public void setFullPrice(double fullPrice) { this.fullPrice = fullPrice; }
     public String getRequestorEmail() { return requestorEmail; }
     public void setRequestorEmail(String requestorEmail) { this.requestorEmail = requestorEmail; }
+    public Double getTotalLength() { return totalLength; }
+    public void setTotalLength(Double totalLength) { this.totalLength = totalLength; }
+    public Integer getExpectedTime() { return expectedTime; }
+    public void setExpectedTime(Integer expectedTime) { this.expectedTime = expectedTime; }
 
     @Override
     public String toString() {
@@ -88,6 +96,8 @@ public class RideRequestDTO {
                 ", destinationAddress='" + destinationAddress + '\'' +
                 ", fullPrice=" + fullPrice +
                 ", requestorEmail='" + requestorEmail + '\'' +
+                ", totalLength=" + totalLength +
+                ", expectedTime=" + expectedTime +
                 '}';
     }
 }

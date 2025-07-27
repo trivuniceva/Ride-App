@@ -4,6 +4,15 @@
       <app-advanced-form-page
         (routeDataSubmitted)="handleRouteDataFromAdvancedForm($event)"
         [fullPrice]="price"
+        [startAddress]="startAddress"
+        [stops]="stops"
+        [destinationAddress]="destinationAddress"
+        [startLocation]="startCoords"
+        [stopLocations]="waypointsCoords"
+        [destinationLocation]="destinationCoords"
+        [vehicleTypeFromParent]="vehicleType"
+        [totalLength]="totalLength"
+        [expectedTime]="expectedTime"
       ></app-advanced-form-page>
     </div>
 
@@ -21,7 +30,6 @@
 
   <div class="ride-right">
     <div class="driver-part">
-<!--      <app-drivers-availability></app-drivers-availability>-->
     </div>
 
     <div class="map-section">
