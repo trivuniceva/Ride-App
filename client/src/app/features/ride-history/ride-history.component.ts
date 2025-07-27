@@ -11,13 +11,15 @@ import { User } from '../../core/models/user.model';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { RideDetailsDialogComponent } from '../ride-details-dialog/ride-details-dialog.component';
 import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
-import {MatDatepicker, MatDatepickerModule} from '@angular/material/datepicker';
+import { MatDatepicker, MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { BaseChartDirective } from 'ng2-charts';
 import { ChartConfiguration, ChartType, ChartData } from 'chart.js';
 import { Chart as ChartJS, LineController, LineElement, PointElement, LinearScale, Title, CategoryScale, Tooltip, Legend } from 'chart.js';
+import { FavoriteRouteService, FavoriteRoute } from '../../core/services/favorite-route/favorite-route.service';
+import { PointDTO } from '../../core/models/PointDTO.model'; 
 
 ChartJS.register(
   LineController,
@@ -58,7 +60,7 @@ export class RideHistoryComponent implements OnInit, AfterViewInit {
   isLoading: boolean = true;
   errorMessage: string | null = null;
   allRides: Ride[] = [];
-  favoriteRideIds: Set<number> = new Set();
+  userFavoriteRoutes: FavoriteRoute[] = [];
 
 
   @ViewChild(MatSort) sort!: MatSort;
@@ -134,7 +136,8 @@ export class RideHistoryComponent implements OnInit, AfterViewInit {
   constructor(
     private rideService: RideService,
     private authService: AuthService,
-    private dialog: MatDialog
+    private dialog: MatDialog,
+    private favoriteRouteService: FavoriteRouteService
   ) { }
 
   ngOnInit(): void {
@@ -149,6 +152,7 @@ export class RideHistoryComponent implements OnInit, AfterViewInit {
 
         this.displayedColumns.push('details');
         this.loadRideHistory();
+        this.loadFavoriteRoutes();
       } else {
         this.isLoading = false;
         this.errorMessage = 'Korisnik nije ulogovan.';
@@ -203,6 +207,22 @@ export class RideHistoryComponent implements OnInit, AfterViewInit {
       }
     });
   }
+
+  loadFavoriteRoutes(): void {
+    if (!this.loggedUser || !this.loggedUser.email) {
+      return;
+    }
+    this.favoriteRouteService.getFavoriteRoutes(this.loggedUser.email).subscribe({
+      next: (favoriteRoutes: FavoriteRoute[]) => {
+        this.userFavoriteRoutes = favoriteRoutes;
+        console.log('Učitane omiljene rute:', this.userFavoriteRoutes);
+      },
+      error: (err) => {
+        console.error('Greška pri učitavanju omiljenih ruta:', err);
+      }
+    });
+  }
+
 
   filterAndProcessRides(): void {
     const startDate = this.range.value.start;
@@ -328,17 +348,114 @@ export class RideHistoryComponent implements OnInit, AfterViewInit {
   }
 
   toggleFavorite(ride: Ride): void {
-    if (this.isFavorite(ride)) {
-      this.favoriteRideIds.delete(ride.id);
-    } else {
-      this.favoriteRideIds.add(ride.id);
+    if (!this.loggedUser || !this.loggedUser.email) {
+      console.warn('Nije moguće dodati/ukloniti omiljenu rutu: korisnik nije ulogovan.');
+      return;
     }
 
+    const existingFavorite = this.getExistingFavoriteRoute(ride);
 
-    //TODO: servis za bek
+    if (existingFavorite) {
+      if (existingFavorite.id) {
+        this.favoriteRouteService.removeFavoriteRoute(existingFavorite.id).subscribe({
+          next: () => {
+            console.log('Ruta uspešno uklonjena iz omiljenih:', ride);
+            this.userFavoriteRoutes = this.userFavoriteRoutes.filter(fav => fav.id !== existingFavorite.id);
+          },
+          error: (err) => {
+            console.error('Greška pri uklanjanju omiljene rute:', err);
+          }
+        });
+      } else {
+        console.warn('Pokušaj uklanjanja omiljene rute bez ID-a.', existingFavorite);
+      }
+    } else {
+      const favoriteRouteData = this.mapRideToFavoriteRouteDTO(ride);
+      this.favoriteRouteService.addFavoriteRoute(
+        favoriteRouteData,
+        { carriesBabies: ride.carriesBabies, carriesPets: ride.carriesPets },
+        this.loggedUser.email
+      ).subscribe({
+        next: (response: any) => {
+          console.log('Backend add favorite route response:', response);
+
+          const newFavoriteRouteId = response.id;
+
+          const newFavoriteRoute: FavoriteRoute = {
+            ...favoriteRouteData,
+            id: newFavoriteRouteId
+          };
+
+          this.userFavoriteRoutes.push(newFavoriteRoute);
+          console.log('Ruta uspešno dodata u omiljene (UI osvežen):', newFavoriteRoute);
+
+        },
+        error: (err) => {
+          console.error('Greška pri dodavanju omiljene rute:', err);
+        }
+      });
+    }
   }
 
   isFavorite(ride: Ride): boolean {
-    return this.favoriteRideIds.has(ride.id);
+    return !!this.getExistingFavoriteRoute(ride);
+  }
+
+  private getExistingFavoriteRoute(ride: Ride): FavoriteRoute | undefined {
+    // Proverava da li postoji omiljena ruta sa istim ključnim karakteristikama
+    return this.userFavoriteRoutes.find(favRoute =>
+      favRoute.userEmail === this.loggedUser?.email &&
+      favRoute.startAddress === ride.startAddress &&
+      favRoute.destinationAddress === ride.destinationAddress &&
+      this.areStopsEqual(favRoute.stops, ride.stops) &&
+      favRoute.vehicleType === ride.vehicleType &&
+      favRoute.carriesBabies === ride.carriesBabies &&
+      favRoute.carriesPets === ride.carriesPets
+    );
+  }
+
+  private areStopsEqual(stops1: string[] | null, stops2: string[] | null): boolean {
+    if (stops1 === stops2) return true;
+    if (!stops1 || !stops2) return false;
+    if (stops1.length !== stops2.length) return false;
+
+    for (let i = 0; i < stops1.length; i++) {
+      if (stops1[i] !== stops2[i]) return false;
+    }
+    return true;
+  }
+
+  private mapRideToFavoriteRouteDTO(ride: Ride): FavoriteRoute {
+    const startLocationDTO: PointDTO | null = ride.startLocation ? {
+      id: ride.startLocation.id,
+      latitude: ride.startLocation.latitude,
+      longitude: ride.startLocation.longitude
+    } : null;
+
+    const destinationLocationDTO: PointDTO | null = ride.destinationLocation ? {
+      id: ride.destinationLocation.id,
+      latitude: ride.destinationLocation.latitude,
+      longitude: ride.destinationLocation.longitude
+    } : null;
+
+    const stopLocationsDTO: PointDTO[] = ride.stopLocations ?
+      ride.stopLocations.map(p => ({
+        id: p.id,
+        latitude: p.latitude,
+        longitude: p.longitude
+      })) : [];
+
+    return {
+      userEmail: this.loggedUser!.email,
+      startAddress: ride.startAddress,
+      stops: ride.stops,
+      destinationAddress: ride.destinationAddress,
+      startLocation: startLocationDTO,
+      stopLocations: stopLocationsDTO,
+      destinationLocation: destinationLocationDTO,
+      vehicleType: ride.vehicleType,
+      carriesBabies: ride.carriesBabies,
+      carriesPets: ride.carriesPets,
+    };
   }
 }

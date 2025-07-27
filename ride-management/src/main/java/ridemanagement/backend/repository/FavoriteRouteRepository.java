@@ -10,5 +10,5 @@ import java.util.Optional;
 @Repository
 public interface FavoriteRouteRepository extends JpaRepository<FavoriteRoute, Long> {
     List<FavoriteRoute> findByUserEmail(String userEmail);
-    Optional<FavoriteRoute> findByUserEmailAndStartAddressAndDestinationAddress(String userEmail, String startAddress, String destinationAddress);
+    List<FavoriteRoute> findByUserEmailAndStartAddressAndDestinationAddress(String userEmail, String startAddress, String destinationAddress);
 }

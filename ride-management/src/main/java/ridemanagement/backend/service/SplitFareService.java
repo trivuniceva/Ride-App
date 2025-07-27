@@ -37,7 +37,7 @@ public class SplitFareService {
     @Autowired
     private PointService pointService;
     @Autowired
-    private FavoriteRouteService favoriteRouteService;
+    private FavoriteRouteService favoriteRouteService; // Već imaš autowired FavoriteRouteService
     @Autowired
     private UserRepository userRepository;
 
@@ -129,33 +129,6 @@ public class SplitFareService {
             }
         }
 
-        FavoriteRouteDTO favoriteRouteDTO = new FavoriteRouteDTO();
-        favoriteRouteDTO.setUserEmail(ride.getRequestorEmail());
-        favoriteRouteDTO.setStartAddress(ride.getStartAddress());
-        favoriteRouteDTO.setStops(ride.getStops());
-        favoriteRouteDTO.setDestinationAddress(ride.getDestinationAddress());
-        favoriteRouteDTO.setVehicleType(ride.getVehicleType());
-        favoriteRouteDTO.setCarriesBabies(ride.isCarriesBabies());
-        favoriteRouteDTO.setCarriesPets(ride.isCarriesPets());
-
-        if (ride.getStartLocation() != null) {
-            favoriteRouteDTO.setStartLocation(new ridemanagement.backend.dto.PointDTO(ride.getStartLocation().getId(), ride.getStartLocation().getLatitude(), ride.getStartLocation().getLongitude()));
-        }
-        if (ride.getDestinationLocation() != null) {
-            favoriteRouteDTO.setDestinationLocation(new ridemanagement.backend.dto.PointDTO(ride.getDestinationLocation().getId(), ride.getDestinationLocation().getLatitude(), ride.getDestinationLocation().getLongitude()));
-        }
-        if (ride.getStopLocations() != null) {
-            favoriteRouteDTO.setStopLocations(ride.getStopLocations().stream()
-                    .map(p -> new ridemanagement.backend.dto.PointDTO(p.getId(), p.getLatitude(), p.getLongitude()))
-                    .collect(Collectors.toList()));
-        }
-
-        try {
-            favoriteRouteService.saveFavoriteRoute(favoriteRouteDTO);
-            System.out.println("Ruta automatski dodata u omiljene nakon uspešne vožnje.");
-        } catch (Exception e) {
-            System.err.println("Greška prilikom automatskog dodavanja rute u omiljene: " + e.getMessage());
-        }
     }
 
     public void rejectRide(Long rideId, Long driverId) {
