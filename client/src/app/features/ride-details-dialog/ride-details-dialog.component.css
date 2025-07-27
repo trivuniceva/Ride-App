@@ -23,7 +23,7 @@
 .dialog-header h2 {
   margin: 0;
   font-size: 1.5rem;
-  color: #3f51b5;
+  color: #333;
 }
 
 .dialog-content {
@@ -41,11 +41,11 @@
 }
 
 .ride-details-left h3 {
-  color: #3f51b5;
+  color: #444;
   margin-top: 0;
   margin-bottom: 20px;
   font-size: 1.3rem;
-  border-bottom: 2px solid #3f51b5;
+  border-bottom: 2px solid #999;
   padding-bottom: 5px;
 }
 
@@ -56,13 +56,14 @@
 }
 
 .ride-details-left p strong {
-  color: #333;
+  color: #222;
 }
 
 .ride-details-left mat-icon {
   vertical-align: middle;
   margin-left: 5px;
   font-size: 1.2rem;
+  color: #666;
 }
 
 .driver-info {
@@ -72,10 +73,10 @@
 }
 
 .driver-info h3 {
-  color: #3f51b5;
+  color: #444;
   font-size: 1.3rem;
   margin-bottom: 20px;
-  border-bottom: 2px solid #3f51b5;
+  border-bottom: 2px solid #999;
   padding-bottom: 5px;
 }
 
@@ -89,6 +90,10 @@
 .actions button {
   width: 100%;
   padding: 12px 0;
+  background-color: #ccc;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
 }
 
 .map-container-dialog {
@@ -102,14 +107,14 @@ app-map-test {
   height: 100%;
 }
 
-
 @media (max-width: 768px) {
   .dialog-content {
     flex-direction: column;
     overflow-y: auto;
   }
 
-  .ride-details-left, .map-container-dialog {
+  .ride-details-left,
+  .map-container-dialog {
     flex: none;
     width: 100%;
     border-right: none;
