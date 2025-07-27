@@ -1,7 +1,15 @@
 <div class="ride-history-container">
   <h2>Istorija Vožnji</h2>
 
-  <div class="table-responsive">
+  <div *ngIf="isLoading" class="loading-spinner">
+    <p>Učitavanje istorije vožnji...</p>
+  </div>
+
+  <div *ngIf="errorMessage" class="error-message">
+    <p>{{ errorMessage }}</p>
+  </div>
+
+  <div class="table-responsive" *ngIf="!isLoading && !errorMessage">
     <table mat-table [dataSource]="dataSource" matSort class="full-width-table">
       <ng-container matColumnDef="route">
         <th mat-header-cell *matHeaderCellDef mat-sort-header>Ruta</th>

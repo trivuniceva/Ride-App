@@ -32,8 +32,16 @@ public class RideService {
         return driverService.convertToDTO(driver);
     }
 
+    public List<Ride> getRideHistoryForUser(Long userId, String userRole, String userEmail) {
+        if ("DRIVER".equalsIgnoreCase(userRole)) {
+            return rideRepository.findByDriverIdOrderByCreatedAtDesc(userId);
+        } else if ("REGISTERED_USER".equalsIgnoreCase(userRole) || "REQUESTOR".equalsIgnoreCase(userRole)) {
+            return rideRepository.findByRequestorEmailOrderByCreatedAtDesc(userEmail);
+        }
+        return List.of();
+    }
 
-    public List<Ride> getAllRidesSortedByCreatedAtDesc() {
+        public List<Ride> getAllRidesSortedByCreatedAtDesc() {
         return rideRepository.findAllByOrderByCreatedAtDesc();
     }
 }
