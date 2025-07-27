@@ -33,6 +33,11 @@ public class RideService {
     }
 
     public List<Ride> getRideHistoryForUser(Long userId, String userRole, String userEmail) {
+
+        if ("ADMINISTRATOR".equalsIgnoreCase(userRole)) {
+            return rideRepository.findAllByOrderByCreatedAtDesc();
+        }
+
         if ("DRIVER".equalsIgnoreCase(userRole)) {
             return rideRepository.findByDriverIdOrderByCreatedAtDesc(userId);
         } else if ("REGISTERED_USER".equalsIgnoreCase(userRole) || "REQUESTOR".equalsIgnoreCase(userRole)) {
