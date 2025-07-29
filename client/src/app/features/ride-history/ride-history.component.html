@@ -1,144 +1,113 @@
 <div class="ride-history-container">
-  <h2>Istorija Vožnji</h2>
+  <h2>Ride History</h2>
 
   <div class="filter-controls">
     <mat-form-field appearance="fill" class="date-picker-field">
-      <mat-label>Unesite opseg datuma</mat-label>
-
+      <mat-label>Enter Date Range</mat-label>
       <mat-date-range-input [formGroup]="range" [rangePicker]="picker">
-        <input matStartDate formControlName="start" placeholder="Početni datum" readonly>
-        <input matEndDate formControlName="end" placeholder="Krajnji datum" readonly>
+        <input matStartDate formControlName="start" placeholder="Start Date" readonly>
+        <input matEndDate formControlName="end" placeholder="End Date" readonly>
       </mat-date-range-input>
-
       <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
       <mat-date-range-picker #picker></mat-date-range-picker>
     </mat-form-field>
 
-    <button mat-raised-button color="warn" (click)="clearDateRange()" class="clear-date-button">
-      <mat-icon>clear</mat-icon> Obriši Datum
+    <button mat-raised-button class="order-again-btn" (click)="clearDateRange()">
+      <mat-icon>clear</mat-icon> Clear Date
     </button>
-
-    <button mat-raised-button color="accent" (click)="filterAndProcessRides()" class="filter-button">
-      <mat-icon>filter_list</mat-icon> Primeni Filter
+    <button mat-raised-button class="order-again-btn">
+      <mat-icon>filter_list</mat-icon> Apply Filter
     </button>
-
-    <button mat-raised-button color="primary" (click)="toggleCharts()" class="toggle-charts-button">
+    <button mat-raised-button class="order-again-btn" (click)="toggleCharts()">
       <mat-icon>{{ showCharts ? 'table_chart' : 'bar_chart' }}</mat-icon>
-      {{ showCharts ? 'Prikaži tabelu' : 'Prikaži grafove' }}
+      {{ showCharts ? 'Show Table' : 'Show Charts' }}
     </button>
   </div>
 
   <div *ngIf="isLoading" class="loading-spinner">
-    <p>Učitavanje istorije vožnji...</p>
+    <p>Loading ride history...</p>
   </div>
-
   <div *ngIf="errorMessage" class="error-message">
     <p>{{ errorMessage }}</p>
   </div>
 
   <div class="charts-section" *ngIf="showCharts && !isLoading && !errorMessage">
-    <h3>Statistika vožnji (za odabrani opseg)</h3>
-
+    <h3>Ride Statistics (for selected range)</h3>
     <div class="statistics-summary">
       <div class="stat-card">
-        <h4>Ukupno vožnji:</h4>
+        <h4>Total Rides:</h4>
         <p>{{ totalRides }}</p>
       </div>
       <div class="stat-card">
-        <h4>Ukupno km:</h4>
+        <h4>Total km:</h4>
         <p>{{ totalKilometers | number:'1.0-2' }} km</p>
       </div>
       <div class="stat-card">
-        <h4>Ukupno novca:</h4>
+        <h4>Total Money:</h4>
         <p>{{ totalMoney | currency:'RSD ':'symbol':'1.2-2' }}</p>
       </div>
       <div class="stat-card">
-        <h4>Prosek vožnji/dan:</h4>
+        <h4>Avg. Rides/Day:</h4>
         <p>{{ averageRidesPerDay | number:'1.0-2' }}</p>
       </div>
       <div class="stat-card">
-        <h4>Prosek km/dan:</h4>
+        <h4>Avg. km/Day:</h4>
         <p>{{ averageKilometersPerDay | number:'1.0-2' }} km</p>
       </div>
       <div class="stat-card">
-        <h4>Prosek novca/dan:</h4>
+        <h4>Avg. Money/Day:</h4>
         <p>{{ averageMoneyPerDay | currency:'RSD ':'symbol':'1.2-2' }}</p>
       </div>
     </div>
-
     <div class="chart-container">
-      <canvas baseChart
-              [data]="ridesPerDayChartData"
-              [options]="ridesPerDayChartOptions"
-              [type]="ridesPerDayChartType">
-      </canvas>
+      <canvas baseChart [data]="ridesPerDayChartData" [options]="ridesPerDayChartOptions" [type]="ridesPerDayChartType"></canvas>
     </div>
-
     <div class="chart-container">
-      <canvas baseChart
-              [data]="kilometersPerDayChartData"
-              [options]="kilometersPerDayChartOptions"
-              [type]="kilometersPerDayChartType">
-      </canvas>
+      <canvas baseChart [data]="kilometersPerDayChartData" [options]="kilometersPerDayChartOptions" [type]="kilometersPerDayChartType"></canvas>
     </div>
-
     <div class="chart-container">
-      <canvas baseChart
-              [data]="moneyPerDayChartData"
-              [options]="moneyPerDayChartOptions"
-              [type]="moneyPerDayChartType">
-      </canvas>
+      <canvas baseChart [data]="moneyPerDayChartData" [options]="moneyPerDayChartOptions" [type]="moneyPerDayChartType"></canvas>
     </div>
   </div>
 
   <div class="table-responsive" *ngIf="!showCharts && !isLoading && !errorMessage">
     <table mat-table [dataSource]="dataSource" matSort class="full-width-table">
       <ng-container matColumnDef="route">
-        <th mat-header-cell *matHeaderCellDef mat-sort-header>Ruta</th>
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>Route</th>
         <td mat-cell *matCellDef="let ride">{{ getRouteDisplay(ride) }}</td>
       </ng-container>
-
       <ng-container matColumnDef="fullPrice">
-        <th mat-header-cell *matHeaderCellDef mat-sort-header>Cena</th>
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>Price</th>
         <td mat-cell *matCellDef="let ride">{{ ride.fullPrice | currency:'RSD ':'symbol':'1.2-2' }}</td>
       </ng-container>
-
       <ng-container matColumnDef="createdAt">
-        <th mat-header-cell *matHeaderCellDef mat-sort-header>Datum Početka</th>
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>Start Date</th>
         <td mat-cell *matCellDef="let ride">{{ ride.createdAt | date:'dd.MM.yyyy. HH:mm' }}</td>
       </ng-container>
-
       <ng-container matColumnDef="rideStatus">
         <th mat-header-cell *matHeaderCellDef mat-sort-header>Status</th>
         <td mat-cell *matCellDef="let ride">{{ ride.rideStatus }}</td>
       </ng-container>
-
       <ng-container matColumnDef="details">
         <th mat-header-cell *matHeaderCellDef></th>
         <td mat-cell *matCellDef="let ride">
           <button mat-raised-button color="primary" (click)="showDetails(ride)">
-            <mat-icon>info</mat-icon> Prikaži detalje
+            <mat-icon>info</mat-icon> Show Details
           </button>
         </td>
       </ng-container>
-
       <ng-container *ngIf="loggedUser?.userRole === 'REGISTERED_USER'" matColumnDef="favorite">
         <th mat-header-cell *matHeaderCellDef></th>
         <td mat-cell *matCellDef="let ride">
           <button mat-icon-button (click)="toggleFavorite(ride)">
-            <mat-icon color="warn">
-              {{ isFavorite(ride) ? 'star' : 'star_border' }}
-            </mat-icon>
+            <mat-icon color="warn">{{ isFavorite(ride) ? 'star' : 'star_border' }}</mat-icon>
           </button>
         </td>
       </ng-container>
-
-
       <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
       <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
-
       <tr class="mat-row" *matNoDataRow>
-        <td class="mat-cell" colspan="5">Nema dostupnih vožnji.</td>
+        <td class="mat-cell" colspan="5">No rides available.</td>
       </tr>
     </table>
   </div>

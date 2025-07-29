@@ -27,7 +27,7 @@ import {User} from '../../../../core/models/user.model';
     AdditionalOptionsComponent,
     SplitFareComponent,
     RideSummaryComponent,
-    RideTrackingPopupComponent
+    // RideTrackingPopupComponent
   ],
   templateUrl: './advanced-form-page.component.html',
   styleUrl: './advanced-form-page.component.css',

@@ -1,55 +1,59 @@
 <div class="dialog-container">
   <div class="dialog-header">
-    <h2>Detalji Vožnje #{{ ride.id }}</h2>
+    <h2>Ride Details #{{ ride.id }}</h2>
     <button mat-icon-button (click)="closeDialog()">
       <mat-icon>close</mat-icon>
     </button>
   </div>
 
-  <div *ngIf="shouldShowRatingButton()" class="rating-action">
-    <button mat-raised-button color="accent" (click)="openRatingDialog()">
-      <mat-icon>rate_review</mat-icon> Ocenite vožnju i vozača
-    </button>
-  </div>
-
+  <!-- Three-column content -->
   <div class="dialog-content">
-    <div class="ride-details-left">
-      <h3>Informacije o vožnji</h3>
-      <p><strong>Ruta:</strong> {{ getRouteDisplay() }}</p>
-      <p><strong>Cena:</strong> {{ ride.fullPrice | currency:'RSD':'symbol':'1.2-2' }}</p>
-      <p><strong>Datum početka:</strong> {{ ride.createdAt | date:'dd.MM.yyyy. HH:mm' }}</p>
+    <!-- Column 1: Ride Info -->
+    <div class="ride-info">
+      <h3>Ride Information</h3>
+      <p><strong>Route:</strong> {{ getRouteDisplay() }}</p>
+      <p><strong>Price:</strong> {{ ride.fullPrice | currency:'RSD':'symbol':'1.2-2' }}</p>
+      <p><strong>Start Date:</strong> {{ ride.createdAt | date:'dd.MM.yyyy. HH:mm' }}</p>
       <p><strong>Status:</strong> {{ ride.rideStatus }}</p>
+    </div>
 
-      <h3>Vozač</h3>
+    <!-- Column 2: Driver Info -->
+    <div class="driver-info">
+      <h3>Driver</h3>
       <div *ngIf="isLoadingDriver">
         <mat-spinner [diameter]="30"></mat-spinner>
       </div>
       <div *ngIf="driver">
-        <p><strong>Ime:</strong> {{ driver.firstname }} {{ driver.lastname }}</p>
+        <p><strong>Name:</strong> {{ driver.firstname }} {{ driver.lastname }}</p>
         <p><strong>Email:</strong> {{ driver.email }}</p>
-        <p><strong>Ocena:</strong>
+        <p><strong>Rating:</strong>
           <ng-container *ngIf="driver.averageRating !== null">
             {{ driver.averageRating | number:'1.1-1' }} <mat-icon>star</mat-icon>
           </ng-container>
-          <ng-container *ngIf="driver.averageRating === null">Nema ocena</ng-container>
+          <ng-container *ngIf="driver.averageRating === null">No ratings</ng-container>
         </p>
       </div>
-
-      <div class="actions">
-        <button mat-raised-button color="primary" (click)="orderNow()">Poruči ponovo</button>
-        <button mat-button (click)="orderLater()">Sačuvaj</button>
-      </div>
     </div>
 
-    <div class="ride-details-right">
-      <div class="map-container-dialog">
-        <app-ride-details-map
-          [startCoords]="startCoords"
-          [destinationCoords]="destinationCoords"
-          [waypointsCoords]="waypointsCoords"
-          [routePathCoords]="routePathCoords"
-        ></app-ride-details-map>
-      </div>
+    <!-- Column 3: Map -->
+    <div class="map-container-dialog">
+      <app-ride-details-map
+        [startCoords]="startCoords"
+        [destinationCoords]="destinationCoords"
+        [waypointsCoords]="waypointsCoords"
+        [routePathCoords]="routePathCoords"
+      ></app-ride-details-map>
     </div>
+  </div>
+
+  <div class="action-buttons">
+    <button *ngIf="shouldShowRatingButton()" mat-raised-button color="accent" (click)="openRatingDialog()">
+      <mat-icon>rate_review</mat-icon> Rate the ride and the driver
+    </button>
+
+    <button mat-raised-button color="primary" class="order-again-btn" (click)="orderNow()">
+      Order Again
+    </button>
+
   </div>
 </div>

@@ -21,7 +21,7 @@ import { RateRideDialogComponent } from '../rate-ride-dialog/rate-ride-dialog.co
     MatIconModule,
     RideDetailsMapComponent,
     MatProgressSpinnerModule,
-    RateRideDialogComponent
+    // RateRideDialogComponent
   ],
   templateUrl: './ride-details-dialog.component.html',
   styleUrls: ['./ride-details-dialog.component.css']
