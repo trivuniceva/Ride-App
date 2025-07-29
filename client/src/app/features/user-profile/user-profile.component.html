@@ -92,6 +92,9 @@
 <app-ride-request-popup
   [visible]="showPopup"
   [message]="popupMessage"
-  (accept)="acceptRide()"
-  (reject)="rejectRide()"
+  [popupType]="popupType"
+[rideId]="currentRideId"
+(accept)="acceptRide()"
+(reject)="rejectRide()"
+(rideAction)="handleRideAction($event)"
 ></app-ride-request-popup>

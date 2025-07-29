@@ -8,6 +8,7 @@ import { RideRequestPopupComponent } from '../drivers/ride-request-popup/ride-re
 import { User } from '../../core/models/user.model';
 import { Subscription } from 'rxjs';
 import { WebSocketService } from '../../core/services/web-socket.service';
+import { RideService } from '../../core/services/ride/ride.service';
 
 @Component({
   selector: 'app-user-profile',
@@ -26,6 +27,7 @@ export class UserProfileComponent implements OnInit, OnDestroy {
   showPopup = false;
   popupMessage = '';
   currentRideId: number | null = null;
+  popupType: 'request' | 'action' = 'request';
 
   showPasswordChange = false;
   oldPassword = '';
@@ -46,7 +48,8 @@ export class UserProfileComponent implements OnInit, OnDestroy {
     private userService: UserService,
     private router: Router,
     private authService: AuthService,
-    private webSocketService: WebSocketService
+    private webSocketService: WebSocketService,
+    private rideService: RideService
   ) {}
 
   ngOnInit(): void {
@@ -61,38 +64,54 @@ export class UserProfileComponent implements OnInit, OnDestroy {
         }
       }
 
-      if (this.user && this.user.userRole === 'DRIVER') {
-        console.log(" ide sranjeeeee")
-        console.log(" ---------------------------------------------------------------")
-        this.wsSubscription = this.webSocketService.getMessages().subscribe((notification: any) => {
-          // --- DODAJ OVE CONSOLE.LOG LINIJE OVDE ---
-          console.log('--- WebSocket Notification Received ---');
-          console.log('Raw notification object:', notification);
-          console.log('Notification Type:', notification.type);
-          console.log('Notification Driver ID:', notification.driverId);
-          console.log('Current User ID (from component):', this.user?.id);
-          console.log('Are IDs matching?', notification.driverId === this.user?.id); // Provera podudaranja
-          console.log('Is notification type RIDE_REQUEST?', notification.type === 'RIDE_REQUEST');
-          // --- KRAJ DODATIH LINIJA ---
+      if (this.user && this.user.userRole === 'DRIVER' && this.user.id) {
+        console.log("Inicijalizacija WebSocket pretplate za vozača...");
 
+        this.wsSubscription = this.webSocketService.subscribeToUserTopic(this.user.id, '/user/{userId}/queue/driver-updates').subscribe({
+          next: (notification: any) => {
+            console.log('--- WebSocket Driver-Specific Notification Received ---');
+            console.log('Raw notification object:', notification);
+            console.log('Notification Type:', notification.type);
+            console.log('Notification Driver ID:', notification.driverId);
+            console.log('Current User ID (from component):', this.user?.id);
+            console.log('Are IDs matching?', notification.driverId === this.user?.id);
 
-          console.log(notification.type)
-          console.log("notification.type")
-          if (notification.type === 'RIDE_REQUEST' && notification.driverId === this.user?.id) {
-            console.log('Conditions met! Showing popup...');
-            this.popupMessage = notification.message;
-            this.currentRideId = notification.rideId;
-            this.showPopup = true;
-          } else {
-            console.log('Conditions NOT met. Popup not shown.');
-            if (notification.type !== 'RIDE_REQUEST') {
-              console.log('Reason: Type is not RIDE_REQUEST. Actual type:', notification.type);
+            if (notification.driverId === this.user?.id) {
+              switch (notification.type) {
+                case 'RIDE_REQUEST':
+                  console.log('Conditions met! Showing RIDE_REQUEST popup from driver-specific topic...');
+                  this.popupMessage = notification.message;
+                  this.currentRideId = notification.rideId;
+                  this.popupType = 'request';
+                  this.showPopup = true;
+                  break;
+                case 'DRIVER_ARRIVED_AT_PICKUP_FOR_DRIVER':
+                  console.log('Conditions met! Showing DRIVER_ARRIVED_AT_PICKUP_FOR_DRIVER popup...');
+                  this.popupMessage = notification.message || 'Stigli ste na početnu adresu vožnje. Da li želite da započnete vožnju ili je otkažete?';
+                  this.currentRideId = notification.rideId;
+                  this.popupType = 'action';
+                  this.showPopup = true;
+                  break;
+                default:
+                  console.log('Nepoznata ili neobrađena vozačeva notifikacija na driver-specific topicu:', notification.type, notification);
+                  break;
+              }
+            } else {
+              console.log('Notification ignored on driver-specific topic: Driver ID mismatch. Notification ID:', notification.driverId, 'User ID:', this.user?.id);
             }
-            if (notification.driverId !== this.user?.id) {
-              console.log('Reason: Driver ID mismatch. Notification ID:', notification.driverId, 'User ID:', this.user?.id);
-            }
+          },
+          error: (err) => {
+            console.error('Greška pri primanju vozačevih notifikacija na driver-specific topicu:', err);
+          },
+          complete: () => {
+            console.log('Vozačeva WebSocket pretplata na driver-specific topic završena.');
           }
         });
+      } else {
+        if (this.wsSubscription) {
+          this.wsSubscription.unsubscribe();
+          this.wsSubscription = undefined;
+        }
       }
     });
   }
@@ -219,9 +238,7 @@ export class UserProfileComponent implements OnInit, OnDestroy {
   }
 
   savePaymentInfo() {
-
   }
-
 
   acceptRide() {
     if (!this.currentRideId || !this.user?.id) {
@@ -230,7 +247,6 @@ export class UserProfileComponent implements OnInit, OnDestroy {
     }
 
     this.showPopup = false;
-
     this.userService.acceptRide(this.currentRideId, this.user.id).subscribe({
       next: (response: any) => {
         alert('✅ ' + response.message);
@@ -256,7 +272,6 @@ export class UserProfileComponent implements OnInit, OnDestroy {
     }
 
     this.showPopup = false;
-
     this.userService.rejectRide(this.currentRideId, this.user.id).subscribe({
       next: (response: any) => {
         alert('❌ ' + response.message);
@@ -273,5 +288,43 @@ export class UserProfileComponent implements OnInit, OnDestroy {
         this.currentRideId = null;
       }
     });
+  }
+
+  handleRideAction(event: { action: 'start' | 'cancel', reason?: string }): void {
+    console.log('Driver ride action received:', event);
+    this.showPopup = false;
+
+    if (!this.currentRideId || !this.user?.id) {
+      alert('Greška: Nedostaju podaci za akciju vožnje.');
+      return;
+    }
+
+    if (event.action === 'start') {
+      console.log('Driver starting ride for ID:', this.currentRideId);
+      this.rideService.startRideByDriver(this.currentRideId).subscribe({
+        next: (response) => {
+          alert('✅ ' + response.message);
+          console.log('Ride started by driver successfully:', response);
+          this.currentRideId = null;
+        },
+        error: (err) => {
+          alert('❌ Greška pri započinjanju vožnje: ' + (err.error?.error || 'Nepoznata greška.'));
+          console.error('Error starting ride by driver:', err);
+        }
+      });
+    } else if (event.action === 'cancel' && event.reason) {
+      console.log('Driver cancelling ride for ID:', this.currentRideId, 'Reason:', event.reason);
+      this.rideService.cancelRideByDriver(this.currentRideId, event.reason).subscribe({
+        next: (response) => {
+          alert('❌ ' + response.message);
+          console.log('Ride cancelled by driver successfully:', response);
+          this.currentRideId = null;
+        },
+        error: (err) => {
+          alert('❌ Greška pri otkazivanju vožnje: ' + (err.error?.error || 'Nepoznata greška.'));
+          console.error('Error cancelling ride by driver:', err);
+        }
+      });
+    }
   }
 }

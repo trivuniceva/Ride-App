@@ -107,4 +107,34 @@ public class RideController {
                     .body(Collections.emptyList());
         }
     }
+
+    @PostMapping("/ride/{rideId}/start")
+    public ResponseEntity<Map<String, String>> startRideByDriver(@PathVariable Long rideId) {
+        try {
+            rideService.startRideByDriver(rideId);
+            return ResponseEntity.ok(Map.of("message", "Vožnja je uspešno započeta."));
+        } catch (NoSuchElementException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("error", e.getMessage()));
+        } catch (IllegalStateException e) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(Map.of("error", e.getMessage()));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("error", "Greška pri započinjanju vožnje: " + e.getMessage()));
+        }
+    }
+
+    @PostMapping("/ride/{rideId}/cancel")
+    public ResponseEntity<Map<String, String>> cancelRideByDriver(@PathVariable Long rideId, @RequestBody Map<String, String> requestBody) {
+        try {
+            String reason = requestBody.get("reason");
+            if (reason == null || reason.trim().isEmpty()) {
+                return ResponseEntity.badRequest().body(Map.of("error", "Razlog otkazivanja je obavezan."));
+            }
+            rideService.cancelRideByDriver(rideId, reason);
+            return ResponseEntity.ok(Map.of("message", "Vožnja je uspešno otkazana."));
+        } catch (NoSuchElementException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("error", e.getMessage()));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("error", "Greška pri otkazivanju vožnje: " + e.getMessage()));
+        }
+    }
 }

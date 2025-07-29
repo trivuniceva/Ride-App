@@ -90,4 +90,20 @@ export class RideService {
     return this.http.get<Ride[]>(`${this.apiUrl}/history/${userId}/${userRole}`, { params });
   }
 
+  acceptRide(rideId: number, driverId: number): Observable<any> {
+    return this.http.post(`${this.apiUrl}/accept/${rideId}/${driverId}`, {});
+  }
+
+  rejectRide(rideId: number, driverId: number): Observable<any> {
+    return this.http.post(`${this.apiUrl}/reject/${rideId}/${driverId}`, {});
+  }
+
+  startRideByDriver(rideId: number): Observable<any> {
+    return this.http.post(`${this.apiUrl}/ride/${rideId}/start`, {});
+  }
+
+  cancelRideByDriver(rideId: number, reason: string): Observable<any> {
+    return this.http.post(`${this.apiUrl}/ride/${rideId}/cancel`, { reason });
+  }
+
 }

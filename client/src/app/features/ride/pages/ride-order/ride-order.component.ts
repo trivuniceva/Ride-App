@@ -252,7 +252,7 @@ export class RideOrderComponent implements OnInit, OnDestroy {
   handleActiveDriverLocationChange(location: [number, number] | null): void {
     this.ngZone.run(() => {
       if (location) {
-        this.activeDriverLocation = [...location]; // Koristite spread operator
+        this.activeDriverLocation = [...location];
       } else {
         this.activeDriverLocation = null;
       }

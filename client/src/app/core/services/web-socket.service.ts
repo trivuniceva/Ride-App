@@ -1,11 +1,9 @@
-// src/app/core/services/web-socket.service.ts
-
 import { Injectable } from '@angular/core';
 import { Client, IMessage, StompSubscription } from '@stomp/stompjs';
-import { Observable, ReplaySubject, BehaviorSubject, Subject } from 'rxjs'; // Dodao Subject za waitOnConnect$
+import { Observable, ReplaySubject, BehaviorSubject, Subject } from 'rxjs';
 import SockJS from 'sockjs-client/dist/sockjs';
 import { environment } from '../../../environments/environment';
-import { take, filter } from 'rxjs/operators'; // Dodao take i filter
+import { take, filter } from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root'
@@ -13,7 +11,6 @@ import { take, filter } from 'rxjs/operators'; // Dodao take i filter
 export class WebSocketService {
   private stompClient: Client;
   private isConnected: boolean = false;
-  // Dodatni Subject koji će emitovati kada je konekcija uspostavljena
   private connectionEstablished$: Subject<void> = new Subject<void>();
 
 
@@ -42,7 +39,7 @@ export class WebSocketService {
       console.log('Povezan na WebSocket (za chat i notifikacije)', frame);
       this.isConnected = true;
       this.processedMessageIds.clear();
-      this.connectionEstablished$.next(); // Emituj događaj da je konekcija uspostavljena
+      this.connectionEstablished$.next();
 
       this.stompClient.subscribe('/user/queue/messages', (message: IMessage) => {
         this.processIncomingMessage(message);
@@ -61,13 +58,10 @@ export class WebSocketService {
     this.stompClient.onDisconnect = (frame) => {
       console.log('Odjavljen sa WebSocket-a', frame);
       this.isConnected = false;
-      // Ne emitujemo na connectionEstablished$ ovde, jer se to koristi za inicijalnu pretplatu.
-      // Resetujemo ga tek na sledećem aktiviranju stompClienta ako je potrebno
     };
 
     this.stompClient.onStompError = (frame) => {
       console.error('STOMP Error:', frame);
-      // Ne ažuriramo isConnected ovde direktno, onDisconnect će se verovatno pozvati
     };
 
     this.stompClient.activate();
@@ -79,7 +73,6 @@ export class WebSocketService {
       const parsedMessage = JSON.parse(message.body);
       console.log('Received WebSocket message (parsed):', parsedMessage);
 
-      // Koristimo message-id ako postoji za dedup, inače fallback na kombinaciju
       const messageIdentifier = message.headers['message-id'] ||
         `${parsedMessage.chatSessionId || ''}-${parsedMessage.timestamp || ''}-${parsedMessage.senderId || ''}-${parsedMessage.messageContent || ''}`;
 
@@ -113,8 +106,8 @@ export class WebSocketService {
     return this.allReceivedMessages$;
   }
 
-  public subscribeToUserTopic(userId: number): Observable<any> {
-    const topic = `/user/${userId}/queue/ride-updates`;
+  public subscribeToUserTopic(userId: number, topicSuffix: string = '/user/{userId}/queue/ride-updates'): Observable<any> {
+    const topic = topicSuffix.replace('{userId}', String(userId));
     console.log(`Povezivanje na WebSocket topic: ${topic}`);
 
     return new Observable(observer => {
@@ -131,23 +124,20 @@ export class WebSocketService {
             observer.error(e);
           }
         });
-        console.log(`Uspešno pretplaćen na ${topic}`); // Potvrdni log
+        console.log(`Uspešno pretplaćen na ${topic}`);
       };
 
       if (this.isConnected) {
-        // Ako je već povezan, odmah se pretplati
         subscribe();
       } else {
-        // Ako nije povezan, čekaj da se konekcija uspostavi
         console.log(`WebSocket nije povezan. Čekam uspostavljanje veze pre pretplate na korisničku temu ${topic}.`);
         this.connectionEstablished$.pipe(
-          take(1) // Uzmi samo prvi put kada se veza uspostavi
+          take(1)
         ).subscribe(() => {
-          subscribe(); // Kada se veza uspostavi, pretplati se
+          subscribe();
         });
       }
 
-      // Funkcija za čišćenje kada se Angular Observable odjavi
       return () => {
         if (stompSubscription && this.stompClient.connected) {
           stompSubscription.unsubscribe();

@@ -129,7 +129,6 @@ public class SplitFareService {
                         "Vozač " + acceptedDriver.getFirstname() + " " + acceptedDriver.getLastname() + " je prihvatio vašu vožnju!",
                         ride.getId(), acceptedDriver.getFirstname(), acceptedDriver.getLastname(), acceptedDriver.getProfilePic());
 
-                // **** PROSLEĐENO: requestorUserId u pozivu startSimulation ****
                 rideSimulationService.startSimulation(ride, requestorUserId);
 
             } catch (NoSuchElementException e) {
@@ -226,6 +225,7 @@ public class SplitFareService {
             System.out.println("Nema više odgovarajućih vozača za vožnju " + ride.getId());
         }
     }
+
 
     private void confirmAndProcessPayment(double fullPrice, List<String> passengers) {
         int totalPeople = passengers.size() + 1;

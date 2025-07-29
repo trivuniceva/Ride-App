@@ -20,11 +20,12 @@ public class NotificationService {
         NotificationDTO notification = new NotificationDTO("RIDE_REQUEST", message, rideRequestDTO, rideId, driverId);
         try {
             String jsonMessage = objectMapper.writeValueAsString(notification);
-            messagingTemplate.convertAndSend(
-                    "/topic/ride-requests",
+            messagingTemplate.convertAndSendToUser(
+                    String.valueOf(driverId),
+                    "/queue/driver-updates",
                     jsonMessage
             );
-            System.out.println("Poslato obaveštenje vozaču " + driverId + " na /topic/ride-requests (TEST)");
+            System.out.println("Poslato obaveštenje vozaču " + driverId + " o zahtevu za vožnju na /user/" + driverId + "/queue/driver-updates");
         } catch (JsonProcessingException e) {
             System.err.println("Greška prilikom serijalizacije obaveštenja u JSON: " + e.getMessage());
         }
@@ -45,42 +46,53 @@ public class NotificationService {
         }
     }
 
-    /**
-     * Šalje ažuriranje lokacije vozača korisniku putem WebSocket-a.
-     *
-     * @param userId ID korisnika kome se šalje obaveštenje.
-     * @param rideId ID vožnje.
-     * @param driverId ID vozača.
-     * @param latitude Trenutna latituda vozača.
-     * @param longitude Trenutna longituda vozača.
-     * @param notificationType Tip notifikacije (npr. "DRIVER_EN_ROUTE", "RIDE_IN_PROGRESS").
-     */
     public void notifyUserDriverLocation(Long userId, Long rideId, Long driverId, double latitude, double longitude, String notificationType) {
-        // Kreiraj NotificationDTO koji će sadržati podatke o lokaciji
         NotificationDTO notification = new NotificationDTO(
                 notificationType,
-                "Ažuriranje lokacije vozača", // Možeš staviti dinamičku poruku
+                "Ažuriranje lokacije vozača",
                 rideId,
                 userId,
-                null, // Ne treba ime vozača ovde
-                null, // Ne treba prezime vozača ovde
-                null  // Ne treba slika vozača ovde
+                null,
+                null,
+                null
         );
-        // Dodaj koordinate direktno u DTO ili kreiraj novi DTO za lokaciju
         notification.setLatitude(latitude);
         notification.setLongitude(longitude);
-        notification.setDriverId(driverId); // Dodaj driverId u DTO
+        notification.setDriverId(driverId);
 
         try {
             String jsonMessage = objectMapper.writeValueAsString(notification);
             messagingTemplate.convertAndSendToUser(
                     String.valueOf(userId),
-                    "/queue/ride-updates", // Koristi isti topic kao i za ostale notifikacije korisniku
+                    "/queue/ride-updates",
                     jsonMessage
             );
             System.out.println("Poslato ažuriranje lokacije vozača za vožnju " + rideId + " korisniku " + userId + ": " + latitude + ", " + longitude);
         } catch (JsonProcessingException e) {
             System.err.println("Greška prilikom serijalizacije obaveštenja o lokaciji vozača: " + e.getMessage());
+        }
+    }
+
+    public void notifyDriverArrivedAtPickup(Long driverId, Long rideId, String message) {
+        NotificationDTO notification = new NotificationDTO(
+                "DRIVER_ARRIVED_AT_PICKUP_FOR_DRIVER",
+                message,
+                rideId,
+                null,
+                null, null, null
+        );
+        notification.setDriverId(driverId);
+
+        try {
+            String jsonMessage = objectMapper.writeValueAsString(notification);
+            messagingTemplate.convertAndSendToUser(
+                    String.valueOf(driverId),
+                    "/queue/driver-updates",
+                    jsonMessage
+            );
+            System.out.println("Poslato obaveštenje vozaču " + driverId + " o dolasku na pick-up za vožnju " + rideId);
+        } catch (JsonProcessingException e) {
+            System.err.println("Greška prilikom serijalizacije obaveštenja za vozača o dolasku na pick-up: " + e.getMessage());
         }
     }
 }

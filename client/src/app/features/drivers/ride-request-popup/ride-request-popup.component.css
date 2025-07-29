@@ -8,12 +8,111 @@
 }
 .popup {
   background: white;
-  padding: 20px;
+  padding: 30px; /* Povećan padding */
   border-radius: 10px;
   box-shadow: 0 0 20px rgba(0,0,0,0.3);
   text-align: center;
+  max-width: 450px; /* Dodata max širina */
+  width: 90%; /* Prilagodljiva širina */
 }
+
+.popup h3 {
+  font-size: 1.8em;
+  margin-bottom: 20px;
+  color: #333;
+}
+
+.popup h2 { /* Dodato za "Vozač je stigao!" */
+  font-size: 2em;
+  margin-bottom: 20px;
+  color: #2c3e50;
+}
+
+.popup p {
+  font-size: 1.1em;
+  color: #555;
+  line-height: 1.5;
+  margin-bottom: 25px;
+}
+
+.button-group { /* Dodato za grupu dugmadi */
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  margin-top: 25px;
+}
+
 button {
   margin: 10px;
-  padding: 8px 20px;
+  padding: 12px 25px; /* Povećan padding */
+  border: none;
+  border-radius: 6px; /* Zaobljenije ivice */
+  font-size: 1.1em; /* Veći font */
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+  min-width: 150px; /* Minimalna širina */
+  background-color: #007bff; /* Podrazumevana boja */
+  color: white;
+}
+
+button:hover {
+  transform: translateY(-2px);
+  background-color: #0056b3;
+}
+
+/* Specifični stilovi za dugmad akcija */
+.btn-cancel {
+  background-color: #e74c3c;
+  color: white;
+}
+.btn-cancel:hover {
+  background-color: #c0392b;
+}
+
+.btn-start {
+  background-color: #27ae60;
+  color: white;
+}
+.btn-start:hover {
+  background-color: #229a53;
+}
+
+.btn-confirm-cancel {
+  background-color: #f39c12;
+  color: white;
+}
+.btn-confirm-cancel:hover {
+  background-color: #e67e22;
+}
+
+.btn-back {
+  background-color: #7f8c8d;
+  color: white;
+}
+.btn-back:hover {
+  background-color: #6c757d;
+}
+
+textarea { /* Stilovi za textarea */
+  width: calc(100% - 30px);
+  min-height: 100px;
+  padding: 15px;
+  margin-bottom: 15px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 1em;
+  resize: vertical;
+  box-sizing: border-box;
+}
+
+textarea.is-invalid {
+  border-color: #e74c3c;
+  box-shadow: 0 0 0 0.2rem rgba(231, 76, 60, 0.25);
+}
+
+.error-message {
+  color: #e74c3c;
+  font-size: 0.9em;
+  margin-top: -10px;
+  margin-bottom: 15px;
 }
