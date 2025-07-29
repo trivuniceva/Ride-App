@@ -74,7 +74,7 @@ h2 {
 .mat-cell {
   padding: 8px 16px;
   border-bottom: 1px solid rgba(0, 0, 0, 0.12);
-  white-space: nowrap;
+  /*white-space: nowrap;*/
 }
 
 .mat-header-cell {
@@ -93,7 +93,7 @@ h2 {
 
 .mat-column-details {
   text-align: right;
-  width: 120px;
+  width: 170px;
 }
 
 .mat-column-details button {
