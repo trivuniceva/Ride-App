@@ -5,10 +5,12 @@ import org.springframework.stereotype.Service;
 import jakarta.transaction.Transactional;
 import ridemanagement.backend.dto.RideRatingDTO;
 import ridemanagement.backend.model.RideRating;
+import ridemanagement.backend.model.Vehicle; // Dodaj import za Vehicle
 import ridemanagement.backend.repository.RideRatingRepository;
 
 import java.time.ZonedDateTime;
 import java.time.Duration;
+import java.util.NoSuchElementException; // Dodaj import za NoSuchElementException
 import java.util.Optional;
 
 @Service
@@ -16,6 +18,13 @@ public class RideRatingService {
 
     @Autowired
     private RideRatingRepository rideRatingRepository;
+    @Autowired
+    private DriverService driverService; // Pretpostavka da DriverService može da dohvati Vehicle po ID-u vozača ili direktno VehicleService
+
+    // Ako imaš poseban VehicleService, koristi njega:
+    // @Autowired
+    // private VehicleService vehicleService;
+
 
     private static final Duration RATING_WINDOW = Duration.ofDays(3);
 
@@ -28,6 +37,20 @@ public class RideRatingService {
 
         RideRating rideRating;
 
+        // **** Dohvati Vehicle objekat pre kreiranja RideRating ****
+        Vehicle vehicle = null;
+        if (ratingDTO.getVehicleId() != null) {
+            try {
+                // Pretpostavka: DriverService ima metodu za dohvaćanje vozila po ID-u vozila
+                // Ako imaš VehicleService, onda bi bilo vehicleService.findById(ratingDTO.getVehicleId())
+                vehicle = driverService.findVehicleById(ratingDTO.getVehicleId()); // Prilagodi ovu metodu ako je potrebno
+            } catch (NoSuchElementException e) {
+                System.err.println("Upozorenje: Vozilo sa ID " + ratingDTO.getVehicleId() + " nije pronađeno za ocenu vožnje. Nastavljam bez vozila.");
+                // Možeš baciti izuzetak ili nastaviti bez vozila, zavisno od poslovne logike
+            }
+        }
+        // *************************************************************
+
         if (existingRatingOptional.isPresent()) {
             rideRating = existingRatingOptional.get();
 
@@ -39,6 +62,7 @@ public class RideRatingService {
             rideRating.setDriverRating(ratingDTO.getDriverRating());
             rideRating.setVehicleRating(ratingDTO.getVehicleRating());
             rideRating.setComment(ratingDTO.getComment());
+            rideRating.setVehicle(vehicle); // **** Postavi Vehicle objekat ****
             System.out.println("Updating existing ride rating for ride ID: " + ratingDTO.getRideId() + " by user: " + ratingDTO.getReviewerUserId());
 
         } else {
@@ -46,7 +70,7 @@ public class RideRatingService {
                     ratingDTO.getRideId(),
                     ratingDTO.getReviewerUserId(),
                     ratingDTO.getDriverId(),
-                    ratingDTO.getVehicleId(),
+                    vehicle, // **** PROSLEDI VEHICLE OBJEKAT ****
                     ratingDTO.getDriverRating(),
                     ratingDTO.getVehicleRating(),
                     ratingDTO.getComment()

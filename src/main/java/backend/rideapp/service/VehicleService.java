@@ -4,7 +4,7 @@ import backend.rideapp.dto.DriverRegistrationDTO;
 import backend.rideapp.dto.VehicleDTO;
 import ridemanagement.backend.model.Vehicle;
 import ridemanagement.backend.model.VehicleType;
-import backend.rideapp.repository.VehicleRepository;
+import backend.rideapp.repository.VehicleRepositoryMain;
 import com.rideapp.usermanagement.dto.RegisterRequestDTO;
 import com.rideapp.usermanagement.model.ErrorResponse;
 import com.rideapp.usermanagement.model.SuccessResponse;
@@ -21,7 +21,7 @@ import org.springframework.stereotype.Service;
 public class VehicleService {
 
     @Autowired
-    VehicleRepository vehicleRepository;
+    VehicleRepositoryMain vehicleRepositoryMain;
 
     @Autowired
     AuthService authService;
@@ -50,7 +50,7 @@ public class VehicleService {
             String type = String.valueOf(vehicleDTO.getVehicleType());
             vehicle.setVehicleType(getVehicleType(type.toUpperCase()));
             try {
-                vehicleRepository.save(vehicle);
+                vehicleRepositoryMain.save(vehicle);
                 System.out.println("snimio vozilo");
                 return ResponseEntity.ok(new SuccessResponse("Registration successful!"));
 

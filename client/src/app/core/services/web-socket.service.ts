@@ -124,7 +124,7 @@ export class WebSocketService {
         stompSubscription = this.stompClient.subscribe(topic, (message: IMessage) => {
           try {
             const parsedMessage = JSON.parse(message.body);
-            console.log(`Received message on ${topic}:`, parsedMessage); // Dodatni log
+            console.log(`Received message on ${topic} (full parsed):`, parsedMessage);
             observer.next(parsedMessage);
           } catch (e) {
             console.error('Failed to parse WebSocket message body in user topic:', e, message.body);

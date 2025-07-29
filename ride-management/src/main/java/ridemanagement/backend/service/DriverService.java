@@ -9,20 +9,21 @@ import ridemanagement.backend.dto.PointDTO;
 import ridemanagement.backend.dto.RideRequestDTO;
 import ridemanagement.backend.model.Driver;
 import ridemanagement.backend.model.Point;
+import ridemanagement.backend.model.Vehicle;
 import ridemanagement.backend.model.WorkSession;
 import ridemanagement.backend.repository.DriverRepository;
 import ridemanagement.backend.repository.RideRatingRepository;
 import jakarta.transaction.Transactional;
+import ridemanagement.backend.repository.VehicleRepository;
 import ridemanagement.backend.repository.WorkSessionRepository;
 
 import java.sql.Timestamp;
 import java.time.Duration;
 import java.time.LocalDateTime;
-import java.util.Comparator;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
-import java.util.OptionalDouble; // DODATO: Import za OptionalDouble
+import java.util.OptionalDouble;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -40,6 +41,8 @@ public class DriverService {
 
     @Autowired
     private RideRatingRepository rideRatingRepository;
+    @Autowired
+    private VehicleRepository vehicleRepository;
 
     public Driver findById(Long driverId) {
         return driverRepository.findById(driverId)
@@ -160,7 +163,7 @@ public class DriverService {
                 .collect(Collectors.toList());
 
         if (ratings.isEmpty()) {
-            return null; // Ako nema ocena, vrati null
+            return null;
         }
 
         OptionalDouble average = ratings.stream()
@@ -300,5 +303,14 @@ public class DriverService {
         } else {
             throw new NoSuchElementException("Driver with ID " + id + " not found.");
         }
+    }
+
+    public Driver save(Driver driver) {
+        return driverRepository.save(driver);
+    }
+
+    public Vehicle findVehicleById(Long vehicleId) {
+        return vehicleRepository.findById(vehicleId)
+                .orElseThrow(() -> new NoSuchElementException("Vozilo sa ID " + vehicleId + " nije pronađeno."));
     }
 }

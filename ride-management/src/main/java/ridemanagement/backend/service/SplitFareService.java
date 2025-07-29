@@ -1,5 +1,7 @@
 package ridemanagement.backend.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rideapp.usermanagement.model.EmailService;
 import com.rideapp.usermanagement.repository.UserRepository;
 import com.rideapp.usermanagement.service.TokenService;
@@ -40,8 +42,10 @@ public class SplitFareService {
     private FavoriteRouteService favoriteRouteService;
     @Autowired
     private UserRepository userRepository;
+    @Autowired
+    private RideSimulationService rideSimulationService;
 
-    private Long getUserIdByEmail(String email) {
+    public Long getUserIdByEmail(String email) {
         User user = userRepository.findByEmail(email);
         if (user != null) {
             return user.getId();
@@ -124,11 +128,14 @@ public class SplitFareService {
                 notificationService.notifyUser(requestorUserId, "DRIVER_ACCEPTED_RIDE",
                         "Vozač " + acceptedDriver.getFirstname() + " " + acceptedDriver.getLastname() + " je prihvatio vašu vožnju!",
                         ride.getId(), acceptedDriver.getFirstname(), acceptedDriver.getLastname(), acceptedDriver.getProfilePic());
+
+                // **** PROSLEĐENO: requestorUserId u pozivu startSimulation ****
+                rideSimulationService.startSimulation(ride, requestorUserId);
+
             } catch (NoSuchElementException e) {
                 System.err.println("Greska: Prihvaćeni vozač sa ID " + ride.getDriverId() + " nije pronađen: " + e.getMessage());
             }
         }
-
     }
 
     public void rejectRide(Long rideId, Long driverId) {

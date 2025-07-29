@@ -44,4 +44,43 @@ public class NotificationService {
             System.err.println("Greška prilikom serijalizacije obaveštenja za korisnika u JSON: " + e.getMessage());
         }
     }
+
+    /**
+     * Šalje ažuriranje lokacije vozača korisniku putem WebSocket-a.
+     *
+     * @param userId ID korisnika kome se šalje obaveštenje.
+     * @param rideId ID vožnje.
+     * @param driverId ID vozača.
+     * @param latitude Trenutna latituda vozača.
+     * @param longitude Trenutna longituda vozača.
+     * @param notificationType Tip notifikacije (npr. "DRIVER_EN_ROUTE", "RIDE_IN_PROGRESS").
+     */
+    public void notifyUserDriverLocation(Long userId, Long rideId, Long driverId, double latitude, double longitude, String notificationType) {
+        // Kreiraj NotificationDTO koji će sadržati podatke o lokaciji
+        NotificationDTO notification = new NotificationDTO(
+                notificationType,
+                "Ažuriranje lokacije vozača", // Možeš staviti dinamičku poruku
+                rideId,
+                userId,
+                null, // Ne treba ime vozača ovde
+                null, // Ne treba prezime vozača ovde
+                null  // Ne treba slika vozača ovde
+        );
+        // Dodaj koordinate direktno u DTO ili kreiraj novi DTO za lokaciju
+        notification.setLatitude(latitude);
+        notification.setLongitude(longitude);
+        notification.setDriverId(driverId); // Dodaj driverId u DTO
+
+        try {
+            String jsonMessage = objectMapper.writeValueAsString(notification);
+            messagingTemplate.convertAndSendToUser(
+                    String.valueOf(userId),
+                    "/queue/ride-updates", // Koristi isti topic kao i za ostale notifikacije korisniku
+                    jsonMessage
+            );
+            System.out.println("Poslato ažuriranje lokacije vozača za vožnju " + rideId + " korisniku " + userId + ": " + latitude + ", " + longitude);
+        } catch (JsonProcessingException e) {
+            System.err.println("Greška prilikom serijalizacije obaveštenja o lokaciji vozača: " + e.getMessage());
+        }
+    }
 }
