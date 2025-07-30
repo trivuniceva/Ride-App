@@ -13,7 +13,11 @@
         [vehicleTypeFromParent]="vehicleType"
         [totalLength]="totalLength"
         [expectedTime]="expectedTime"
-      ></app-advanced-form-page>
+        (activeDriverLocationChange)="handleActiveDriverLocationChange($event)"
+        (activeDriverIdChange)="handleActiveDriverIdChange($event)"
+        [currentRideId]="activeRideId"
+        (rideCreated)="handleRideCreated($event)"
+        (showSummaryPopup)="showPopup = $event"> </app-advanced-form-page>
     </div>
 
     <div *ngIf="userRole !== 'REGISTERED_USER'">
@@ -40,7 +44,10 @@
             [destinationCoords]="destinationCoords"
             [alternativeRoutes]="alternativeRoutes"
             [waypointsCoords]="waypointsCoords"
-            [drivers]="allDrivers" ></app-map-test>
+            [drivers]="allDrivers"
+            [activeDriverLocation]="activeDriverLocation"
+            [activeDriverId]="activeDriverId"
+          ></app-map-test>
         </div>
       </div>
 

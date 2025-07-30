@@ -1,4 +1,4 @@
-import { Component, OnInit, SimpleChanges, NgZone } from '@angular/core';
+import { Component, OnInit, SimpleChanges, NgZone, OnDestroy } from '@angular/core';
 import { MapTestComponent } from '../../components/map-test/map-test.component';
 import { RouteFormComponent } from '../../components/route-form/route-form.component';
 import axios from 'axios';
@@ -23,7 +23,6 @@ import {PointDTO} from "../../../../core/models/PointDTO.model";
   imports: [
     MapTestComponent,
     RouteFormComponent,
-    MapTestComponent,
     RouteInfoComponent,
     NgIf,
     AdvancedFormPageComponent,
@@ -31,7 +30,7 @@ import {PointDTO} from "../../../../core/models/PointDTO.model";
   templateUrl: './ride-order.component.html',
   styleUrls: ['./ride-order.component.css'],
 })
-export class RideOrderComponent implements OnInit {
+export class RideOrderComponent implements OnInit, OnDestroy {
   apiKey: string = '';
 
   startCoords: [number, number] | null = null;
@@ -49,9 +48,15 @@ export class RideOrderComponent implements OnInit {
   allDrivers: Driver[] = [];
   totalLength: number | undefined;
   expectedTime: number | undefined;
-  stops: string[] = []; // Dodajemo stops properti
+  stops: string[] = [];
+
+  activeDriverLocation: [number, number] | null = null;
+  activeDriverId: number | null = null;
+  activeRideId: number | null = null;
 
   private authSubscription: Subscription | undefined;
+  private driverSubscription: Subscription | undefined;
+  showPopup: boolean = false;
 
   constructor(private authService: AuthService, private driverService: DriverService, private ngZone: NgZone) {}
 
@@ -59,19 +64,35 @@ export class RideOrderComponent implements OnInit {
     this.authSubscription = this.authService.loggedUser$.subscribe((user: User | null) => {
       if (user && user.userRole) {
         this.userRole = user.userRole;
+        console.log('DEBUG: RideOrderComponent userRole changed to:', this.userRole);
       } else {
         this.userRole = '';
+        console.log('DEBUG: RideOrderComponent userRole reset to empty.');
       }
     });
 
     this.apiKey = environment.openrouteserviceApiKey;
 
-    this.driverService.getDrivers().subscribe((data) => {
-      this.ngZone.run(() => {
-        this.allDrivers = data;
-        console.log('Dohvaćeni vozači:', this.allDrivers);
-      });
+    this.driverSubscription = this.driverService.getDrivers().subscribe({
+      next: (data) => {
+        this.ngZone.run(() => {
+          this.allDrivers = data;
+          console.log('Dohvaćeni vozači:', this.allDrivers);
+        });
+      },
+      error: (err) => {
+        console.error('Greška pri dohvaćanju vozača:', err);
+      }
     });
+  }
+
+  ngOnDestroy(): void {
+    if (this.authSubscription) {
+      this.authSubscription.unsubscribe();
+    }
+    if (this.driverSubscription) {
+      this.driverSubscription.unsubscribe();
+    }
   }
 
   async handleRouteData(routeData: {
@@ -101,7 +122,7 @@ export class RideOrderComponent implements OnInit {
         this.destinationAddress = routeData.destinationAddress;
         this.waypointsCoords = waypointsCoords;
         this.vehicleType = routeData.vehicleType || null;
-        this.stops = routeData.stops; // Postavi stops properti
+        this.stops = routeData.stops;
 
         const routes = await this.getRoutes(startCoords, waypointsCoords, destinationCoords);
 
@@ -124,13 +145,13 @@ export class RideOrderComponent implements OnInit {
             console.log('Trajanje:', this.duration, 'min');
             console.log('alternativeRoutes:', this.alternativeRoutes);
           } else {
-            console.log('Dekodiranje nije uspelo');
+            console.log('Dekodiranje rute nije uspelo.');
           }
         } else {
-          console.log('Uslov nije ispunjen');
+          console.log('Nema dostupnih ruta ili geometrija rute je prazna.');
         }
       } else {
-        console.error('Geocoding failed');
+        console.error('Geocoding failed: Start or destination coordinates could not be obtained.');
       }
     } catch (error) {
       console.error('Error during route calculation:', error);
@@ -152,22 +173,33 @@ export class RideOrderComponent implements OnInit {
   }
 
   async geocodeAddress(address: string): Promise<[number, number] | null> {
-    const response = await axios.get(`https://api.openrouteservice.org/geocode/search`, {
-      params: {
-        api_key: this.apiKey,
-        text: address,
-      },
-      headers: {
-        Accept: 'application/json',
-      },
-      timeout: 5000,
-    });
+    try {
+      console.log(`Attempting to geocode address: "${address}"`);
+      const response = await axios.get(`https://api.openrouteservice.org/geocode/search`, {
+        params: {
+          api_key: this.apiKey,
+          text: address,
+        },
+        headers: {
+          Accept: 'application/json',
+        },
+        timeout: 10000,
+      });
 
-    if (response.data.features && response.data.features.length > 0) {
-      const coords = response.data.features[0].geometry.coordinates;
-      return [coords[1], coords[0]];
+      console.log(`Geocoding response for "${address}":`, response.data);
+
+      if (response.data.features && response.data.features.length > 0) {
+        const coords = response.data.features[0].geometry.coordinates;
+        console.log(`Geocoding successful for "${address}": [${coords[1]}, ${coords[0]}]`);
+        return [coords[1], coords[0]];
+      } else {
+        console.warn(`No features found for address: "${address}". Response:`, response.data);
+        return null;
+      }
+    } catch (error: any) {
+      console.error(`Error geocoding address "${address}":`, error.response ? error.response.data : error.message);
+      return null;
     }
-    return null;
   }
 
   async getRoutes(
@@ -181,6 +213,9 @@ export class RideOrderComponent implements OnInit {
         coordinates.push([waypoint[1], waypoint[0]]);
       }
       coordinates.push([destinationCoords[1], destinationCoords[0]]);
+
+      console.log('Attempting to get routes with coordinates:', coordinates);
+
       const response = await axios.post(
         'https://api.openrouteservice.org/v2/directions/driving-car',
         {
@@ -191,12 +226,14 @@ export class RideOrderComponent implements OnInit {
             Authorization: this.apiKey,
             'Content-Type': 'application/json',
           },
+          timeout: 10000,
         }
       );
 
+      console.log('Routes response:', response.data);
       return response.data.routes;
     } catch (error: any) {
-      console.error('Greška tokom izračunavanja rute:', error);
+      console.error('Greška tokom izračunavanja rute (getRoutes):', error.response ? error.response.data : error.message);
       return [];
     }
   }
@@ -212,4 +249,30 @@ export class RideOrderComponent implements OnInit {
       '.........................................................................................................'
     );
   }
+
+  handleActiveDriverLocationChange(location: [number, number] | null): void {
+    this.ngZone.run(() => {
+      if (location) {
+        this.activeDriverLocation = [...location];
+      } else {
+        this.activeDriverLocation = null;
+      }
+      console.log('DEBUG: RideOrderComponent received activeDriverLocation (after update):', this.activeDriverLocation);
+    });
+  }
+
+  handleActiveDriverIdChange(driverId: number | null): void {
+    this.ngZone.run(() => {
+      this.activeDriverId = driverId;
+      console.log('DEBUG: RideOrderComponent received activeDriverId:', this.activeDriverId);
+    });
+  }
+
+  handleRideCreated(rideId: number | null): void {
+    this.ngZone.run(() => {
+      this.activeRideId = rideId;
+      console.log('DEBUG: RideOrderComponent activeRideId set to:', this.activeRideId);
+    });
+  }
 }
+

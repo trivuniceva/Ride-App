@@ -20,8 +20,10 @@ public class RideRating {
     @Column(name = "driver_id", nullable = false)
     private Long driverId;
 
-    @Column(name = "vehicle_id")
-    private Long vehicleId;
+    // **** PROMENA OVDE: Mapiraj kao ManyToOne vezu sa Vehicle entitetom ****
+    @ManyToOne(fetch = FetchType.LAZY) // Uklonjeno cascade = CascadeType.ALL ako je bilo
+    @JoinColumn(name = "vehicle_id") // Ovo je kolona u ride_rating tabeli koja je strani ključ
+    private Vehicle vehicle; // Sada referenciramo ceo Vehicle objekat
 
     @Column(name = "driver_rating", nullable = false)
     private Integer driverRating;
@@ -39,11 +41,12 @@ public class RideRating {
         this.ratingDate = ZonedDateTime.now();
     }
 
-    public RideRating(Long rideId, Long reviewerUserId, Long driverId, Long vehicleId, Integer driverRating, Integer vehicleRating, String comment) {
+    // **** Ažuriraj konstruktor da prima Vehicle objekat umesto Long vehicleId ****
+    public RideRating(Long rideId, Long reviewerUserId, Long driverId, Vehicle vehicle, Integer driverRating, Integer vehicleRating, String comment) {
         this.rideId = rideId;
         this.reviewerUserId = reviewerUserId;
         this.driverId = driverId;
-        this.vehicleId = vehicleId;
+        this.vehicle = vehicle; // Postavi Vehicle objekat
         this.driverRating = driverRating;
         this.vehicleRating = vehicleRating;
         this.comment = comment;
@@ -82,12 +85,13 @@ public class RideRating {
         this.driverId = driverId;
     }
 
-    public Long getVehicleId() {
-        return vehicleId;
+    // **** Ažuriraj getter i setter za Vehicle objekat ****
+    public Vehicle getVehicle() {
+        return vehicle;
     }
 
-    public void setVehicleId(Long vehicleId) {
-        this.vehicleId = vehicleId;
+    public void setVehicle(Vehicle vehicle) {
+        this.vehicle = vehicle;
     }
 
     public Integer getDriverRating() {

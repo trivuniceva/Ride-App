@@ -9,20 +9,18 @@ import ridemanagement.backend.dto.PointDTO;
 import ridemanagement.backend.dto.RideRequestDTO;
 import ridemanagement.backend.model.Driver;
 import ridemanagement.backend.model.Point;
+import ridemanagement.backend.model.Vehicle;
 import ridemanagement.backend.model.WorkSession;
-import ridemanagement.backend.repository.DriverRepository;
-import ridemanagement.backend.repository.RideRatingRepository;
+import ridemanagement.backend.repository.*;
 import jakarta.transaction.Transactional;
-import ridemanagement.backend.repository.WorkSessionRepository;
 
 import java.sql.Timestamp;
 import java.time.Duration;
 import java.time.LocalDateTime;
-import java.util.Comparator;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
-import java.util.OptionalDouble; // DODATO: Import za OptionalDouble
+import java.util.OptionalDouble;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -40,6 +38,10 @@ public class DriverService {
 
     @Autowired
     private RideRatingRepository rideRatingRepository;
+    @Autowired
+    private VehicleRepository vehicleRepository;
+    @Autowired
+    private RideRepository rideRepository;
 
     public Driver findById(Long driverId) {
         return driverRepository.findById(driverId)
@@ -160,7 +162,7 @@ public class DriverService {
                 .collect(Collectors.toList());
 
         if (ratings.isEmpty()) {
-            return null; // Ako nema ocena, vrati null
+            return null;
         }
 
         OptionalDouble average = ratings.stream()
@@ -299,6 +301,48 @@ public class DriverService {
             return convertToDTO(driverOptional.get());
         } else {
             throw new NoSuchElementException("Driver with ID " + id + " not found.");
+        }
+    }
+
+    public Driver save(Driver driver) {
+        return driverRepository.save(driver);
+    }
+
+    public Vehicle findVehicleById(Long vehicleId) {
+        return vehicleRepository.findById(vehicleId)
+                .orElseThrow(() -> new NoSuchElementException("Vozilo sa ID " + vehicleId + " nije pronađeno."));
+    }
+
+    @Transactional
+    public void updateDriverAvailabilityAfterRideCompletion(Long driverId) {
+        Driver driver = findById(driverId);
+
+        boolean hasFutureRides = rideRepository.existsByDriverIdAndRideStatusIn(
+                driverId,
+                List.of("ACCEPTED", "ARRIVED_AT_PICKUP", "IN_PROGRESS")
+        );
+
+        driver.setHasFutureDrive(hasFutureRides);
+
+        if (hasFutureRides) {
+            driver.setAvailable(false);
+            System.out.println("Vozač " + driverId + " završio vožnju, ali ima budućih vožnji. Postavljen na: isAvailable=false, hasFutureDrive=true.");
+        } else {
+            driver.setAvailable(true);
+            System.out.println("Vozač " + driverId + " završio vožnju i nema budućih vožnji. Postavljen na: isAvailable=true, hasFutureDrive=false.");
+        }
+
+        driverRepository.save(driver);
+    }
+
+    @Transactional
+    public void setDriverBusyForNewRide(Long driverId) {
+        Driver driver = findById(driverId);
+        if (driver.isAvailable()) {
+            driver.setAvailable(false);
+            driver.setHasFutureDrive(true);
+            driverRepository.save(driver);
+            System.out.println("Vozač " + driverId + " je prihvatio vožnju. Postavljen na: isAvailable=false, hasFutureDrive=true.");
         }
     }
 }

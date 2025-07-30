@@ -1,5 +1,7 @@
 package ridemanagement.backend.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rideapp.usermanagement.model.EmailService;
 import com.rideapp.usermanagement.repository.UserRepository;
 import com.rideapp.usermanagement.service.TokenService;
@@ -19,6 +21,8 @@ import java.math.RoundingMode;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Set;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 @Service
@@ -40,8 +44,10 @@ public class SplitFareService {
     private FavoriteRouteService favoriteRouteService;
     @Autowired
     private UserRepository userRepository;
+    @Autowired
+    private RideSimulationService rideSimulationService;
 
-    private Long getUserIdByEmail(String email) {
+    public Long getUserIdByEmail(String email) {
         User user = userRepository.findByEmail(email);
         if (user != null) {
             return user.getId();
@@ -88,6 +94,8 @@ public class SplitFareService {
         System.out.println(ride.toString());
         ride = rideRepository.save(ride);
 
+        scheduleFailureIfNoDriverResponse(ride.getId());
+
         Long requestorUserId = getUserIdByEmail(ride.getRequestorEmail());
 
         if (requestorUserId != null) {
@@ -124,11 +132,13 @@ public class SplitFareService {
                 notificationService.notifyUser(requestorUserId, "DRIVER_ACCEPTED_RIDE",
                         "Vozač " + acceptedDriver.getFirstname() + " " + acceptedDriver.getLastname() + " je prihvatio vašu vožnju!",
                         ride.getId(), acceptedDriver.getFirstname(), acceptedDriver.getLastname(), acceptedDriver.getProfilePic());
+
+                rideSimulationService.startSimulation(ride, requestorUserId);
+
             } catch (NoSuchElementException e) {
                 System.err.println("Greska: Prihvaćeni vozač sa ID " + ride.getDriverId() + " nije pronađen: " + e.getMessage());
             }
         }
-
     }
 
     public void rejectRide(Long rideId, Long driverId) {
@@ -220,6 +230,7 @@ public class SplitFareService {
         }
     }
 
+
     private void confirmAndProcessPayment(double fullPrice, List<String> passengers) {
         int totalPeople = passengers.size() + 1;
         BigDecimal fullPriceDecimal = new BigDecimal(fullPrice);
@@ -233,4 +244,25 @@ public class SplitFareService {
             // emailService.sendPaymentConfirmation(email, token , pricePerPerson);
         }
     }
+
+    private void scheduleFailureIfNoDriverResponse(Long rideId) {
+        Executors.newSingleThreadScheduledExecutor().schedule(() -> {
+            Ride latestRide = rideRepository.findById(rideId).orElse(null);
+            if (latestRide != null && "PENDING_DRIVER_RESPONSE".equals(latestRide.getRideStatus())) {
+                latestRide.setRideStatus("FAILED");
+                rideRepository.save(latestRide);
+
+                Long requestorUserId = getUserIdByEmail(latestRide.getRequestorEmail());
+                if (requestorUserId != null) {
+                    notificationService.notifyUser(requestorUserId,
+                            "RIDE_FAILED",
+                            "Nijedan vozač nije odgovorio na zahtev za vožnju. Pokušajte ponovo kasnije.",
+                            latestRide.getId(), null, null, null);
+                }
+
+                System.out.println("Vožnja " + rideId + " je označena kao FAILED jer nijedan vozač nije odgovorio u roku.");
+            }
+        }, 15, TimeUnit.SECONDS);
+    }
+
 }

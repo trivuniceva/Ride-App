@@ -10,16 +10,15 @@ import java.sql.Timestamp;
 @Table(name = "drivers")
 public class Driver extends User {
 
-
     @Column(name = "is_available", nullable = false)
     private boolean isAvailable;
 
-    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "vehicle_id")
     @JsonIgnore
     private Vehicle vehicle;
 
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "location_id")
     @JsonIgnore
     private Point location;

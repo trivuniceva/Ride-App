@@ -2,15 +2,15 @@ package ridemanagement.backend.model;
 
 import com.rideapp.usermanagement.model.User;
 import jakarta.persistence.*;
-import org.springframework.data.annotation.Id;
+// import org.springframework.data.annotation.Id; // **** UKLONI OVAJ IMPORT ****
 
 
 @Entity
 @Table(name = "vehicle")
 public class Vehicle {
 
-    @jakarta.persistence.Id
-    @Id
+    @jakarta.persistence.Id // **** OSTAVI SAMO OVU ANOTACIJU ****
+    // @Id // **** UKLONI OVU REDUNDANTNU ANOTACIJU ****
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 

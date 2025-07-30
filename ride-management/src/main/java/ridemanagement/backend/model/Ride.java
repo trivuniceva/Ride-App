@@ -85,6 +85,9 @@ public class Ride {
     @Column(name = "driver_id")
     private Set<Long> refusedDriverIds = new HashSet<>();
 
+    @Lob
+    @Column(name = "path_taken")
+    private String pathTaken = "";
 
     public Ride() {
         this.createdAt = LocalDateTime.now();
@@ -169,6 +172,14 @@ public class Ride {
     public void setRefusedDriverIds(Set<Long> refusedDriverIds) { this.refusedDriverIds = refusedDriverIds; }
     public void addRefusedDriver(Long driverId) { this.refusedDriverIds.add(driverId); }
 
+    public String getPathTaken() {
+        return pathTaken;
+    }
+
+    public void setPathTaken(String pathTaken) {
+        this.pathTaken = pathTaken;
+    }
+
     @Override
     public String toString() {
         return "Ride{" +
@@ -192,6 +203,7 @@ public class Ride {
                 ", totalLength=" + totalLength +
                 ", driverId=" + driverId +
                 ", refusedDriverIds=" + refusedDriverIds +
+                ", pathTaken='" + pathTaken + '\'' +
                 '}';
     }
 }

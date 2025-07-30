@@ -3,125 +3,101 @@
   flex-direction: column;
   width: 90vw;
   max-width: 1200px;
-  min-height: 70vh;
-  max-height: 90vh;
-  border-radius: 8px;
   overflow: hidden;
-  background-color: #ffffff;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
 .dialog-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 15px 25px;
-  border-bottom: 1px solid #eee;
-  background-color: #f8f8f8;
+  padding: 20px 30px;
+  background-color: #f5f5f5;
+  border-bottom: 1px solid #ddd;
 }
 
 .dialog-header h2 {
-  margin: 0;
-  font-size: 1.5rem;
+  font-size: 1.6rem;
   color: #333;
+  margin: 0;
 }
 
 .dialog-content {
   display: flex;
-  flex-grow: 1;
-  overflow: hidden;
+  flex-direction: row;
+  gap: 30px;
+  padding: 30px;
+  flex-wrap: wrap;
 }
 
-.ride-details-left {
+.ride-info,
+.driver-info,
+.map-container-dialog {
   flex: 1;
-  padding: 25px;
-  overflow-y: auto;
-  border-right: 1px solid #eee;
-  background-color: #fff;
+  min-width: 280px;
 }
 
-.ride-details-left h3 {
-  color: #444;
-  margin-top: 0;
+.ride-info h3,
+.driver-info h3 {
   margin-bottom: 20px;
-  font-size: 1.3rem;
+  font-size: 1.4rem;
   border-bottom: 2px solid #999;
-  padding-bottom: 5px;
+  padding-bottom: 6px;
+  color: #444;
 }
 
-.ride-details-left p {
-  margin-bottom: 10px;
-  line-height: 1.5;
+.ride-info p,
+.driver-info p {
+  margin: 12px 0;
   color: #555;
+  line-height: 1.5;
 }
 
-.ride-details-left p strong {
+.ride-info p strong,
+.driver-info p strong {
   color: #222;
 }
 
-.ride-details-left mat-icon {
-  vertical-align: middle;
-  margin-left: 5px;
-  font-size: 1.2rem;
-  color: #666;
-}
-
-.driver-info {
-  margin-top: 30px;
-  padding-top: 20px;
-  border-top: 1px solid #eee;
-}
-
-.driver-info h3 {
-  color: #444;
-  font-size: 1.3rem;
-  margin-bottom: 20px;
-  border-bottom: 2px solid #999;
-  padding-bottom: 5px;
-}
-
-.actions {
-  margin-top: 30px;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.actions button {
-  width: 100%;
-  padding: 12px 0;
-  background-color: #ccc;
-  color: #fff;
-  border: none;
-  border-radius: 4px;
-}
-
 .map-container-dialog {
-  flex: 2;
-  position: relative;
+  height: 300px;
+  border-left: 1px solid #eee;
 }
 
-app-map-test {
+.map-container-dialog app-ride-details-map {
   display: block;
   width: 100%;
   height: 100%;
 }
 
-@media (max-width: 768px) {
+.action-buttons {
+  margin-top: 8%;
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  padding: 20px 30px;
+}
+
+.action-buttons button {
+  min-width: 180px;
+}
+
+@media (max-width: 900px) {
   .dialog-content {
     flex-direction: column;
-    overflow-y: auto;
-  }
-
-  .ride-details-left,
-  .map-container-dialog {
-    flex: none;
-    width: 100%;
-    border-right: none;
-    border-bottom: 1px solid #eee;
   }
 
   .map-container-dialog {
-    min-height: 300px;
+    height: 250px;
+    border-left: none;
+    border-top: 1px solid #eee;
   }
 }
+
+.order-again-btn {
+  color: black;
+}
+
+.order-again-btn:hover{
+  background-color: black;
+  color: white;
+}
+

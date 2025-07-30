@@ -74,7 +74,7 @@ h2 {
 .mat-cell {
   padding: 8px 16px;
   border-bottom: 1px solid rgba(0, 0, 0, 0.12);
-  white-space: nowrap;
+  /*white-space: nowrap;*/
 }
 
 .mat-header-cell {
@@ -93,7 +93,7 @@ h2 {
 
 .mat-column-details {
   text-align: right;
-  width: 120px;
+  width: 170px;
 }
 
 .mat-column-details button {
@@ -205,3 +205,33 @@ button[mat-icon-button] .mat-icon {
   font-size: 24px;
 }
 
+button[mat-raised-button].order-again-btn {
+  background-color: white;
+  color: black;
+  border: 1px solid #ddd;
+}
+
+button[mat-raised-button].order-again-btn .mat-icon {
+  color: black;
+}
+
+button[mat-raised-button].order-again-btn:hover {
+  background-color: black;
+  color: white;
+}
+
+button[mat-raised-button].order-again-btn:hover .mat-icon {
+  color: white;
+}
+
+::ng-deep .mat-calendar-body-selected {
+  background-color: black !important;
+  color: white !important;
+}
+
+::ng-deep .mat-date-range-input-start-date,
+::ng-deep .mat-date-range-input-end-date {
+  background-color: black !important;
+  color: white !important;
+  border-radius: 50%;
+}

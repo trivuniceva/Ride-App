@@ -1,5 +1,8 @@
 import {Component, EventEmitter, Input, Output, OnInit} from '@angular/core';
-import {NgForOf, NgIf} from '@angular/common';
+import {CommonModule, CurrencyPipe, NgForOf, NgIf} from '@angular/common';
+import {FormsModule} from '@angular/forms';
+import {MatButtonModule} from '@angular/material/button';
+import {MatIconModule} from '@angular/material/icon';
 
 @Component({
   selector: 'app-ride-summary',
@@ -7,6 +10,11 @@ import {NgForOf, NgIf} from '@angular/common';
   imports: [
     NgIf,
     NgForOf,
+    CommonModule,
+    FormsModule,
+    MatButtonModule,
+    MatIconModule,
+    CurrencyPipe
   ],
   templateUrl: './ride-summary.component.html',
   styleUrl: './ride-summary.component.css',

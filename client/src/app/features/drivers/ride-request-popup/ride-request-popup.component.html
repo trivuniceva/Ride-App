@@ -1,8 +1,46 @@
 <div class="popup-overlay" *ngIf="visible">
   <div class="popup">
-    <h3>📢 Nova vožnja</h3>
-    <p>{{ message }}</p>
-    <button (click)="accept.emit()">Prihvati</button>
-    <button (click)="reject.emit()">Odbij</button>
+    <ng-container *ngIf="popupType === 'request'">
+      <h3>📢 New Ride</h3>
+      <p>{{ message }}</p>
+      <div class="button-group">
+        <button class="btn-accept" (click)="onAcceptRequest()">Accept</button>
+        <button class="btn-reject" (click)="onRejectRequest()">Reject</button>
+      </div>
+    </ng-container>
+
+    <ng-container *ngIf="popupType === 'action'">
+      <ng-container *ngIf="isArrivedAtDestination && !showCancellationReason">
+        <h2>Ride Completed!</h2>
+        <p>{{ message }}</p>
+        <div class="button-group">
+          <button class="btn-accept" (click)="onCompleteRide()">Finish Ride</button>
+        </div>
+      </ng-container>
+
+      <ng-container *ngIf="!isArrivedAtDestination && !showCancellationReason">
+        <h2>You have arrived at the pickup location!</h2>
+        <p>{{ message }}</p>
+        <div class="button-group">
+          <button class="btn-accept" (click)="onStartRide()">Start Ride</button>
+          <button class="btn-reject" (click)="onCancelRidePrompt()">Cancel Ride</button>
+        </div>
+      </ng-container>
+
+      <ng-container *ngIf="showCancellationReason && !isArrivedAtDestination">
+        <h2>Reason for Cancelling the Ride</h2>
+        <p>Please provide a detailed reason for cancellation:</p>
+        <textarea [(ngModel)]="cancellationReason"
+                  placeholder="Enter reason (min. 10 characters)"
+                  [ngClass]="{'is-invalid': isReasonInvalid}"></textarea>
+        <div *ngIf="isReasonInvalid" class="error-message">
+          Reason must be at least 10 characters long.
+        </div>
+        <div class="button-group">
+          <button class="btn-reject" (click)="onBackToActions()">Back</button>
+          <button class="btn-accept" (click)="onConfirmCancel()">Confirm Cancellation</button>
+        </div>
+      </ng-container>
+    </ng-container>
   </div>
 </div>
