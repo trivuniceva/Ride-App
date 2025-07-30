@@ -21,6 +21,8 @@ import java.math.RoundingMode;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Set;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 @Service
@@ -91,6 +93,8 @@ public class SplitFareService {
 
         System.out.println(ride.toString());
         ride = rideRepository.save(ride);
+
+        scheduleFailureIfNoDriverResponse(ride.getId());
 
         Long requestorUserId = getUserIdByEmail(ride.getRequestorEmail());
 
@@ -240,4 +244,25 @@ public class SplitFareService {
             // emailService.sendPaymentConfirmation(email, token , pricePerPerson);
         }
     }
+
+    private void scheduleFailureIfNoDriverResponse(Long rideId) {
+        Executors.newSingleThreadScheduledExecutor().schedule(() -> {
+            Ride latestRide = rideRepository.findById(rideId).orElse(null);
+            if (latestRide != null && "PENDING_DRIVER_RESPONSE".equals(latestRide.getRideStatus())) {
+                latestRide.setRideStatus("FAILED");
+                rideRepository.save(latestRide);
+
+                Long requestorUserId = getUserIdByEmail(latestRide.getRequestorEmail());
+                if (requestorUserId != null) {
+                    notificationService.notifyUser(requestorUserId,
+                            "RIDE_FAILED",
+                            "Nijedan vozač nije odgovorio na zahtev za vožnju. Pokušajte ponovo kasnije.",
+                            latestRide.getId(), null, null, null);
+                }
+
+                System.out.println("Vožnja " + rideId + " je označena kao FAILED jer nijedan vozač nije odgovorio u roku.");
+            }
+        }, 15, TimeUnit.SECONDS);
+    }
+
 }
