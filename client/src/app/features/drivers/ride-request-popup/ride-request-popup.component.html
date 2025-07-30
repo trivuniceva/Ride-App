@@ -1,40 +1,44 @@
 <div class="popup-overlay" *ngIf="visible">
   <div class="popup">
     <ng-container *ngIf="popupType === 'request'">
-      <h3>📢 Nova vožnja</h3>
+      <h3>📢 New Ride</h3>
       <p>{{ message }}</p>
-      <button (click)="onAcceptRequest()">Prihvati</button>
-      <button (click)="onRejectRequest()">Odbij</button>
+      <div class="button-group">
+        <button class="btn-accept" (click)="onAcceptRequest()">Accept</button>
+        <button class="btn-reject" (click)="onRejectRequest()">Reject</button>
+      </div>
     </ng-container>
 
     <ng-container *ngIf="popupType === 'action'">
       <ng-container *ngIf="isArrivedAtDestination && !showCancellationReason">
-        <h2>Vožnja je završena!</h2>
-        <p>{{ message }}</p> <div class="button-group">
-        <button class="btn btn-finish" (click)="onCompleteRide()">Završi vožnju</button>
-      </div>
+        <h2>Ride Completed!</h2>
+        <p>{{ message }}</p>
+        <div class="button-group">
+          <button class="btn-accept" (click)="onCompleteRide()">Finish Ride</button>
+        </div>
       </ng-container>
 
       <ng-container *ngIf="!isArrivedAtDestination && !showCancellationReason">
-        <h2>Stigli ste na polaziste!</h2>
-        <p>{{ message }}</p> <div class="button-group">
-        <button class="btn btn-cancel" (click)="onCancelRidePrompt()">Otkaži vožnju</button>
-        <button class="btn btn-start" (click)="onStartRide()">Započni vožnju</button>
-      </div>
+        <h2>You have arrived at the pickup location!</h2>
+        <p>{{ message }}</p>
+        <div class="button-group">
+          <button class="btn-accept" (click)="onStartRide()">Start Ride</button>
+          <button class="btn-reject" (click)="onCancelRidePrompt()">Cancel Ride</button>
+        </div>
       </ng-container>
 
       <ng-container *ngIf="showCancellationReason && !isArrivedAtDestination">
-        <h2>Razlog otkazivanja vožnje</h2>
-        <p>Molimo navedite detaljan razlog otkazivanja:</p>
+        <h2>Reason for Cancelling the Ride</h2>
+        <p>Please provide a detailed reason for cancellation:</p>
         <textarea [(ngModel)]="cancellationReason"
-                  placeholder="Unesite razlog (min. 10 karaktera)"
+                  placeholder="Enter reason (min. 10 characters)"
                   [ngClass]="{'is-invalid': isReasonInvalid}"></textarea>
         <div *ngIf="isReasonInvalid" class="error-message">
-          Razlog mora imati najmanje 10 karaktera.
+          Reason must be at least 10 characters long.
         </div>
         <div class="button-group">
-          <button class="btn btn-back" (click)="onBackToActions()">Nazad</button>
-          <button class="btn btn-confirm-cancel" (click)="onConfirmCancel()">Potvrdi otkazivanje</button>
+          <button class="btn-reject" (click)="onBackToActions()">Back</button>
+          <button class="btn-accept" (click)="onConfirmCancel()">Confirm Cancellation</button>
         </div>
       </ng-container>
     </ng-container>
