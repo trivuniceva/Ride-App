@@ -11,10 +11,7 @@ import ridemanagement.backend.model.Ride;
 import ridemanagement.backend.service.RideService;
 import ridemanagement.backend.service.SplitFareService;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.NoSuchElementException;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @RestController
@@ -137,4 +134,13 @@ public class RideController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("error", "Greška pri otkazivanju vožnje: " + e.getMessage()));
         }
     }
+
+    @PostMapping("/ride/{rideId}/complete")
+    public ResponseEntity<Map<String, String>> completeRide(@PathVariable Long rideId) {
+        rideService.completeRide(rideId);
+        Map<String, String> response = new HashMap<>();
+        response.put("message", "Vožnja " + rideId + " je uspešno završena.");
+        return ResponseEntity.ok(response);
+    }
+
 }

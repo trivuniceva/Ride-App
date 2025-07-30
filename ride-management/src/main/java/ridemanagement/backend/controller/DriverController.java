@@ -68,14 +68,19 @@ public class DriverController {
     @GetMapping("/{id}")
     public ResponseEntity<DriverDTO> getDriverById(@PathVariable Long id) {
         try {
-            DriverDTO driverDTO = driverService.getDriverDTOById(id); // Using DriverDTO as per your /all endpoint
+            DriverDTO driverDTO = driverService.getDriverDTOById(id);
             return ResponseEntity.ok(driverDTO);
         } catch (NoSuchElementException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build(); // Return 404 if not found
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         } catch (Exception e) {
             System.err.println("Error fetching driver by ID: " + e.getMessage());
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build(); // Generic error
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
 
+    @PostMapping("/drivers/set-unavailable/{driverId}")
+    public ResponseEntity<String> setDriverUnavailable(@PathVariable Long driverId) {
+        driverService.setDriverBusyForNewRide(driverId);
+        return ResponseEntity.ok("Vozač " + driverId + " je postavljen kao nedostupan.");
+    }
 }

@@ -106,4 +106,7 @@ export class RideService {
     return this.http.post(`${this.apiUrl}/ride/${rideId}/cancel`, { reason });
   }
 
+  completeRideByDriver(rideId: number): Observable<any> {
+    return this.http.post(`${this.apiUrl}/ride/${rideId}/complete`, {});
+  }
 }

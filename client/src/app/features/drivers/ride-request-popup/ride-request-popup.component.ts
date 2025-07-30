@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output, OnInit } from '@angular/core';
+import { Component, EventEmitter, Input, Output, OnInit, OnChanges, SimpleChanges } from '@angular/core';
 import { NgIf, NgClass } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
@@ -13,7 +13,7 @@ import { FormsModule } from '@angular/forms';
   templateUrl: './ride-request-popup.component.html',
   styleUrl: './ride-request-popup.component.css'
 })
-export class RideRequestPopupComponent implements OnInit {
+export class RideRequestPopupComponent implements OnInit, OnChanges {
   @Input() visible = false;
   @Input() message: string = '';
   @Input() popupType: 'request' | 'action' = 'request';
@@ -22,14 +22,24 @@ export class RideRequestPopupComponent implements OnInit {
   @Output() accept = new EventEmitter<void>();
   @Output() reject = new EventEmitter<void>();
 
-  @Output() rideAction = new EventEmitter<{ action: 'start' | 'cancel', reason?: string }>();
+  @Output() rideAction = new EventEmitter<{ action: 'start' | 'cancel' | 'complete', reason?: string }>();
 
   showCancellationReason: boolean = false;
   cancellationReason: string = '';
   isReasonInvalid: boolean = false;
+  isArrivedAtDestination: boolean = false;
 
   ngOnInit(): void {
     this.resetState();
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['message'] && changes['message'].currentValue) {
+      this.checkIfArrivedAtDestination(changes['message'].currentValue);
+    }
+    if (changes['visible'] && !changes['visible'].currentValue) {
+      this.resetState();
+    }
   }
 
   onAcceptRequest(): void {
@@ -69,9 +79,19 @@ export class RideRequestPopupComponent implements OnInit {
     this.isReasonInvalid = false;
   }
 
+  onCompleteRide(): void {
+    this.rideAction.emit({ action: 'complete' });
+    this.resetState();
+  }
+
+  private checkIfArrivedAtDestination(message: string): void {
+    this.isArrivedAtDestination = message.toLowerCase().includes('odredište');
+  }
+
   private resetState(): void {
     this.showCancellationReason = false;
     this.cancellationReason = '';
     this.isReasonInvalid = false;
+    this.isArrivedAtDestination = false;
   }
 }

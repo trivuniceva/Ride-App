@@ -1,7 +1,5 @@
-<!-- src/app/features/ride/components/ride-request-popup/ride-request-popup.component.html -->
 <div class="popup-overlay" *ngIf="visible">
   <div class="popup">
-    <!-- Prikaz za tip 'request' (prihvatanje/odbijanje vožnje) -->
     <ng-container *ngIf="popupType === 'request'">
       <h3>📢 Nova vožnja</h3>
       <p>{{ message }}</p>
@@ -9,18 +7,23 @@
       <button (click)="onRejectRequest()">Odbij</button>
     </ng-container>
 
-    <!-- Prikaz za tip 'action' (započinjanje/otkazivanje vožnje) -->
     <ng-container *ngIf="popupType === 'action'">
-      <ng-container *ngIf="!showCancellationReason">
-        <h2>Vozač je stigao!</h2>
-        <p>{{ message }}</p> <!-- Poruka će biti "Stigli ste na početnu adresu..." -->
-        <div class="button-group">
-          <button class="btn btn-cancel" (click)="onCancelRidePrompt()">Otkaži vožnju</button>
-          <button class="btn btn-start" (click)="onStartRide()">Započni vožnju</button>
-        </div>
+      <ng-container *ngIf="isArrivedAtDestination && !showCancellationReason">
+        <h2>Vožnja je završena!</h2>
+        <p>{{ message }}</p> <div class="button-group">
+        <button class="btn btn-finish" (click)="onCompleteRide()">Završi vožnju</button>
+      </div>
       </ng-container>
 
-      <ng-container *ngIf="showCancellationReason">
+      <ng-container *ngIf="!isArrivedAtDestination && !showCancellationReason">
+        <h2>Stigli ste na polaziste!</h2>
+        <p>{{ message }}</p> <div class="button-group">
+        <button class="btn btn-cancel" (click)="onCancelRidePrompt()">Otkaži vožnju</button>
+        <button class="btn btn-start" (click)="onStartRide()">Započni vožnju</button>
+      </div>
+      </ng-container>
+
+      <ng-container *ngIf="showCancellationReason && !isArrivedAtDestination">
         <h2>Razlog otkazivanja vožnje</h2>
         <p>Molimo navedite detaljan razlog otkazivanja:</p>
         <textarea [(ngModel)]="cancellationReason"

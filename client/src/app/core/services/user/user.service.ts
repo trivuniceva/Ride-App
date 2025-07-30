@@ -162,4 +162,9 @@ export class UserService {
       })
     );
   }
+
+  setDriverUnavailable(driverId: number): Observable<any> {
+    return this.http.post(`${this.driverApiUrl}/set-unavailable/${driverId}`, {});
+  }
+
 }

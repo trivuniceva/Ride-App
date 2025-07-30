@@ -102,4 +102,17 @@ public class RideService {
         }
     }
 
+    @Transactional
+    public void completeRide(Long rideId) {
+        Ride ride = rideRepository.findById(rideId)
+                .orElseThrow(() -> new NoSuchElementException("Ride not found with ID: " + rideId));
+
+        ride.setRideStatus("COMPLETED");
+        rideRepository.save(ride);
+
+        if (ride.getDriverId() != null) {
+            driverService.updateDriverAvailabilityAfterRideCompletion(ride.getDriverId());
+        }
+
+    }
 }

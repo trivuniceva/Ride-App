@@ -1,7 +1,6 @@
-// src/app/core/services/ride-reorder/ride-reorder.service.ts
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
-import { Ride } from '../../models/ride.model'; // Uverite se da je putanja ispravna
+import { Ride } from '../../models/ride.model';
 
 @Injectable({
   providedIn: 'root'

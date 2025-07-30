@@ -68,9 +68,11 @@ public class RideSimulationService {
             }
 
             if (driver != null) {
-                driver.setAvailable(true);
-                driver.setHasFutureDrive(false);
-                driverService.save(driver);
+//                driver.setAvailable(true);
+//                driver.setHasFutureDrive(false);
+//                driverService.save(driver);
+                driverService.updateDriverAvailabilityAfterRideCompletion(driver.getId());
+
             }
 
         } catch (Exception e) {
@@ -163,6 +165,18 @@ public class RideSimulationService {
         simulatePathMovement(ride, driver, actualRidePath, "RIDE_IN_PROGRESS", requestorUserId);
 
         System.out.println("Vožnja " + ride.getId() + " stigla na odredište.");
+
+        if (driver != null && driver.getId() != null) {
+            notificationService.notifyDriverArrivedAtPickup(
+                    driver.getId(),
+                    ride.getId(),
+                    "Stigli ste na odredište. Da li želite da završite vožnju?"
+            );
+        }
+
+        if (requestorUserId != null) {
+            notificationService.notifyUser(requestorUserId, "RIDE_ARRIVED_AT_DESTINATION", "Vožnja je stigla na odredište!", ride.getId(), null, null, null);
+        }
     }
 
     private void simulatePathMovement(Ride ride, Driver driver, List<Point> path, String notificationType, Long requestorUserId) throws InterruptedException {
