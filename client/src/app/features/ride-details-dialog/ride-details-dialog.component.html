@@ -6,7 +6,6 @@
     </button>
   </div>
 
-  <!-- Three-column content -->
   <div class="dialog-content">
     <!-- Column 1: Ride Info -->
     <div class="ride-info">
@@ -51,7 +50,11 @@
       <mat-icon>rate_review</mat-icon> Rate the ride and the driver
     </button>
 
-    <button mat-raised-button color="primary" class="order-again-btn" (click)="orderNow()">
+    <button *ngIf="loggedUser?.userRole !== 'DRIVER'"
+            mat-raised-button
+            color="primary"
+            class="order-again-btn"
+            (click)="orderNow()">
       Order Again
     </button>
 
