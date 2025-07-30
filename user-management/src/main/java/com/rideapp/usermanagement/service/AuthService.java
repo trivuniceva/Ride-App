@@ -33,12 +33,13 @@ public class AuthService {
             if(user.getUserRole().equals(UserRole.DRIVER)){
                 System.out.println("ovo je driver");
                 System.out.println(user.toString());
-                return user;
-
+                if(user.isActive())
+                    return user;
             }
             else {
                 System.out.println("dobar korisnik: " + user.getProfilePic());
-                return user;
+                if(user.isActive())
+                    return user;
             }
         }
         return null;
