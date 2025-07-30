@@ -50,7 +50,7 @@
       <mat-icon>rate_review</mat-icon> Rate the ride and the driver
     </button>
 
-    <button *ngIf="loggedUser?.userRole !== 'DRIVER'"
+    <button *ngIf="loggedUser?.userRole === 'REGISTERED_USER'"
             mat-raised-button
             color="primary"
             class="order-again-btn"
