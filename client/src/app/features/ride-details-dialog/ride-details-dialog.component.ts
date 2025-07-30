@@ -11,6 +11,8 @@ import { AuthService } from '../../core/services/auth/auth.service';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { RideDetailsMapComponent } from '../ride-details-map/ride-details-map.component';
 import { RateRideDialogComponent } from '../rate-ride-dialog/rate-ride-dialog.component';
+import { Router } from '@angular/router';
+import {RideReorderService} from '../../core/services/ride-reorder/ride-reorder-service.service';
 
 @Component({
   selector: 'app-ride-details-dialog',
@@ -21,7 +23,6 @@ import { RateRideDialogComponent } from '../rate-ride-dialog/rate-ride-dialog.co
     MatIconModule,
     RideDetailsMapComponent,
     MatProgressSpinnerModule,
-    // RateRideDialogComponent
   ],
   templateUrl: './ride-details-dialog.component.html',
   styleUrls: ['./ride-details-dialog.component.css']
@@ -30,7 +31,7 @@ export class RideDetailsDialogComponent implements OnInit {
   ride: Ride;
   driver: Driver | null = null;
   isLoadingDriver: boolean = false;
-  loggedUser: User | null = null; // Ovo već imaš
+  loggedUser: User | null = null;
 
   startCoords: [number, number] | null = null;
   destinationCoords: [number, number] | null = null;
@@ -42,7 +43,9 @@ export class RideDetailsDialogComponent implements OnInit {
     @Inject(MAT_DIALOG_DATA) public data: { ride: Ride },
     private driverService: DriverService,
     private authService: AuthService,
-    private dialog: MatDialog
+    private dialog: MatDialog,
+    private rideReorderService: RideReorderService,
+    private router: Router
   ) {
     this.ride = data.ride;
   }
@@ -65,7 +68,12 @@ export class RideDetailsDialogComponent implements OnInit {
           averageRating: (loggedUser as Driver).averageRating
         };
       } else {
-        this.fetchDriverDetailsFromBackend(this.ride.driverId);
+        if (this.ride.driverId) {
+          this.fetchDriverDetailsFromBackend(this.ride.driverId);
+        } else {
+          this.driver = null;
+          this.isLoadingDriver = false;
+        }
       }
     });
   }
@@ -119,13 +127,6 @@ export class RideDetailsDialogComponent implements OnInit {
     const threeDaysAgo = new Date();
     threeDaysAgo.setDate(threeDaysAgo.getDate() - 3);
 
-    // console.log('Logged User:', this.loggedUser);
-    // console.log('User Role is REGISTERED_USER:', isRegisteredUser);
-    // console.log('Ride Status is FINISHED:', rideFinished);
-    // console.log('Ride Created At:', createdAt);
-    // console.log('Three Days Ago:', threeDaysAgo);
-    // console.log('Ride within 3 days:', createdAt >= threeDaysAgo);
-
     return isRegisteredUser && rideFinished && createdAt >= threeDaysAgo;
   }
 
@@ -156,7 +157,9 @@ export class RideDetailsDialogComponent implements OnInit {
   }
 
   orderNow(): void {
-    this.dialogRef.close('orderNow');
+    this.rideReorderService.setRideToReorder(this.ride);
+    this.dialogRef.close();
+    this.router.navigate(['/order-ride']);
   }
 
   orderLater(): void {

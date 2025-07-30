@@ -67,7 +67,7 @@ public class NotificationService {
                     "/queue/ride-updates",
                     jsonMessage
             );
-            System.out.println("Poslato ažuriranje lokacije vozača za vožnju " + rideId + " korisniku " + userId + ": " + latitude + ", " + longitude);
+//            System.out.println("Poslato ažuriranje lokacije vozača za vožnju " + rideId + " korisniku " + userId + ": " + latitude + ", " + longitude);
         } catch (JsonProcessingException e) {
             System.err.println("Greška prilikom serijalizacije obaveštenja o lokaciji vozača: " + e.getMessage());
         }

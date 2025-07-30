@@ -19,7 +19,7 @@ import { BaseChartDirective } from 'ng2-charts';
 import { ChartConfiguration, ChartType, ChartData } from 'chart.js';
 import { Chart as ChartJS, LineController, LineElement, PointElement, LinearScale, Title, CategoryScale, Tooltip, Legend } from 'chart.js';
 import { FavoriteRouteService, FavoriteRoute } from '../../core/services/favorite-route/favorite-route.service';
-import { PointDTO } from '../../core/models/PointDTO.model'; 
+import { PointDTO } from '../../core/models/PointDTO.model';
 
 ChartJS.register(
   LineController,
@@ -337,9 +337,6 @@ export class RideHistoryComponent implements OnInit, AfterViewInit {
     });
 
     dialogRef.afterClosed().subscribe(result => {
-      if (result === 'orderNow') {
-      } else if (result === 'orderLater') {
-      }
     });
   }
 
@@ -402,7 +399,6 @@ export class RideHistoryComponent implements OnInit, AfterViewInit {
   }
 
   private getExistingFavoriteRoute(ride: Ride): FavoriteRoute | undefined {
-    // Proverava da li postoji omiljena ruta sa istim ključnim karakteristikama
     return this.userFavoriteRoutes.find(favRoute =>
       favRoute.userEmail === this.loggedUser?.email &&
       favRoute.startAddress === ride.startAddress &&

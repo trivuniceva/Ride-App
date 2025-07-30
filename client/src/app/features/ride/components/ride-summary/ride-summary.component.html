@@ -5,9 +5,10 @@
     <div class="route-details">
       <h3>Route Details</h3>
       <p><strong>Start Address:</strong> {{ routeData.startAddress }}</p>
-      <p><strong>Stops:</strong> {{ routeData.stops.join(', ') }}</p>
+      <p><strong>Stops:</strong> {{ routeData.stops?.join(', ') || 'Nema međustanica' }}</p>
       <p><strong>Destination Address:</strong> {{ routeData.destinationAddress }}</p>
       <p><strong>Vehicle Type:</strong> {{ routeData.vehicleType }}</p>
+      <p><strong>Total Price:</strong> {{ fullPrice | currency:'RSD ':'symbol':'1.2-2' }}</p>
     </div>
 
     <div class="additional-options">

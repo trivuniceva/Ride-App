@@ -19,6 +19,7 @@ export class MapTestComponent implements OnInit, OnChanges, AfterViewInit, OnDes
   @Input() activeDriverId: number | null = null;
 
   private map!: L.Map;
+  private mapInitialized: boolean = false;
   private routeLine: L.Polyline | null = null;
   private driverMarkers: L.Marker[] = [];
   private activeDriverMarker: L.Marker | null = null;
@@ -55,6 +56,9 @@ export class MapTestComponent implements OnInit, OnChanges, AfterViewInit, OnDes
 
   ngOnInit(): void {
     this.initializeMap();
+    queueMicrotask(() => {
+      this.drawInitialMapContent();
+    });
   }
 
   ngAfterViewInit(): void {
@@ -66,6 +70,11 @@ export class MapTestComponent implements OnInit, OnChanges, AfterViewInit, OnDes
 
   ngOnChanges(changes: SimpleChanges): void {
     console.log('ngOnChanges (MapTestComponent):', changes);
+
+    if (!this.mapInitialized) {
+      console.warn("Map not initialized in ngOnChanges, skipping map operations for now. Will re-evaluate on map init or next change.");
+      return;
+    }
 
     if (
       changes['startCoords'] ||
@@ -88,7 +97,7 @@ export class MapTestComponent implements OnInit, OnChanges, AfterViewInit, OnDes
       }
     }
 
-    if (changes['drivers'] || changes['activeDriverId']) {
+    if (changes['drivers']) {
       this.drawStaticDrivers();
     }
 
@@ -100,11 +109,12 @@ export class MapTestComponent implements OnInit, OnChanges, AfterViewInit, OnDes
   ngOnDestroy(): void {
     if (this.map) {
       this.map.remove();
+      this.mapInitialized = false;
     }
   }
 
   private initializeMap(): void {
-    if (this.map) return;
+    if (this.mapInitialized) return;
 
     this.map = L.map('map').setView([45.2396, 19.8227], 13);
 
@@ -113,9 +123,41 @@ export class MapTestComponent implements OnInit, OnChanges, AfterViewInit, OnDes
       subdomains: 'abcd',
       maxZoom: 20,
     }).addTo(this.map);
+
+    this.mapInitialized = true;
+    console.log('Map initialized and mapInitialized flag set to true.');
   }
 
+  private drawInitialMapContent(): void {
+    if (!this.mapInitialized) {
+      console.error("drawInitialMapContent called but map not initialized! This should not happen.");
+      return;
+    }
+    console.log("drawInitialMapContent called. Drawing initial inputs.");
+
+    if (this.startCoords && this.destinationCoords && this.alternativeRoutes.length > 0) {
+      this.drawRoute();
+    } else if (this.startCoords || this.destinationCoords) {
+      this.drawRoute();
+    }
+
+
+    if (this.drivers && this.drivers.length > 0) {
+      this.drawStaticDrivers();
+    }
+
+    if (this.activeDriverLocation || this.activeDriverId !== null) {
+      this.updateActiveDriverLocation();
+    }
+  }
+
+
   private drawRoute(): void {
+    if (!this.mapInitialized) {
+      console.warn("Map not initialized, cannot draw route.");
+      return;
+    }
+
     if (this.routeLine) {
       this.map.removeLayer(this.routeLine);
     }
@@ -126,11 +168,13 @@ export class MapTestComponent implements OnInit, OnChanges, AfterViewInit, OnDes
       }
     });
 
-    this.routeLine = L.polyline(this.alternativeRoutes, { color: 'green', weight: 5 }).addTo(this.map);
-
-    if (this.routeLine.getLatLngs().length > 0) {
-      this.map.fitBounds(this.routeLine.getBounds(), { padding: [50, 50] });
+    if (this.alternativeRoutes && this.alternativeRoutes.length > 0) {
+      this.routeLine = L.polyline(this.alternativeRoutes, { color: 'green', weight: 5 }).addTo(this.map);
+      if (this.routeLine.getLatLngs().length > 0) {
+        this.map.fitBounds(this.routeLine.getBounds(), { padding: [50, 50] });
+      }
     }
+
 
     if (this.startCoords) {
       L.marker(this.startCoords, { icon: L.icon({
@@ -164,6 +208,11 @@ export class MapTestComponent implements OnInit, OnChanges, AfterViewInit, OnDes
   }
 
   private drawStaticDrivers(): void {
+    if (!this.mapInitialized) {
+      console.warn("Map not initialized, cannot draw static drivers.");
+      return;
+    }
+
     this.driverMarkers.forEach(marker => this.map.removeLayer(marker));
     this.driverMarkers = [];
 
@@ -232,6 +281,11 @@ export class MapTestComponent implements OnInit, OnChanges, AfterViewInit, OnDes
   }
 
   private updateActiveDriverLocation(): void {
+    if (!this.mapInitialized) {
+      console.warn("Map not initialized, cannot update active driver location.");
+      return;
+    }
+
     if (!this.activeDriverLocation || this.activeDriverId === null) {
       if (this.activeDriverMarker) {
         this.map.removeLayer(this.activeDriverMarker);
@@ -269,6 +323,10 @@ export class MapTestComponent implements OnInit, OnChanges, AfterViewInit, OnDes
   }
 
   clearActiveDriverPath(): void {
+    if (!this.mapInitialized) {
+      console.warn("Map not initialized, cannot clear active driver path.");
+      return;
+    }
     if (this.activeDriverPathLine) {
       this.map.removeLayer(this.activeDriverPathLine);
       this.activeDriverPathLine = null;

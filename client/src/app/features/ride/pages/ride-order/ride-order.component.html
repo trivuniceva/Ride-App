@@ -15,7 +15,9 @@
         [expectedTime]="expectedTime"
         (activeDriverLocationChange)="handleActiveDriverLocationChange($event)"
         (activeDriverIdChange)="handleActiveDriverIdChange($event)"
-        [currentRideId]="activeRideId" (rideCreated)="handleRideCreated($event)" ></app-advanced-form-page>
+        [currentRideId]="activeRideId"
+        (rideCreated)="handleRideCreated($event)"
+        (showSummaryPopup)="showPopup = $event"> </app-advanced-form-page>
     </div>
 
     <div *ngIf="userRole !== 'REGISTERED_USER'">

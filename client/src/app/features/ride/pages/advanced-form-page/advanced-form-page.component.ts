@@ -8,7 +8,6 @@ import { VehicleTypeComponent } from '../../components/vehicle-type/vehicle-type
 import { AdditionalOptionsComponent } from '../../components/additional-options/additional-options.component';
 import { SplitFareComponent } from '../../components/split-fare/split-fare.component';
 import { RideSummaryComponent } from '../../components/ride-summary/ride-summary.component';
-import { RideTrackingPopupComponent } from '../../components/ride-tracking-popup/ride-tracking-popup.component';
 
 import { WebSocketService } from '../../../../core/services/web-socket.service';
 import {PointDTO} from '../../../../core/models/PointDTO.model';
@@ -16,6 +15,8 @@ import {RideService} from '../../../../core/services/ride/ride.service';
 import {AuthService} from '../../../../core/services/auth/auth.service';
 import {FavoriteRouteService} from '../../../../core/services/favorite-route/favorite-route.service';
 import {User} from '../../../../core/models/user.model';
+import { Ride } from '../../../../core/models/ride.model';
+import {RideReorderService} from '../../../../core/services/ride-reorder/ride-reorder-service.service';
 
 @Component({
   selector: 'app-advanced-form-page',
@@ -27,7 +28,6 @@ import {User} from '../../../../core/models/user.model';
     AdditionalOptionsComponent,
     SplitFareComponent,
     RideSummaryComponent,
-    // RideTrackingPopupComponent
   ],
   templateUrl: './advanced-form-page.component.html',
   styleUrl: './advanced-form-page.component.css',
@@ -78,6 +78,8 @@ export class AdvancedFormPageComponent implements OnInit, AfterViewInit, OnDestr
     distance: number | undefined;
     duration: number | undefined;
   }>();
+  @Output() showSummaryPopup = new EventEmitter<boolean>();
+
 
   routeData: {
     startAddress: string;
@@ -99,12 +101,14 @@ export class AdvancedFormPageComponent implements OnInit, AfterViewInit, OnDestr
 
   private authSubscription: Subscription | undefined;
   private wsSubscription: Subscription | undefined;
+  private reorderSubscription: Subscription | undefined;
 
   constructor(
     private rideService: RideService,
     private authService: AuthService,
     private favoriteRouteService: FavoriteRouteService,
-    private webSocketService: WebSocketService
+    private webSocketService: WebSocketService,
+    private rideReorderService: RideReorderService
   ) {}
 
   ngOnInit(): void {
@@ -113,11 +117,6 @@ export class AdvancedFormPageComponent implements OnInit, AfterViewInit, OnDestr
       if (user && user.id && user.email) {
         this.requestorEmail = user.email;
         this.currentUserId = user.id;
-        // if (user.userRole === 'REGISTERED_USER') {
-        //   if (!this.wsSubscription || this.wsSubscription.closed || !this.webSocketService.isWebSocketConnected()) {
-        //     this.subscribeToRideNotifications(user.id);
-        //   }
-        // }
       } else {
         this.requestorEmail = '';
         this.currentUserId = null;
@@ -125,6 +124,13 @@ export class AdvancedFormPageComponent implements OnInit, AfterViewInit, OnDestr
           this.wsSubscription.unsubscribe();
           this.wsSubscription = undefined;
         }
+      }
+    });
+
+    this.reorderSubscription = this.rideReorderService.currentRideToReorder$.subscribe(ride => {
+      if (ride) {
+        this.populateFormWithRideData(ride);
+        this.rideReorderService.clearRideToReorder();
       }
     });
   }
@@ -148,9 +154,6 @@ export class AdvancedFormPageComponent implements OnInit, AfterViewInit, OnDestr
   }
 
   ngAfterViewInit(): void {
-    if (this.vehicleType) {
-      this.showRoute();
-    }
   }
 
   ngOnDestroy(): void {
@@ -160,6 +163,9 @@ export class AdvancedFormPageComponent implements OnInit, AfterViewInit, OnDestr
     }
     if (this.wsSubscription) {
       this.wsSubscription.unsubscribe();
+    }
+    if (this.reorderSubscription) {
+      this.reorderSubscription.unsubscribe();
     }
   }
 
@@ -183,19 +189,18 @@ export class AdvancedFormPageComponent implements OnInit, AfterViewInit, OnDestr
   }
 
   showRoute(): void {
-    if (this.routeForm) {
-      const routeData = {
-        startAddress: this.routeForm.startAddressValue,
-        stops: this.routeForm.stops,
-        destinationAddress: this.routeForm.destinationAddressValue,
-        startLocation: this.routeForm.startLocationValue,
-        stopLocations: this.routeForm.stopLocations,
-        destinationLocation: this.routeForm.destinationLocationValue,
-        vehicleType: this.vehicleType,
-      };
-      this.handleRouteData(routeData);
-    }
+    const routeDataToUse = this.routeData.startAddress ? this.routeData : {
+      startAddress: this.routeForm.startAddressValue,
+      stops: this.routeForm.stops,
+      destinationAddress: this.routeForm.destinationAddressValue,
+      startLocation: this.routeForm.startLocationValue,
+      stopLocations: this.routeForm.stopLocations,
+      destinationLocation: this.routeForm.destinationLocationValue,
+      vehicleType: this.vehicleType,
+    };
+    this.handleRouteData(routeDataToUse);
   }
+
 
   handleRouteData(routeData: {
     startAddress: string;
@@ -208,6 +213,19 @@ export class AdvancedFormPageComponent implements OnInit, AfterViewInit, OnDestr
   }): void {
     this.routeData = routeData;
     console.log('Route Data with Coordinates: ->>>>>', this.routeData);
+
+    this.startAddress = routeData.startAddress;
+    this.stops = routeData.stops;
+    this.destinationAddress = routeData.destinationAddress;
+    if (routeData.startLocation) {
+      this.startLocation = [routeData.startLocation.latitude, routeData.startLocation.longitude];
+    }
+    this.stopLocations = routeData.stopLocations.map(loc => [loc.latitude, loc.longitude]);
+    if (routeData.destinationLocation) {
+      this.destinationLocation = [routeData.destinationLocation.latitude, routeData.destinationLocation.longitude];
+    }
+    this.vehicleType = routeData.vehicleType;
+
     this.routeDataSubmitted.emit({
       ...routeData,
       distance: this.totalLength,
@@ -218,9 +236,6 @@ export class AdvancedFormPageComponent implements OnInit, AfterViewInit, OnDestr
   handleVehicleTypeSelected(selectedType: string) {
     console.log(selectedType);
     this.vehicleType = selectedType;
-    if (this.routeForm) {
-      this.showRoute();
-    }
   }
 
   handlePaymentConfirmation() {
@@ -290,6 +305,7 @@ export class AdvancedFormPageComponent implements OnInit, AfterViewInit, OnDestr
 
   handlePopupClosed() {
     this.showPopup = false;
+    this.showSummaryPopup.emit(false);
   }
 
   onRideTrackingPopupClosed() {
@@ -411,5 +427,51 @@ export class AdvancedFormPageComponent implements OnInit, AfterViewInit, OnDestr
       }
     });
   }
-}
 
+  private populateFormWithRideData(ride: Ride): void {
+    console.log('Populating form with ride data for reorder:', ride);
+    this.startAddress = ride.startAddress;
+    this.stops = ride.stops || [];
+    this.destinationAddress = ride.destinationAddress;
+
+    if (ride.startLocation) {
+      this.startLocation = [ride.startLocation.latitude, ride.startLocation.longitude];
+    } else {
+      this.startLocation = null;
+    }
+
+    this.stopLocations = ride.stopLocations?.map(p => [p.latitude, p.longitude]) || [];
+
+    if (ride.destinationLocation) {
+      this.destinationLocation = [ride.destinationLocation.latitude, ride.destinationLocation.longitude];
+    } else {
+      this.destinationLocation = null;
+    }
+
+    this.vehicleType = ride.vehicleType;
+    this.additionalOptions = {
+      carriesBabies: ride.carriesBabies,
+      carriesPets: ride.carriesPets
+    };
+    this.passengers = ride.passengers || [this.requestorEmail];
+    this.splitFareEmails = ride.passengers?.filter(email => email !== this.requestorEmail) || [];
+    this.fullPrice = ride.fullPrice;
+    this.totalLength = ride.totalLength;
+    this.expectedTime = ride.expectedTime;
+
+    this.routeData = {
+      startAddress: this.startAddress,
+      stops: this.stops,
+      destinationAddress: this.destinationAddress,
+      startLocation: this.startLocation ? { latitude: this.startLocation[0], longitude: this.startLocation[1] } : null,
+      stopLocations: this.stopLocations.map(loc => ({ latitude: loc[0], longitude: loc[1] })),
+      destinationLocation: this.destinationLocation ? { latitude: this.destinationLocation[0], longitude: this.destinationLocation[1] } : null,
+      vehicleType: this.vehicleType,
+    };
+
+    this.handleRouteData(this.routeData);
+
+    this.currentStep = 3;
+    this.processPayment();
+  }
+}

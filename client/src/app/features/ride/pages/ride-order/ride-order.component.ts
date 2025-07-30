@@ -56,6 +56,7 @@ export class RideOrderComponent implements OnInit, OnDestroy {
 
   private authSubscription: Subscription | undefined;
   private driverSubscription: Subscription | undefined;
+  showPopup: boolean = false;
 
   constructor(private authService: AuthService, private driverService: DriverService, private ngZone: NgZone) {}
 

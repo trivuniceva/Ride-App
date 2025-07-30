@@ -60,7 +60,7 @@ public class RideSimulationService {
             simulateActualRide(ride, driver, requestorUserId);
 
             ride.setRideStatus("COMPLETED");
-            ride.setDriverId(null);
+            System.out.println(ride.getDriverId());
             rideRepository.save(ride);
 
             if (requestorUserId != null) {
