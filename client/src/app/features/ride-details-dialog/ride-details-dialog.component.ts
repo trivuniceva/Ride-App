@@ -122,7 +122,7 @@ export class RideDetailsDialogComponent implements OnInit {
     if (!this.loggedUser) return false;
 
     const isRegisteredUser = this.loggedUser.userRole === 'REGISTERED_USER';
-    const rideFinished = this.ride.rideStatus === 'FINISHED';
+    const rideFinished = this.ride.rideStatus === 'COMPLETED';
     const createdAt = new Date(this.ride.createdAt);
     const threeDaysAgo = new Date();
     threeDaysAgo.setDate(threeDaysAgo.getDate() - 3);
