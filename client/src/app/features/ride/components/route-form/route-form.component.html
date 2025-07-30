@@ -5,18 +5,18 @@
         type="text"
         id="startAddress"
         #startAddressInput
-      placeholder="Pickup"
-      class="form-control"
-      (input)="onStartAddressInput($event)"
-      [matAutocomplete]="startAuto"
-      [value]="startAddressValue"
+        placeholder="Pickup"
+        class="form-control"
+        (input)="onStartAddressInput($event)"
+        [matAutocomplete]="startAuto"
+        [value]="startAddressValue"
       />
       <mat-autocomplete #startAuto="matAutocomplete" (optionSelected)="onStartAddressSelect($event.option.value)">
         <mat-option
           *ngFor="let addressLoc of startAddressOptions"
           [value]="addressLoc"
         >
-        {{ addressLoc.address }}
+          {{ addressLoc.address }}
         </mat-option>
       </mat-autocomplete>
     </div>
@@ -26,24 +26,23 @@
         type="text"
         id="destinationAddress"
         #destinationAddressInput
-      placeholder="Destination"
-      class="form-control"
-      (input)="onDestinationAddressInput($event)"
-      [matAutocomplete]="destinationAuto"
-      [value]="destinationAddressValue"
+        placeholder="Destination"
+        class="form-control"
+        (input)="onDestinationAddressInput($event)"
+        [matAutocomplete]="destinationAuto"
+        [value]="destinationAddressValue"
       />
       <mat-autocomplete #destinationAuto="matAutocomplete" (optionSelected)="onDestinationAddressSelect($event.option.value)">
         <mat-option
           *ngFor="let addressLoc of destinationAddressOptions"
           [value]="addressLoc"
         >
-        {{ addressLoc.address }}
+          {{ addressLoc.address }}
         </mat-option>
       </mat-autocomplete>
     </div>
 
     <app-stops-form
-      *ngIf="userRole === ''"
       [stops]="stops"
       [stopAddressOptions]="stopAddressOptions"
       (stopsChanged)="onStopsChanged($event)"
@@ -51,8 +50,9 @@
       (stopAddressInputted)="onStopAddressInputted($event)"
     ></app-stops-form>
 
-    <button *ngIf="userRole !== ''" type="submit" class="btn btn-primary">
-      Request
+
+    <button type="submit" class="btn btn-primary">
+      {{ userRole !== 'REGISTERED_USER' ? 'Show Route' : 'Request' }}
     </button>
   </form>
 </div>
