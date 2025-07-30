@@ -14,12 +14,12 @@ import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { MatDatepicker, MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
 import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatInputModule } from '@angular/material/input';
 import { BaseChartDirective } from 'ng2-charts';
 import { ChartConfiguration, ChartType, ChartData } from 'chart.js';
 import { Chart as ChartJS, LineController, LineElement, PointElement, LinearScale, Title, CategoryScale, Tooltip, Legend } from 'chart.js';
 import { FavoriteRouteService, FavoriteRoute } from '../../core/services/favorite-route/favorite-route.service';
 import { PointDTO } from '../../core/models/PointDTO.model';
+import {MatInputModule} from '@angular/material/input';
 
 ChartJS.register(
   LineController,
@@ -62,8 +62,13 @@ export class RideHistoryComponent implements OnInit, AfterViewInit {
   allRides: Ride[] = [];
   userFavoriteRoutes: FavoriteRoute[] = [];
 
-
-  @ViewChild(MatSort) sort!: MatSort;
+  _sort!: MatSort;
+  @ViewChild(MatSort) set sort(value: MatSort) {
+    if (value) {
+      this._sort = value;
+      this.dataSource.sort = this._sort;
+    }
+  }
 
   range = new FormGroup({
     start: new FormControl<Date | null>(null),
@@ -164,10 +169,21 @@ export class RideHistoryComponent implements OnInit, AfterViewInit {
         this.filterAndProcessRides();
       }
     });
+
+    this.dataSource.sortingDataAccessor = (item: Ride, property: string) => {
+      switch (property) {
+        case 'fullPrice': return item.fullPrice;
+        case 'createdAt': return new Date(item.createdAt).getTime();
+        case 'rideStatus': return item.rideStatus;
+        default: return (item as any)[property];
+      }
+    };
   }
 
   ngAfterViewInit(): void {
-    this.dataSource.sort = this.sort;
+    if (this._sort && !this.dataSource.sort) {
+      this.dataSource.sort = this._sort;
+    }
   }
 
   loadRideHistory(): void {
@@ -193,6 +209,9 @@ export class RideHistoryComponent implements OnInit, AfterViewInit {
             return dateB.getTime() - dateA.getTime();
           });
           this.filterAndProcessRides();
+          if (this._sort) {
+            this.dataSource.sort = this._sort;
+          }
         } else {
           this.allRides = [];
           this.dataSource.data = [];
@@ -242,6 +261,9 @@ export class RideHistoryComponent implements OnInit, AfterViewInit {
 
     this.dataSource.data = filteredRides;
     this.processChartData(filteredRides);
+    if (this._sort) {
+      this.dataSource.sort = this._sort;
+    }
   }
 
   clearDateRange(): void {
@@ -342,6 +364,9 @@ export class RideHistoryComponent implements OnInit, AfterViewInit {
 
   toggleCharts(): void {
     this.showCharts = !this.showCharts;
+    if (!this.showCharts && this._sort) {
+      this.dataSource.sort = this._sort;
+    }
   }
 
   toggleFavorite(ride: Ride): void {
