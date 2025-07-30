@@ -25,7 +25,7 @@ export class AuthService {
   login(email: string, password: string): Observable<any> {
     return this.http.post(this.apiUrl + '/login', { email, password }).pipe(
       tap((response: any) => {
-        const user: User = response; // Pretpostavljamo da backend vraća User objekat
+        const user: User = response; 
         this.storageHandle({ user: user });
 
         if (user && user.userRole === 'DRIVER') {
